@@ -19,6 +19,7 @@ SPACE = 32
 OFFT = 20
 SPLINE_COUNT = 2
 TRANSLATE = False
+
 def determine_visible(As, pts):
   pairs = []
   sortkey = lambda x: x[2]

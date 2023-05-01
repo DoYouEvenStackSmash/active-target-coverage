@@ -1,0 +1,61 @@
+{
+  "constants": {
+  },
+  "categories": [
+    {
+      "id" : 0,
+      "name" : "fish",
+      "supercategory" : "None"
+    },
+    {
+      "id" : 1,
+      "name" : "atlantic spadefish",
+      "supercategory" : "fish"
+    }
+  ],
+  "trackmap": [
+    1
+  ],
+  "linked_tracks": [
+    {
+      "track_id": 1,
+      "category_id": 0,
+      "track_len": 1,
+      "steps": [
+        0
+      ]
+    }
+  ],
+  "images": [
+    {
+      "id": 0,
+      "file_name": "two_grunt_1.000000.jpg",
+      "height": 1080,
+      "width": 1920
+    }
+  ],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 0,
+      "category_id": 0,
+      "bbox": [
+        2270.90319824,
+        1507.600341795,
+        1423.2346191399997,
+        607.2868652300001
+      ],
+      "area": 864311.6903443435,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 1,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ]
+    }
+  ]
+}
