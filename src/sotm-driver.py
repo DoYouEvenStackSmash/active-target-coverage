@@ -40,7 +40,6 @@ def get_tracks(steps):
 def visible_targets(A, Tlist):
   pairs = []
   sortkey = lambda x: x[2]
-  # A.obj_tracker.init_new_layer()
   frame_id = "frame_"+str(len(A.obj_tracker.layers))
   for target in Tlist:
     d = mfn.euclidean_dist(A.origin, target.get_origin())
@@ -59,11 +58,8 @@ def visible_targets(A, Tlist):
 
       yb = sann.register_annotation(0, dc, frame_id)
       add_list.append(yb)
-      # A.obj_tracker.add_new_element_to_layer(yb)
     c+=1
   A.obj_tracker.add_new_layer(add_list)
-  # print(A.obj_tracker.layers)
-  # if (len(A.obj_tracker.layers) > 1):
   A.obj_tracker.process_layer(len(A.obj_tracker.layers) - 1)
 
 def export_tracks(A, screen):
@@ -82,14 +78,18 @@ def export_tracks(A, screen):
     A.obj_tracker.get_track(i).get_loco_track(fdict=None, steps=steps)
     track_steps.append(steps)
   for s in track_steps:
+    for st in s:
+      print(st)
+    print("-----------------------------")
     t = get_tracks(s)
     for i in range(1, len(t)):
       pafn.frame_draw_line(screen, (t[i-1], t[i]), pafn.colors["magenta"])
-  pygame.display.update
+  pgn = A.get_polygon()
+  pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
     # print(s)
   
 
-def moving_target(screen, A, T):
+def moving_target(screen, Alist, Tlist):
   dest = None
   while 1:
     for event in pygame.event.get():
@@ -97,38 +97,66 @@ def moving_target(screen, A, T):
         # LCTRL for exit hotkey
         if pygame.key.get_mods() == LCTRL:
           pafn.clear_frame(screen)
-          export_tracks(A, screen)
+          for A in Alist:
+            # pgn = A.get_polygon()
+            # pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+            export_tracks(A, screen)
+          pygame.display.update()
 
           # sys.exit()
         elif pygame.key.get_mods() == LALT:
           pafn.clear_frame(screen)
-          pgn = A.get_polygon()
-          pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+          for A in Alist:
+            pgn = A.get_polygon()
+            pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
           pygame.display.update()
         else:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
           translation_path = []
-          translation_path = gfn.lerp_list(T.get_origin(), p, 5)
-          pgn = A.get_polygon()
+          translation_path = gfn.lerp_list(Tlist[0].get_origin(), p, 10)
+          # for A in Alist:
+          # pgn = A.get_polygon()
           for pt in translation_path:
             # pafn.clear_frame(screen)
+            theta, r = mfn.car2pol(Tlist[0].get_origin(), pt)
+            for t in range(len(Tlist)):
+              Tlist[t].origin = mfn.pol2car(Tlist[t].get_origin(), r, theta)
             
-            T.origin = pt
-            visible_targets(A, [T])
+            pafn.clear_frame(screen)
+            # T.origin = pt
+            for a in range(len(Alist)):
+              A = Alist[a]
+              visible_targets(A, Tlist)
+              pgn = A.get_polygon()
+              pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+              # A.rotate(Tlist[0].get_origin())
             # pv = visibility(A, [T])
             # add_visible_to_tracker(pv)
-            # lv = A.obj_tracker.get_layer(len(A.obj_tracker.layers)-1)
-            
+              if A.obj_tracker.active_tracks != None and len(A.obj_tracker.active_tracks):
+                colors = list(set(pafn.colors))
+                c = 0
+                for trk in A.obj_tracker.active_tracks:
+                  # trk = A.obj_tracker.active_tracks[0]
+                  # print(colors[c])
+                  pred_pt = trk.predict_next_box()
+                  pafn.frame_draw_dot(screen, pred_pt, pafn.colors["red"])
+                  A.rotate(pred_pt)
+                  c+=1
+              # pafn.clear_frame(screen)
+              pgn = A.get_polygon()
+              pafn.frame_draw_polygon(screen, pgn, pafn.colors['yellow'])
             
             # for yb in lv:
             #   print(yb.bbox)
-
-            pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+            for t in range(len(Tlist)):
+              pt = Tlist[t].get_origin()
+              pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+            # pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
             # for p in pv:
             #   pafn.frame_draw_dot(screen, p[1].get_origin(), pafn.colors["magenta"])
-            pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+            # pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
             pygame.display.update()
             time.sleep(0.01)
 
@@ -156,10 +184,14 @@ def main():
   pygame.display.update()
   layer = sann.register_new_LOCO_annotations(detections)
   A = Agent([400,400], [np.pi/4, 300, np.pi / 4], obj_tracker = ObjectTrackManager())
+  # A.color = pafn.
+  B = Agent([600,600], [np.pi/8, 100, np.pi / 4], obj_tracker = ObjectTrackManager())
   T = Target((500,500))
+  T2 = Target((600,600))
   
-  print(A.obj_tracker.get_layer())
-  moving_target(screen, A, T)
+  # print(A.obj_tracker.get_layer())
+  # moving_target(screen, [A], T)
+  moving_target(screen, [A], [T])#,T2])
 
 if __name__ =='__main__':
   main()

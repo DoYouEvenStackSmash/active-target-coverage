@@ -50,6 +50,7 @@ class Agent:
     self.fov_width = fov[2]
     self._id = _id
     self.obj_tracker = obj_tracker
+    self.color = None
   
   def rotate(self, target):
     '''
@@ -78,6 +79,10 @@ class Agent:
     return polygon
 
   def compute_detection_coords(self, target):
+    '''
+    Calculates detection coordinates relative to Agent
+    returns a Yolo Formatted bbox
+    '''
     tar_theta, tar_r = mfn.car2pol(self.origin, target)
     tar_theta = mfn.correct_angle(tar_theta)
     org_theta = mfn.correct_angle(self.fov_theta)
@@ -91,11 +96,7 @@ class Agent:
     w = 1
     h = 1
     return [x,y,w,h]
-    # print(ratio)
-
-    # if tar_r > self.fov_radius:
-    #   return False
-    # if lh > tar_theta and rh < tar_theta:
+  
 
   def is_visible(self, target):
     '''

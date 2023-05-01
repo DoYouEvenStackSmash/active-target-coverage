@@ -19,7 +19,7 @@ class ObjectTrackManager:
   constants = { "avg_tolerance"   : 10, 
               "track_lifespan"  : 2,
               "default_avg_dist": 10,
-              "radial_exclusion": 200,
+              "radial_exclusion": 100,
             }
   display_constants = {"trail_len" : 0}
   def __init__(self,
@@ -112,7 +112,6 @@ class ObjectTrackManager:
     '''
     Helper function for creating object tracks
     '''
-    print("creating new track")
     track_id = len(self.global_track_store)
     T = ObjectTrack(track_id, entity.class_id)
     T.add_new_step(entity, fc)
@@ -174,15 +173,16 @@ class ObjectTrackManager:
     '''
     Update preexisting tracks with a single layer of entities
     '''
-    print(f"layer: {layer_idx}")
     curr_layer = self.layers[layer_idx]
     # if len(curr_layer) == 0:
     #   return
-    print(curr_layer)
     fc = layer_idx
     pred,pairs = [],[]
-    if (self.active_tracks == None or len(self.active_tracks) == 0) and len(curr_layer):
-      self.initialize_tracks(layer_idx)
+
+    # reinitialize active tracks if there are none currently active
+    if (self.active_tracks == None or len(self.active_tracks) == 0):
+      if len(curr_layer):
+        self.initialize_tracks(layer_idx)
       return
     
     # gather predictions from track heads
@@ -200,7 +200,6 @@ class ObjectTrackManager:
     
     sortkey = lambda s: s[2]
     pairs = sorted(pairs,key=sortkey)
-    print(pairs)
     pc,tc,lc = 0,len(self.active_tracks),len(curr_layer)
     # print(lc)
     # print(tc)
@@ -215,12 +214,10 @@ class ObjectTrackManager:
         We add a simple check 
       '''
       if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
-        print("excluding")
         tc-=1
         pc+=1
         continue
       # add entity to closest track
-      print("adding new step")
       T = self.global_track_store[elem[0]]
       T.add_new_step(curr_layer[elem[1]], fc)
       # update counters
@@ -236,7 +233,6 @@ class ObjectTrackManager:
           pc += 1
           continue
         # create new ObjectTrack
-        print("creating new track")
         self.create_new_track(curr_layer[elem[1]],fc)
         # update counters
         lc -= 1
