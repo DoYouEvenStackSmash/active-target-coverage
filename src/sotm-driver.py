@@ -29,6 +29,14 @@ OFFT = 20
 SPLINE_COUNT = 2
 TRANSLATE = False
 
+def get_tracks(steps):
+  trail = []
+  for s in steps:
+    x,y,w,h = s['bbox']
+    trail.append((x,y))
+  return trail
+
+
 def visible_targets(A, Tlist):
   pairs = []
   sortkey = lambda x: x[2]
@@ -58,9 +66,9 @@ def visible_targets(A, Tlist):
   # if (len(A.obj_tracker.layers) > 1):
   A.obj_tracker.process_layer(len(A.obj_tracker.layers) - 1)
 
-def export_tracks(A):
+def export_tracks(A, screen):
   print(A.obj_tracker.global_track_store)
-  steps = []
+  # steps = []
   # A.obj_tracker.process_all_layers()
   A.obj_tracker.close_all_tracks()
   
@@ -68,9 +76,17 @@ def export_tracks(A):
   tracks = A.obj_tracker.linked_tracks
   print(len(A.obj_tracker.layers))
   # print(tracks)
+  track_steps = []
   for i in tracks:
+    steps = []
     A.obj_tracker.get_track(i).get_loco_track(fdict=None, steps=steps)
-  print(steps)
+    track_steps.append(steps)
+  for s in track_steps:
+    t = get_tracks(s)
+    for i in range(1, len(t)):
+      pafn.frame_draw_line(screen, (t[i-1], t[i]), pafn.colors["magenta"])
+  pygame.display.update
+    # print(s)
   
 
 def moving_target(screen, A, T):
@@ -80,9 +96,10 @@ def moving_target(screen, A, T):
       if event.type == pygame.MOUSEBUTTONDOWN:
         # LCTRL for exit hotkey
         if pygame.key.get_mods() == LCTRL:
-          export_tracks(A)
+          pafn.clear_frame(screen)
+          export_tracks(A, screen)
 
-          sys.exit()
+          # sys.exit()
         elif pygame.key.get_mods() == LALT:
           pafn.clear_frame(screen)
           pgn = A.get_polygon()
