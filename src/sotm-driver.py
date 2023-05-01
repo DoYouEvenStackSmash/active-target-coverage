@@ -53,8 +53,8 @@ def visible_targets(A, Tlist):
       break
     if pairs[c][0].is_visible(pairs[c][1].get_origin()):
       dc = A.compute_detection_coords(pairs[c][1].get_origin())
-      x,y = pairs[c][1].get_origin()
-      dc = [x,y,1,1]
+      # x,y = pairs[c][1].get_origin()
+      # dc = [x,y,1,1]
 
       yb = sann.register_annotation(0, dc, frame_id)
       add_list.append(yb)
@@ -78,8 +78,12 @@ def export_tracks(A, screen):
     A.obj_tracker.get_track(i).get_loco_track(fdict=None, steps=steps)
     track_steps.append(steps)
   for s in track_steps:
-    for st in s:
-      print(st)
+    for st in range(len(s)):
+      bbox = s[st]["bbox"]
+      x,y = A.decompute_detection_coords(bbox)
+      s[st]["bbox"][0],s[st]["bbox"][1] = x,y
+      # x,y = (bbox[0] / 1920) * A.fov_theta - A.fov_width / 2, bbox[1]
+      # print(st)
     print("-----------------------------")
     t = get_tracks(s)
     for i in range(1, len(t)):
@@ -115,7 +119,7 @@ def moving_target(screen, Alist, Tlist):
             continue
           p = pygame.mouse.get_pos()
           translation_path = []
-          translation_path = gfn.lerp_list(Tlist[0].get_origin(), p, 10)
+          translation_path = gfn.lerp_list(Tlist[0].get_origin(), p, 8)
           # for A in Alist:
           # pgn = A.get_polygon()
           for pt in translation_path:
@@ -141,6 +145,9 @@ def moving_target(screen, Alist, Tlist):
                   # trk = A.obj_tracker.active_tracks[0]
                   # print(colors[c])
                   pred_pt = trk.predict_next_box()
+                  x,y = pred_pt
+                  bbox = [x,y,1,1]
+                  pred_pt = A.decompute_detection_coords(bbox)
                   pafn.frame_draw_dot(screen, pred_pt, pafn.colors["red"])
                   A.rotate(pred_pt)
                   c+=1
@@ -183,9 +190,9 @@ def main():
   screen = pafn.create_display(1000,1000)
   pygame.display.update()
   layer = sann.register_new_LOCO_annotations(detections)
-  A = Agent([400,400], [np.pi/4, 300, np.pi / 4], obj_tracker = ObjectTrackManager())
+  A = Agent([400,400], [np.pi/4, 300, np.pi / 8], obj_tracker = ObjectTrackManager())
   # A.color = pafn.
-  B = Agent([600,600], [np.pi/8, 100, np.pi / 4], obj_tracker = ObjectTrackManager())
+  B = Agent([600,600], [np.pi/8, 100, np.pi / 8], obj_tracker = ObjectTrackManager())
   T = Target((500,500))
   T2 = Target((600,600))
   

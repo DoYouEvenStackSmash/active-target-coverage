@@ -91,11 +91,20 @@ class Agent:
     
     
     ratio = (lh - tar_theta) / (lh - rh)
-    x = 1920 * ratio
+    x = 100 * ratio
     y = tar_r
     w = 1
     h = 1
     return [x,y,w,h]
+  
+  def decompute_detection_coords(self, bbox):
+    org_theta = mfn.correct_angle(self.fov_theta)
+    rh = org_theta - self.fov_width / 2
+    theta = (bbox[0] / 100) * self.fov_width + rh
+    theta = adjust_angle(theta)
+    r =  bbox[1]
+    return mfn.pol2car(self.origin, r, theta)
+
   
 
   def is_visible(self, target):
