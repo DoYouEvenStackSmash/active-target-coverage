@@ -80,7 +80,7 @@ def export_tracks(A, screen):
       x,y = A.transform_from_local_coord(bbox)
       s[st]["bbox"][0],s[st]["bbox"][1] = x,y
       # x,y = (bbox[0] / 1920) * A.fov_theta - A.fov_width / 2, bbox[1]
-      # print(st)
+      print(st)
     print("-----------------------------")
     t = get_tracks(s)
     for i in range(1, len(t)):
@@ -89,8 +89,24 @@ def export_tracks(A, screen):
   pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
     # print(s)
   
+def estimate_next_detection(otm):
+  curr_pt, pred_pt = (),()
+  if otm.active_tracks != None and len(otm.active_tracks):
+    print(f"active tracks: {len(otm.active_tracks)}")
+    trk = otm.active_tracks[0]
+    pred_pt = trk.predict_next_box()
+    curr_pt = trk.get_last_detection()
+  return (curr_pt, pred_pt)
 
 def moving_target(screen, Alist, Tlist):
+  for A in Alist:
+    pgn = A.get_polygon()
+    pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+  for t in range(len(Tlist)):
+    ptr = Tlist[t].get_origin()
+    pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
+  pygame.display.update()
+
   dest = None
   while 1:
     for event in pygame.event.get():
@@ -99,9 +115,10 @@ def moving_target(screen, Alist, Tlist):
         if pygame.key.get_mods() == LCTRL:
           pafn.clear_frame(screen)
           for A in Alist:
-            # pgn = A.get_polygon()
-            # pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
-            export_tracks(A, screen)
+            A.rotate(pygame.mouse.get_pos())
+            pgn = A.get_polygon()
+            pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
+            # export_tracks(A, screen)
           pygame.display.update()
 
           # sys.exit()
@@ -116,11 +133,12 @@ def moving_target(screen, Alist, Tlist):
             continue
           p = pygame.mouse.get_pos()
           translation_path = []
-          translation_path = gfn.lerp_list(Tlist[0].get_origin(), p, 6)
-          # for A in Alist:
-          # pgn = A.get_polygon()
-          for pt in translation_path:
+          translation_path = gfn.lerp_list(Tlist[0].get_origin(), p, 5)
+          print("running\n")
+
+          for pt in translation_path[1:]:
             # pafn.clear_frame(screen)
+            
             theta, r = mfn.car2pol(Tlist[0].get_origin(), pt)
             for t in range(len(Tlist)):
               Tlist[t].origin = mfn.pol2car(Tlist[t].get_origin(), r, theta)
@@ -133,10 +151,16 @@ def moving_target(screen, Alist, Tlist):
               pgn = A.get_polygon()
               pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
 
+              # next_det = A.estimate_next_detection()
               next_det = A.estimate_next_detection()
-              if len(next_det) > 0:
-                pafn.frame_draw_dot(screen, next_det, pafn.colors["red"])
-                A.rotate(next_det)
+              curr, pred = next_det
+              if len(pred) > 0:
+                pafn.frame_draw_dot(screen, pred, pafn.colors['yellow'])
+                pafn.frame_draw_line(screen, (curr,pred), pafn.colors["white"])
+                A.rotate(pred)
+              if len(curr) > 0:
+                pafn.frame_draw_dot(screen, curr, pafn.colors['red'])
+
                 
               # pafn.clear_frame(screen)
               pgn = A.get_polygon()
@@ -145,8 +169,8 @@ def moving_target(screen, Alist, Tlist):
             # for yb in lv:
             #   print(yb.bbox)
             for t in range(len(Tlist)):
-              pt = Tlist[t].get_origin()
-              pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+              ptr = Tlist[t].get_origin()
+              pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
             # pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
             # for p in pv:
             #   pafn.frame_draw_dot(screen, p[1].get_origin(), pafn.colors["magenta"])
@@ -177,15 +201,15 @@ def main():
   screen = pafn.create_display(1000,1000)
   pygame.display.update()
   layer = sann.register_new_LOCO_annotations(detections)
-  A = Agent([400,400], [np.pi/4, 300, np.pi / 4], obj_tracker = ObjectTrackManager())
+  A = Agent([300,300], [0, 300, np.pi / 4], obj_tracker = ObjectTrackManager())
   # A.color = pafn.
-  B = Agent([600,600], [np.pi/8, 100, np.pi / 8], obj_tracker = ObjectTrackManager())
+  B = Agent([600,600], [np.pi/8, 200, np.pi / 6], obj_tracker = ObjectTrackManager())
   T = Target((500,500))
   T2 = Target((600,600))
   
   # print(A.obj_tracker.get_layer())
-  # moving_target(screen, [A], T)
-  moving_target(screen, [A], [T])#,T2])
+  moving_target(screen, [A], [T])
+  # moving_target(screen, [A, B], [T, T2])
 
 if __name__ =='__main__':
   main()

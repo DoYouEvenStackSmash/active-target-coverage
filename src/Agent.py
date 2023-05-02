@@ -58,6 +58,30 @@ class Agent:
     '''
     self.fov_theta = mfn.car2pol(self.origin, target)[0]
 
+  def get_horizontal_axis(self, radius):
+    '''
+    Gets a horizontal line from the agent's fov
+    Returns a list of points
+    '''
+    fov_offts = [ adjust_angle(self.fov_theta + self.fov_width / 2), 
+                  adjust_angle(self.fov_theta + self.fov_width / 4),
+                  adjust_angle(self.fov_theta),
+                  adjust_angle(self.fov_theta - self.fov_width / 4),
+                  adjust_angle(self.fov_theta - self.fov_width / 2) 
+                ]
+    horizontal_axis = []
+
+    for i in fov_offts:
+      horizontal_axis.append(mfn.pol2car(self.origin, radius, i))
+    return horizontal_axis
+  
+  def get_sensor_field(self, levels):
+    y_step = self.fov_radius / levels
+    axes = []
+    for i in range(1, levels + 1):
+      axes.append(self.get_horizontal_axis(y_step * i))
+    return axes
+
   def get_polygon(self):  
     '''
     Gets the convex hull containing the agent origin and the boundary points of its sensor FOV
@@ -85,15 +109,19 @@ class Agent:
     '''
 
     tar_theta, tar_r = mfn.car2pol(self.origin, target)
-    tar_theta = mfn.correct_angle(tar_theta)
-    org_theta = mfn.correct_angle(self.fov_theta)
-
+  
+    org_theta = self.fov_theta
+    if org_theta < 0:
+      org_theta = 2 * np.pi + org_theta
+ 
     lh = org_theta + self.fov_width / 2
     rh = org_theta - self.fov_width / 2
+    if tar_theta < rh:
+      tar_theta = tar_theta + 2 * np.pi
     
-    # ratio = abs(org_theta - tar_theta) / self.fov_width
-    ratio = (lh - tar_theta) / (self.fov_width)
-    # (lh - tar_theta) / (self.fov_width)
+    ratio = (lh - tar_theta) / (lh - rh)
+    
+    
     x = 100 * ratio
     y = tar_r
     w = 1
@@ -101,7 +129,7 @@ class Agent:
     return [x,y,w,h]
   
   
-  def transform_from_local_coord(self, bbox):
+  def transform_from_local_coord(self, x, y, w=1, h=1):
     '''
     Transforms a bbox from agent local coordinates to world coordinates
     returns a Point
@@ -110,8 +138,8 @@ class Agent:
     
     rh = org_theta - self.fov_width / 2
     lh = org_theta + self.fov_width / 2
-    theta = (bbox[0] / 100) * self.fov_width
-    print(f"is_not_visible: {lh}:{theta}:{rh}")
+    theta = (x / 100) * self.fov_width
+    # print(f"is_not_visible: {lh}:{theta}:{rh}")
     ratio = theta - 0.5
     theta = lh - theta
     theta = mfn.correct_angle(theta)
@@ -123,23 +151,47 @@ class Agent:
 
     # theta = adjust_angle(theta)
     
-    r =  bbox[1]
+    r =  y
     return mfn.pol2car(self.origin, r, theta)
 
-  def estimate_next_detection(self):
+  def estimate_rel_next_detection(self):
     '''
-    U
+    Estimates next detection in local coordinate system
+    returns a pair of points
     '''
-    if self.obj_tracker.active_tracks != None and len(self.obj_tracker.active_tracks):
+    last_pt, pred_pt = (),()
+    
+    if self.obj_tracker.has_active_tracks():
       trk = self.obj_tracker.active_tracks[0]
+      last_pt = trk.get_last_detection()
       pred_pt = trk.predict_next_box()
-      x,y = pred_pt
-      pred_pt = self.transform_from_local_coord([x,y,1,1])
-      x,y = pred_pt
-      return (x,y)
+      
     else:
       print("cannot estimate next detection!")
-      return ()
+    
+    nd = (last_pt, pred_pt)
+    print(f"estimated: {nd}")
+    return nd
+  
+  def estimate_next_detection(self):
+    '''
+    Estimates next detection in external coordinate system
+    returns a pair of points
+    '''
+
+    last_pt,pred_pt = (),()
+    nd = self.estimate_rel_next_detection()
+    if len(nd[0]) and len(nd[1]):
+      lx,ly = nd[0]
+      px,py = nd[1]
+      last_pt = self.transform_from_local_coord(lx,ly)
+      pred_pt = self.transform_from_local_coord(px,py)
+    
+    
+    nd = (last_pt,pred_pt)
+    print(f"absolute: {nd}\n")
+    return nd
+    
     
 
   def is_visible(self, target):

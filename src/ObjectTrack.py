@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import numpy as np
 from aux_functions import *
+from render_support import MathFxns as mfn
+from render_support import GeometryFxns as gfn
+from render_support import PygameArtFxns as pafn
 
 class ObjectTrack:
   def __init__(self, track_id, class_id):
@@ -32,17 +35,17 @@ class ObjectTrack:
     Update track velocity vector
     Assumes path is not empty
     '''
-    normalize_theta = lambda theta: theta if theta > 0 else 2 * np.pi + theta
-    cx,cy = pt
-    lx,ly = self.path[-1].get_center_coord()
-    r = MathFxns.euclidean_dist((lx,ly),(cx,cy))
+    center = self.path[-1].get_center_coord()
+    theta, r = mfn.car2pol(center, pt)
+    
     self.delta_v.append(r / self.r)
+    # self.velocity.append(r)
     self.r = r
-
-    theta = np.arctan2(cx - lx, cy - ly)
-    self_theta = normalize_theta(self.theta)
-    new_theta = normalize_theta(theta)
-    self.delta_theta.append(new_theta / self_theta)
+    
+    # # theta = np.arctan2(cx - lx, cy - ly)
+    # self_theta = normalize_theta(self.theta)
+    # new_theta = normalize_theta(theta)
+    # self.delta_theta.append(new_theta / self_theta)
     
     self.theta = theta
 
@@ -122,6 +125,13 @@ class ObjectTrack:
     '''
     return len(self.path)
   
+  def get_last_detection(self):
+    '''
+    Accessor for getting the last detection in a track
+    '''
+    if len(self.path) > 0:
+      return self.path[-1].get_center_coord()
+    return ()
       
   def get_loco_track(self,fdict = None,steps = []):
     '''

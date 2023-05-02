@@ -19,7 +19,7 @@ class ObjectTrackManager:
   constants = { "avg_tolerance"   : 10, 
               "track_lifespan"  : 2,
               "default_avg_dist": 10,
-              "radial_exclusion": 100,
+              "radial_exclusion": 500,
             }
   display_constants = {"trail_len" : 0}
   def __init__(self,
@@ -61,7 +61,13 @@ class ObjectTrackManager:
     '''
     self.layers.append([])
   
-
+  def has_active_tracks(self):
+    '''
+    Indicator function for track activity
+    returns true if there are active tracks
+    '''
+    return (self.active_tracks != None and len(self.active_tracks) > 0)
+  
   def add_new_layer(self, yolobox_arr):
     '''
     Add a yolobox array of registered annotations to object track manager as a new layer
@@ -180,7 +186,8 @@ class ObjectTrackManager:
     pred,pairs = [],[]
 
     # reinitialize active tracks if there are none currently active
-    if (self.active_tracks == None or len(self.active_tracks) == 0):
+    # if (self.active_tracks == None or len(self.active_tracks) == 0):
+    if not self.has_active_tracks():
       if len(curr_layer):
         self.initialize_tracks(layer_idx)
       return
