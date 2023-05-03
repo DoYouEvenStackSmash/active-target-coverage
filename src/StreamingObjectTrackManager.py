@@ -69,7 +69,7 @@ class ObjectTrackManager:
 
     origin = displacement[0]
     theta, rad = displacement[1]
-
+    # print(f"theta: {theta}")
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
       
@@ -78,6 +78,7 @@ class ObjectTrackManager:
       bbox[0],bbox[1] = x,y
       trk.path[-1].bbox = bbox
       trk.path[-1].displaced = True
+      
 
   def add_linear_displacement(self, displacement):
     '''

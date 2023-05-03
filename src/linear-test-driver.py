@@ -46,7 +46,7 @@ def repeatable_test(screen, A, T):
   Tlist = [T]
   Alist = [A]
   T.origin = (500,500)
-  step_size = 15
+  step_size = 30
   destinations = []
   origin = (500,500)
   for i in range(25):
@@ -79,7 +79,7 @@ def repeatable_test(screen, A, T):
     # time.sleep(.05)
       draw_coordinate_frame(screen, A)
     pygame.display.update()
-    time.sleep(.01)
+    time.sleep(.1)
     theta, r = mfn.car2pol(Tlist[0].get_origin(), pt)
     for t in range(len([Tlist])):
       # Tlist[t].origin = mfn.pol2car(Tlist[t].get_origin(), r, theta)

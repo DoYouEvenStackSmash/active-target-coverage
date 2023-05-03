@@ -65,8 +65,16 @@ class Agent:
     displacement = (pt, mfn.car2pol(target_pt, pt))
     
     self.obj_tracker.add_angular_displacement(displacement)
-    
+    # print(f"angular: {displacement[1]}")
+    # print(self.fov_theta, theta)
+    distance = self.fov_theta - theta
+    if (distance > np.pi):
+      distance = 2 * np.pi - distance
+    if (distance < -np.pi):
+      distance = -2 * np.pi - distance
+
     self.fov_theta = theta
+    return distance
 
   def translate_sensor(self, target):
     '''
@@ -85,6 +93,8 @@ class Agent:
     self.obj_tracker.add_linear_displacement(displacement)
     
     self.origin = pt
+
+    return displacement[1][1]
     
     
   def get_horizontal_axis(self, radius):
@@ -288,13 +298,14 @@ class Agent:
         for p in rotation[start:]:
           if len(pred) > 0:
             if err_type == Agent.ANGULAR:
-              self.rotate_sensor(p)
-            elif err_type == Agent.RANGE:
-              self.translate_sensor(p)
+              disp = self.rotate_sensor(p)
+            # elif err_type == Agent.RANGE:
+            #   disp = self.translate_sensor(p)
           
         estimates = self.predict_targets_covered()
         j = 0
         break
+    
 
   def export_tracks(self):
     '''
