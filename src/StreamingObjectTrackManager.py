@@ -1,7 +1,9 @@
 import collections
 import sys
 sys.path.append("..")
-
+from render_support import MathFxns as mfn
+from render_support import GeometryFxns as gfn
+from render_support import PygameArtFxns as pafn
 from aux_functions import *
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
@@ -37,7 +39,8 @@ class ObjectTrackManager:
                 fdict = {},
                 categories = CATEGORIES,
                 img_centers = [],
-                imported = False
+                imported = False,
+                displacements = []
               ):
     self.global_track_store = global_track_store
     self.inactive_tracks = inactive_tracks
@@ -53,6 +56,20 @@ class ObjectTrackManager:
     self.categories = categories
     self.img_centers = img_centers
     self.imported = imported
+    self.displacements = displacements
+
+  def add_displacement(self, displacement):
+    if not self.has_active_tracks():
+      return
+    padj = displacement
+    origin = padj[0]
+    theta, rad = padj[1]
+    for i in range(len(self.active_tracks)):
+      trk = self.active_tracks[i]
+      bbox = trk.path[-1].bbox
+      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, theta)
+      bbox[0],bbox[1] = x,y
+      trk.path[-1].bbox = bbox
 
 
   def init_new_layer(self):

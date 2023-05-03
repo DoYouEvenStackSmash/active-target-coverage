@@ -25,6 +25,7 @@ def determine_visible(As, pts):
   sortkey = lambda x: x[2]
   
   for i in As:
+    # i.pose_adjustments.append(None)
     for j in pts:
       d = mfn.euclidean_dist(i.origin, j)
       pairs.append((i, j, d))

@@ -9,13 +9,15 @@ class ObjectTrack:
   def __init__(self, track_id, class_id):
     self.r = 0
     self.theta = 0
-    self.delta_theta = []
-    self.delta_v = []
+    self.delta_theta = [0]
+    self.delta_v = [0]
+    self.v = [0]
     self.path = []
     self.track_id = track_id
     self.color = rand_color()
     self.last_frame = -1
     self.class_id = class_id
+    self.displacements = [None]
 
   def add_new_step(self, yb, frame_id):
     ''' 
@@ -30,16 +32,18 @@ class ObjectTrack:
     self.path.append(yb)
 
   
-  def update_track_vector(self, pt):
+  def update_track_vector(self, pt, displacement = None):
     '''
     Update track velocity vector
     Assumes path is not empty
     '''
     center = self.path[-1].get_center_coord()
     theta, r = mfn.car2pol(center, pt)
-    
+    self.v.append(r)
     self.delta_v.append(r / self.r)
     # self.velocity.append(r)
+    print(f"velocity: {r}")
+    print(f"delta_v: {self.delta_v[-1]}")
     self.r = r
     
     # # theta = np.arctan2(cx - lx, cy - ly)
@@ -51,15 +55,26 @@ class ObjectTrack:
 
     # add recent velocity to delta_v
   
-  def predict_next_box(self):
+  def predict_next_box(self, posn = None):
     '''
     Predict next bounding box center
     '''
+    # lx,ly = 0,0
     lx,ly = self.path[-1].get_center_coord()
     if len(self.path) == 1:
       return (lx,ly)
-    return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
+    
+    if posn:
+      lx,ly = posn
+    
+    new_posn = mfn.pol2car((lx,ly), self.v[-1], self.theta)
+    print(new_posn)
+    return new_posn
+    # return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
   
+  def get_track_heading(self):
+
+    return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta)
   
   def is_alive(self, fc, expiration):
     '''

@@ -42,6 +42,9 @@ class Target:
     '''
     return self._id
 
+TOLERANCE = 0.1
+WINDOW_WIDTH = 100
+
 class Agent:
   def __init__(self, origin = [0, 0], fov = [0, 100, np.pi / 2], _id = 0, obj_tracker = None):
     self.origin = origin
@@ -51,12 +54,37 @@ class Agent:
     self._id = _id
     self.obj_tracker = obj_tracker
     self.color = None
+    self.pose_adjustments = [None]
+  
+  def targets_covered(self):
+    estimates = []
+    if self.obj_tracker.has_active_tracks():
+      for t_id in range(len(self.obj_tracker.active_tracks)):
+        elem = self.estimate_rel_next_detection(t_id)
+        print(f"track {t_id} detectable:\t{self.is_detectable(elem[1])}")
+
   
   def rotate(self, target):
     '''
     Rotates the sensor on the object tracker
     '''
-    self.fov_theta = mfn.car2pol(self.origin, target)[0]
+    # x = self.fov_theta
+    theta = mfn.car2pol(self.origin, target)[0]
+    
+    x,y,w,h = self.transform_to_local_coord(target)
+    pt1 = (x,y)
+    print(f"target:{pt1}")
+    pt = mfn.pol2car(self.origin, y, self.fov_theta)
+    x2,y2,w2,h2 = self.transform_to_local_coord(pt)
+    pt = (x2,y2)
+    print(f"origin:{pt}")
+
+    displacement = (pt, mfn.car2pol(pt1, pt))
+    print(displacement)
+    self.obj_tracker.add_displacement(displacement)
+    # self.pose_adjustments.append(displacement)
+    self.fov_theta = theta
+
 
   def get_horizontal_axis(self, radius):
     '''
@@ -122,7 +150,7 @@ class Agent:
     ratio = (lh - tar_theta) / (lh - rh)
     
     
-    x = 100 * ratio
+    x = WINDOW_WIDTH * ratio
     y = tar_r
     w = 1
     h = 1
@@ -138,7 +166,7 @@ class Agent:
     
     rh = org_theta - self.fov_width / 2
     lh = org_theta + self.fov_width / 2
-    theta = (x / 100) * self.fov_width
+    theta = (x / WINDOW_WIDTH) * self.fov_width
     # print(f"is_not_visible: {lh}:{theta}:{rh}")
     ratio = theta - 0.5
     theta = lh - theta
@@ -154,7 +182,7 @@ class Agent:
     r =  y
     return mfn.pol2car(self.origin, r, theta)
 
-  def estimate_rel_next_detection(self):
+  def estimate_rel_next_detection(self, idx = 0):
     '''
     Estimates next detection in local coordinate system
     returns a pair of points
@@ -162,25 +190,38 @@ class Agent:
     last_pt, pred_pt = (),()
     
     if self.obj_tracker.has_active_tracks():
-      trk = self.obj_tracker.active_tracks[0]
+      trk = self.obj_tracker.active_tracks[idx]
+      trk_h = trk.get_track_heading()
       last_pt = trk.get_last_detection()
       pred_pt = trk.predict_next_box()
-      
-    else:
-      print("cannot estimate next detection!")
+    #   if self.pose_adjustments[-1] != None:
+    #     padj = self.pose_adjustments[-1]
+    #     origin = padj[0]
+    #     theta, rad = padj[1]
+    #     last_pt = mfn.pol2car(last_pt, rad, theta)
+    #     # est_pred_pt = mfn.pol2car(last_pt, trk_h[1], trk_h[3])
+    #     # pred_pt = est_pred_pt
+    #     pred_pt = mfn.pol2car(pred_pt, rad, theta)
+    #     # last_pt = mfn.pol2car(last_pt, -1 * rad, )
+    #   #   theta_adj
+    #   # elif self.pose_adjustments[-1] == None and trk_h[2] > 2:
+    #     # pred_pt = last_pt
+    #     # print("FLAGFLAGFLAG")
+    # else:
+    #   print("cannot estimate next detection!")
     
     nd = (last_pt, pred_pt)
-    print(f"estimated: {nd}")
+    # print(f"estimated: {nd}")
     return nd
   
-  def estimate_next_detection(self):
+  def estimate_next_detection(self, idx = 0):
     '''
     Estimates next detection in external coordinate system
     returns a pair of points
     '''
 
     last_pt,pred_pt = (),()
-    nd = self.estimate_rel_next_detection()
+    nd = self.estimate_rel_next_detection(idx)
     if len(nd[0]) and len(nd[1]):
       lx,ly = nd[0]
       px,py = nd[1]
@@ -189,10 +230,17 @@ class Agent:
     
     
     nd = (last_pt,pred_pt)
-    print(f"absolute: {nd}\n")
+    # print(f"absolute: {nd}\n")
     return nd
     
-    
+  def is_detectable(self, target):
+    adj_win_bnd = WINDOW_WIDTH * TOLERANCE  
+    adj_rad_bnd = self.fov_radius * TOLERANCE
+    if target[0] < 0 + adj_win_bnd or target[0] > WINDOW_WIDTH - adj_win_bnd:
+      return False
+    if target[1] > self.fov_radius - adj_rad_bnd  or target[1] < 0 + adj_rad_bnd:
+      return False
+    return True
 
   def is_visible(self, target):
     '''
@@ -213,5 +261,5 @@ class Agent:
       return False
     if lh > tar_theta and rh < tar_theta:
       return True
-    print(f"is_not_visible: {lh}:{tar_theta}:{rh}")
+    # print(f"is_not_visible: {lh}:{tar_theta}:{rh}")
     return False
