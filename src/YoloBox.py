@@ -22,6 +22,7 @@ class YoloBox:
     self.prev = None
     self.center_xy = center_xy
     self.distance = distance
+    self.displaced = False
 
 
   def get_corner_coords(self):

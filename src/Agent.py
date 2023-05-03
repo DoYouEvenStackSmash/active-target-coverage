@@ -42,12 +42,13 @@ class Target:
     '''
     return self._id
 
-TOLERANCE = 0.1
-WINDOW_WIDTH = 100
-ANGULAR = 1
-RANGE = 2
-VALID = 0
+
 class Agent:
+  VALID = 0
+  ANGULAR = 1
+  RANGE = 2
+  TOLERANCE = 0.1
+  WINDOW_WIDTH = 100
   def __init__(self, origin = [0, 0], fov = [0, 100, np.pi / 2], _id = 0, obj_tracker = None):
     self.origin = origin
     self.fov_theta = fov[0]
@@ -178,7 +179,7 @@ class Agent:
     
     ratio = (lh - tar_theta) / (lh - rh)
     
-    x = WINDOW_WIDTH * ratio
+    x = Agent.WINDOW_WIDTH * ratio
     y = tar_r
     w = 1
     h = 1
@@ -194,7 +195,7 @@ class Agent:
     
     rh = org_theta - self.fov_width / 2
     lh = org_theta + self.fov_width / 2
-    theta = (x / WINDOW_WIDTH) * self.fov_width
+    theta = (x / Agent.WINDOW_WIDTH) * self.fov_width
     # print(f"is_not_visible: {lh}:{theta}:{rh}")
     ratio = theta - 0.5
     theta = lh - theta
@@ -251,13 +252,13 @@ class Agent:
     Indicates whether a target point is detectable (within tolerance)
 
     '''
-    adj_win_bnd = WINDOW_WIDTH * TOLERANCE  
-    adj_rad_bnd = self.fov_radius * (TOLERANCE/1)
-    if target[0] < 0 + adj_win_bnd or target[0] > WINDOW_WIDTH - adj_win_bnd:
-      return False, ANGULAR
+    adj_win_bnd = Agent.WINDOW_WIDTH * Agent.TOLERANCE  
+    adj_rad_bnd = self.fov_radius * (Agent.TOLERANCE/1)
+    if target[0] < 0 + adj_win_bnd or target[0] > Agent.WINDOW_WIDTH - adj_win_bnd:
+      return False, Agent.ANGULAR
     if target[1] > self.fov_radius - adj_rad_bnd  or target[1] < 0 + adj_rad_bnd:
-      return False, RANGE
-    return True, VALID
+      return False, Agent.RANGE
+    return True, Agent.VALID
 
   def is_visible(self, target):
     '''

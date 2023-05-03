@@ -182,6 +182,7 @@ class ObjectTrack:
               "track_id" : self.track_id,
               "trackmap_index" : -1,
               "vid_id":0, 
-              "track_color": self.color})
+              "track_color": self.color,
+              "displaced": yb.displaced})
     
       

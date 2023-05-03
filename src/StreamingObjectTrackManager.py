@@ -77,6 +77,7 @@ class ObjectTrackManager:
       x,y = mfn.pol2car((bbox[0],bbox[1]), rad, theta)
       bbox[0],bbox[1] = x,y
       trk.path[-1].bbox = bbox
+      trk.path[-1].displaced = True
 
   def add_linear_displacement(self, displacement):
     '''
@@ -97,6 +98,7 @@ class ObjectTrackManager:
       x,y = mfn.pol2car((bbox[0],bbox[1]), rad, trk.theta+theta)
       bbox[0],bbox[1] = x,y
       trk.path[-1].bbox = bbox
+      trk.path[-1].displaced = True
 
   def init_new_layer(self):
     '''
