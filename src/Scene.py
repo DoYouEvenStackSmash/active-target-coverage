@@ -13,6 +13,7 @@ from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
 from OTFTrackerApi import StreamingAnnotations as sann
+from Target import Target
 
 import pygame
 import numpy as np
@@ -38,10 +39,16 @@ def get_tracks(steps):
   return trail
 
 def visible_targets(A, Tlist):
+  '''
+  Determines visible targets in the vicinity of agent A and updates
+  the agent A's tracker.
+
+  Does not return
+  '''
   pairs = []
   sortkey = lambda x: x[2]
   frame_id = "frame_"+str(len(A.obj_tracker.layers))
-  # A.pose_adjustments.append(None)
+  
   for target in Tlist:
     d = mfn.euclidean_dist(A.origin, target.get_origin())
     pairs.append((A, target, d))
@@ -61,112 +68,13 @@ def visible_targets(A, Tlist):
   A.obj_tracker.add_new_layer(add_list)
   A.obj_tracker.process_layer(len(A.obj_tracker.layers) - 1)
 
-def export_linked_loco_tracks(A,fdict = None):
-  '''
-    build "annotations" : [] from linked tracks only
-  '''
-  OTM = A.obj_tracker
-  track_steps = []
-  for i in OTM.linked_tracks:
-    # steps = []
-    OTM.get_track(i).get_loco_track(fdict=None,steps=track_steps)
-  for st in range(len(track_steps)):
-    bbox = track_steps[st]["bbox"]
-    x,y,w,h = bbox
-    # x,y = A.transform_from_local_coord(x,y,w,h)
-    bbox[0],bbox[1] = x,y
-    track_steps[st]["bbox"] = bbox
-  # print(f'{len(steps)} total steps')
-  for i in range(len(track_steps)):
-    track_steps[i]["id"] = i
-  return track_steps
-
-def export_loco_fmt(A):
-  '''
-  Export active tracks and associated metadata to loco format
-  '''
-  # construct filename lookup dictionary
-  fdict = None
-  # construct "images" : []
-  imgs = []
-  OTM = A.obj_tracker
-  # construct "annotations" : []
-  steps = export_linked_loco_tracks(A,fdict)
-  
-  '''
-  Generate new images with which to populate a LOCO of the REFLECTED images
-  '''
-
-  # construct "linked_tracks" : []
-  linked_tracks = [{"track_id": i, "category_id" : OTM.get_track(i).class_id, 
-                    "track_len": 0, "steps":[] } 
-                    for i in OTM.linked_tracks]
-
-  
-  trackmap = {} # {track_id : posn in linked_tracks}
-  for i,lt in enumerate(linked_tracks):
-    trackmap[linked_tracks[i]['track_id']] = i
-  
-  # add trackmap_index to all annotations
-  for s in steps:
-    linked_tracks[trackmap[s['track_id']]]['steps'].append(s['id'])
-    s['trackmap_index'] = trackmap[s['track_id']]
-  
-  # add length to linked tracks for fun
-  for l in linked_tracks:
-    l["track_len"] = len(l['steps'])
-  
-  # assemble final dictionary
-  exp = {
-          "constants": ObjectTrackManager.constants,
-          "categories":OTM.categories,
-          "trackmap":list(trackmap),
-          "linked_tracks":linked_tracks,
-          "images":imgs, 
-          "annotations":steps
-        }
-  return exp
-
-def export_tracks(screen, A):
-  # print(A.obj_tracker.global_track_store)
-  # steps = []
-  # A.obj_tracker.process_all_layers()
-  A.obj_tracker.close_all_tracks()
-  A.obj_tracker.link_all_tracks(0)
-  e = export_loco_fmt(A)
-  f = open("out.json", "w")
-  f.write(json.dumps(e, indent = 2))
-  f.close()
-
-  # tracks = A.obj_tracker.linked_tracks
-  # # print(len(A.obj_tracker.layers))
-  # # print(tracks)
-  # track_steps = []
-
-  # for i in tracks:
-  #   steps = []
-  #   A.obj_tracker.get_track(i).get_loco_track(fdict=None, steps=steps)
-  #   track_steps.append(steps)
-  # for s in track_steps:
-  #   json.dumps(s,indent=2)
-  #   for st in range(len(s)):
-  #     bbox = s[st]["bbox"]
-  #     x,y,w,h = bbox
-  #     x,y = A.transform_from_local_coord(x,y,w,h)
-  #     bbox[0],bbox[1] = x,y
-  #     s[st]["bbox"] = bbox
-  #   #   s[st]["bbox"][0],s[st]["bbox"][1] = x,y
-  #   #   # x,y = (bbox[0] / 1920) * A.fov_theta - A.fov_width / 2, bbox[1]
-  #   #   print(st)
-  #   # print("-----------------------------")
-  #   print(json.dumps(s,indent=2))
-  #   t = get_tracks(s)
-  #   for i in range(1, len(t)):
-  #     pafn.frame_draw_line(screen, (t[i-1], t[i]), pafn.colors["magenta"])
-  # pgn = A.get_polygon()
-  # pafn.frame_draw_polygon(screen, pgn, pafn.colors['tangerine'])
 
 def draw_coordinate_frame(screen, A):
+  '''
+  Helper function for displaying the curved coordinate fov of agent A
+
+  Does not return
+  '''
   coord_frame = A.get_sensor_field(5)
   for level in coord_frame:
     for i in range(1, len(level)):
@@ -176,6 +84,12 @@ def draw_coordinate_frame(screen, A):
 
 
 def import_loco_fmt(s, sys_path):
+  '''
+  Imports a LOCO formatted json
+
+  Returns a json of some sort
+  '''
+
   # set up trackmap for accessing tracks
   # self.imported = True
   # trackmap = s['trackmap']

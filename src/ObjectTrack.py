@@ -34,7 +34,7 @@ class ObjectTrack:
   
   def update_track_vector(self, pt, displacement = None):
     '''
-    Update track velocity vector
+    Update track trajectory information
     Assumes path is not empty
     '''
     center = self.path[-1].get_center_coord()
@@ -43,11 +43,6 @@ class ObjectTrack:
     self.delta_v.append(r / self.r)
 
     self.r = r
-    
-    # # theta = np.arctan2(cx - lx, cy - ly)
-    # self_theta = normalize_theta(self.theta)
-    # new_theta = normalize_theta(theta)
-    # self.delta_theta.append(new_theta / self_theta)
     
     self.theta = theta
 
@@ -71,6 +66,10 @@ class ObjectTrack:
     # return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
   
   def get_track_heading(self):
+    '''
+    Accessor for track trajectory information
+    Returns the track heading
+    '''
 
     return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta)
   

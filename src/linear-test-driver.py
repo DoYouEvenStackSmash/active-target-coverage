@@ -30,58 +30,7 @@ SPACE = 32
 OFFT = 20
 SPLINE_COUNT = 2
 TRANSLATE = False
-def adjust_for_coverage(A, Tlist = [], screen = None):
-  
-  estimates = A.predict_targets_covered()
-  j = 0
-  while j < len(estimates):
-    i = estimates[j]
-    indicator, err_type = A.is_detectable(i[1])
-    if indicator:
-      j+=1
-      continue
-    else:
-      pred = A.transform_from_local_coord(i[1][0],i[1][1])
-      curr = A.transform_from_local_coord(i[0][0],i[0][1])
 
-      if len(pred) > 0:
-        if screen != None:
-          pafn.frame_draw_line(screen, (curr,pred), pafn.colors["white"])
-        if err_type == Agent.ANGULAR:
-          start = 0
-          rotation = []
-
-          if screen == None:
-            A.rotate_sensor(pred)
-            estimates = A.predict_targets_covered()
-            j = 0
-            break
-          else:
-            rotation = gfn.lerp_list(Tlist[0].get_origin(), pred, 10)
-            start = 1
-          
-          # incrementally rotate the agent
-          for p in rotation[start:]:
-            pafn.clear_frame(screen)
-            pafn.frame_draw_dot(screen, pred, pafn.colors['yellow'])
-            pafn.frame_draw_dot(screen, Tlist[0].get_origin(), pafn.colors["green"])
-            # pafn.frame_draw_dot(screen, pred, pafn.colors['yellow'])
-            A.rotate_sensor(p)
-            draw_coordinate_frame(screen, A)
-            pygame.display.update()
-            time.sleep(0.01)
-          estimates = A.predict_targets_covered()
-          j = 0
-          break
-        elif err_type == Agent.RANGE:
-          A.translate_sensor(pred)
-          estimates = A.predict_targets_covered()
-          j = 0
-          break
-        # recompute estimates
-      if len(curr) > 0:
-        if screen != None:
-          pafn.frame_draw_dot(screen, curr, pafn.colors['red'])
 
 def predict_coverage(A,screen):
   estimates = A.predict_targets_covered()
@@ -125,7 +74,8 @@ def repeatable_test(screen, A, T):
     for a in range(len(Alist)):
       A = Alist[a]
       predict_coverage(A,screen)
-      adjust_for_coverage(A, Tlist,screen)
+      A.adjust_for_coverage()
+      # adjust_for_coverage(A,Tlist,screen)
     # time.sleep(.05)
       draw_coordinate_frame(screen, A)
     pygame.display.update()
@@ -144,8 +94,12 @@ def repeatable_test(screen, A, T):
   
   print(f"num_steps:{len(translation_path)}")
   print(f"rotations:{rotate_counter}")
-  for A in Alist:
-    export_tracks(screen, A)
+  
+  # for A in Alist:
+  e = A.export_tracks()
+  f = open("out.json", "w")
+  f.write(json.dumps(e, indent = 2))
+  f.close()
       # pygame.display.update()
 
 def main():

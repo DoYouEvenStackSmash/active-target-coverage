@@ -299,3 +299,69 @@ class ObjectTrackManager:
           self.active_tracks.rotate()
         else:
           self.inactive_tracks.append(self.active_tracks.pop())
+  
+
+  def export_loco_fmt(self):
+    '''
+    Export active tracks and associated metadata to loco format
+    '''
+    # construct filename lookup dictionary
+    fdict = None
+    # construct "images" : []
+    imgs = []
+    # construct "annotations" : []
+    steps = self.export_linked_loco_tracks(fdict)
+    
+    '''
+    Generate new images with which to populate a LOCO of the REFLECTED images
+    '''
+
+    # construct "linked_tracks" : []
+    linked_tracks = [{"track_id": i, "category_id" : self.get_track(i).class_id, 
+                      "track_len": 0, "steps":[] } 
+                      for i in self.linked_tracks]
+
+    
+    trackmap = {} # {track_id : posn in linked_tracks}
+    for i,lt in enumerate(linked_tracks):
+      trackmap[linked_tracks[i]['track_id']] = i
+    
+    # add trackmap_index to all annotations
+    for s in steps:
+      linked_tracks[trackmap[s['track_id']]]['steps'].append(s['id'])
+      s['trackmap_index'] = trackmap[s['track_id']]
+    
+    # add length to linked tracks for fun
+    for l in linked_tracks:
+      l["track_len"] = len(l['steps'])
+    
+    # assemble final dictionary
+    exp = {
+            "constants": ObjectTrackManager.constants,
+            "categories":self.categories,
+            "trackmap":list(trackmap),
+            "linked_tracks":linked_tracks,
+            "images":imgs, 
+            "annotations":steps
+          }
+    return exp
+  
+  def export_linked_loco_tracks(self, fdict = None):
+    '''
+      build "annotations" : [] from linked tracks only
+    '''
+    
+    track_steps = []
+    for i in self.linked_tracks:
+      # steps = []
+      self.get_track(i).get_loco_track(fdict=None,steps=track_steps)
+    for st in range(len(track_steps)):
+      bbox = track_steps[st]["bbox"]
+      x,y,w,h = bbox
+      
+      bbox[0],bbox[1] = x,y
+      track_steps[st]["bbox"] = bbox
+    
+    for i in range(len(track_steps)):
+      track_steps[i]["id"] = i
+    return track_steps

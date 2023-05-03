@@ -5,6 +5,7 @@ from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
 from StreamingObjectTrackManager import ObjectTrackManager
+from Target import Target
 import numpy as np
   
 def adjust_angle(theta):
@@ -15,32 +16,6 @@ def adjust_angle(theta):
     theta = theta + 2 * np.pi
   
   return theta
-
-class Target:
-  def __init__(self, origin, color = None, _id = 0):
-    self.origin = origin
-    self.color = color
-    self._id = _id
-
-  def reposition(self, destination):
-    '''
-    Repositions the origin of the target to some destination
-    '''
-    self.origin = destination
-
-  def get_origin(self):
-    '''
-    Accessor for the origin of the target
-    Returns an (x,y) point
-    '''
-    return self.origin
-
-  def get_id(self):
-    '''
-    Accessor for the unique identifier of the object
-    Returns an id
-    '''
-    return self._id
 
 
 class Agent:
@@ -58,7 +33,7 @@ class Agent:
     self.obj_tracker = obj_tracker
     self.color = None
     self.pose_adjustments = [None]
-  
+
   def predict_targets_covered(self):
     '''
     Report predicted coverage
@@ -68,14 +43,14 @@ class Agent:
       for t_id in range(len(self.obj_tracker.active_tracks)):
         elem = self.estimate_rel_next_detection(t_id)
         estimates.append(elem)
-        # estimates.append(self.is_detectable(elem[1]))
-        # print(f"track {t_id} detectable:\t{estimates[-1]}")
+        
     return estimates
   
   def rotate_sensor(self, target):
     '''
     Rotates the sensor
     Applies a displacement to all active tracks
+    Does not return
     '''
     
     theta = mfn.car2pol(self.origin, target)[0]
@@ -94,26 +69,27 @@ class Agent:
     self.fov_theta = theta
 
   def translate_sensor(self, target):
+    '''
+    Translates the agent based on a sensor reading
+    Applies a displacement to all active tracks
+    Does not return
+    '''
     
     theta, r = mfn.car2pol(self.origin, target)
     x,y,w,h = self.transform_to_local_coord(target)
-    # x3,y3,w3,h3 = self.transform_to_local_coord(self.origin)
-    # pt = mfn.pol2car(self.origin, y * (0.05), self.fov_theta)
-    # x2,y2,w2,h2 = self.transform_to_local_coord(pt)
-    # target_pt = (x,y)
-    # pt = (x2,y2)
+
     x3,y3,w3,h3 = self.transform_to_local_coord(self.origin)
     pt = mfn.pol2car(self.origin,y * 0.1, self.fov_theta)
-    # pt = self.transform_to_local_coord((pt[0],pt[1]))
+    
     displacement = (pt, mfn.car2pol((pt[0],pt[1]),self.origin))
     self.obj_tracker.add_linear_displacement(displacement)
-    # self.origin = 
     
     self.origin = pt
-    # self.transform_from_local_coord(pt[0],pt[1])
+    
     
   def get_horizontal_axis(self, radius):
     '''
+    Helper function for get_sensor_field
     Gets a horizontal line from the agent's fov
     Returns a list of points
     '''
@@ -134,7 +110,6 @@ class Agent:
     Gets the coordinate frame of the sensor
     Returns a list of lists of points [[(x1,y1),(x2,y2),...],[...],...]
     '''
-
     y_step = self.fov_radius / levels
     axes = []
     for i in range(1, levels + 1):
@@ -240,6 +215,10 @@ class Agent:
     return nd
   
   def get_predictions(self):
+    '''
+    Estimates next detections
+    Returns a list of pairs of xy points[((x1,y1),(x2,y2))]
+    '''
     predictions = []
     if not self.obj_tracker.has_active_tracks():
       return []
@@ -250,14 +229,17 @@ class Agent:
   def is_detectable(self, target):
     '''
     Indicates whether a target point is detectable (within tolerance)
-
+    Returns a boolean indicator and a type identifier
     '''
     adj_win_bnd = Agent.WINDOW_WIDTH * Agent.TOLERANCE  
     adj_rad_bnd = self.fov_radius * (Agent.TOLERANCE/1)
+
     if target[0] < 0 + adj_win_bnd or target[0] > Agent.WINDOW_WIDTH - adj_win_bnd:
       return False, Agent.ANGULAR
+
     if target[1] > self.fov_radius - adj_rad_bnd  or target[1] < 0 + adj_rad_bnd:
       return False, Agent.RANGE
+    
     return True, Agent.VALID
 
   def is_visible(self, target):
@@ -279,5 +261,48 @@ class Agent:
       return False
     if lh > tar_theta and rh < tar_theta:
       return True
-    # print(f"is_not_visible: {lh}:{tar_theta}:{rh}")
+    
     return False
+  
+  def adjust_for_coverage(self):
+    '''
+    Adjusts agent pose to improve coverage of predictions
+    Does not return
+    '''
+
+    estimates = self.predict_targets_covered()
+    j = 0
+    while j < len(estimates):
+      i = estimates[j]
+      indicator, err_type = self.is_detectable(i[1])
+      if indicator:
+        j+=1
+        continue
+      else:
+        pred = self.transform_from_local_coord(i[1][0],i[1][1])
+        curr = self.transform_from_local_coord(i[0][0],i[0][1])
+        rotation = gfn.lerp_list(curr, pred, 2)
+        start = 1
+          
+          # incrementally rotate the agent
+        for p in rotation[start:]:
+          if len(pred) > 0:
+            if err_type == Agent.ANGULAR:
+              self.rotate_sensor(p)
+            elif err_type == Agent.RANGE:
+              self.translate_sensor(p)
+          
+        estimates = self.predict_targets_covered()
+        j = 0
+        break
+
+  def export_tracks(self):
+    '''
+    Exports the recorded tracks from the agent's object tracker
+    returns a LOCO formatted json object
+    '''
+    self.obj_tracker.close_all_tracks()
+    self.obj_tracker.link_all_tracks(0)
+    e = self.obj_tracker.export_loco_fmt()
+    return e
+    

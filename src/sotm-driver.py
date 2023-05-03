@@ -13,6 +13,7 @@ from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
 from OTFTrackerApi import StreamingAnnotations as sann
+from Target import Target
 from Scene import *
 import json
 
