@@ -41,9 +41,7 @@ class ObjectTrack:
     theta, r = mfn.car2pol(center, pt)
     self.v.append(r)
     self.delta_v.append(r / self.r)
-    # self.velocity.append(r)
-    print(f"velocity: {r}")
-    print(f"delta_v: {self.delta_v[-1]}")
+
     self.r = r
     
     # # theta = np.arctan2(cx - lx, cy - ly)

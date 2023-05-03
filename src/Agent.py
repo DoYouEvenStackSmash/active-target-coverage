@@ -44,7 +44,9 @@ class Target:
 
 TOLERANCE = 0.1
 WINDOW_WIDTH = 100
-
+ANGULAR = 1
+RANGE = 2
+VALID = 0
 class Agent:
   def __init__(self, origin = [0, 0], fov = [0, 100, np.pi / 2], _id = 0, obj_tracker = None):
     self.origin = origin
@@ -56,36 +58,59 @@ class Agent:
     self.color = None
     self.pose_adjustments = [None]
   
-  def targets_covered(self):
+  def predict_targets_covered(self):
+    '''
+    Report predicted coverage
+    '''
     estimates = []
     if self.obj_tracker.has_active_tracks():
       for t_id in range(len(self.obj_tracker.active_tracks)):
         elem = self.estimate_rel_next_detection(t_id)
-        print(f"track {t_id} detectable:\t{self.is_detectable(elem[1])}")
-
+        estimates.append(elem)
+        # estimates.append(self.is_detectable(elem[1]))
+        # print(f"track {t_id} detectable:\t{estimates[-1]}")
+    return estimates
   
-  def rotate(self, target):
+  def rotate_sensor(self, target):
     '''
-    Rotates the sensor on the object tracker
+    Rotates the sensor
+    Applies a displacement to all active tracks
     '''
-    # x = self.fov_theta
+    
     theta = mfn.car2pol(self.origin, target)[0]
     
     x,y,w,h = self.transform_to_local_coord(target)
-    pt1 = (x,y)
-    print(f"target:{pt1}")
+    
     pt = mfn.pol2car(self.origin, y, self.fov_theta)
     x2,y2,w2,h2 = self.transform_to_local_coord(pt)
+    target_pt = (x,y)
     pt = (x2,y2)
-    print(f"origin:{pt}")
-
-    displacement = (pt, mfn.car2pol(pt1, pt))
-    print(displacement)
-    self.obj_tracker.add_displacement(displacement)
-    # self.pose_adjustments.append(displacement)
+    
+    displacement = (pt, mfn.car2pol(target_pt, pt))
+    
+    self.obj_tracker.add_angular_displacement(displacement)
+    
     self.fov_theta = theta
 
-
+  def translate_sensor(self, target):
+    
+    theta, r = mfn.car2pol(self.origin, target)
+    x,y,w,h = self.transform_to_local_coord(target)
+    # x3,y3,w3,h3 = self.transform_to_local_coord(self.origin)
+    # pt = mfn.pol2car(self.origin, y * (0.05), self.fov_theta)
+    # x2,y2,w2,h2 = self.transform_to_local_coord(pt)
+    # target_pt = (x,y)
+    # pt = (x2,y2)
+    x3,y3,w3,h3 = self.transform_to_local_coord(self.origin)
+    pt = mfn.pol2car(self.origin,y * 0.1, self.fov_theta)
+    # pt = self.transform_to_local_coord((pt[0],pt[1]))
+    displacement = (pt, mfn.car2pol((pt[0],pt[1]),self.origin))
+    self.obj_tracker.add_linear_displacement(displacement)
+    # self.origin = 
+    
+    self.origin = pt
+    # self.transform_from_local_coord(pt[0],pt[1])
+    
   def get_horizontal_axis(self, radius):
     '''
     Gets a horizontal line from the agent's fov
@@ -104,6 +129,11 @@ class Agent:
     return horizontal_axis
   
   def get_sensor_field(self, levels):
+    '''
+    Gets the coordinate frame of the sensor
+    Returns a list of lists of points [[(x1,y1),(x2,y2),...],[...],...]
+    '''
+
     y_step = self.fov_radius / levels
     axes = []
     for i in range(1, levels + 1):
@@ -135,7 +165,6 @@ class Agent:
     Calculates detection coordinates relative to Agent
     returns a Yolo Formatted bbox
     '''
-
     tar_theta, tar_r = mfn.car2pol(self.origin, target)
   
     org_theta = self.fov_theta
@@ -148,7 +177,6 @@ class Agent:
       tar_theta = tar_theta + 2 * np.pi
     
     ratio = (lh - tar_theta) / (lh - rh)
-    
     
     x = WINDOW_WIDTH * ratio
     y = tar_r
@@ -171,13 +199,6 @@ class Agent:
     ratio = theta - 0.5
     theta = lh - theta
     theta = mfn.correct_angle(theta)
-    # theta = rh + theta
-     
-    # print(f"is_not_visible: {lh}:{tar_theta}:{rh}")
-    # ltheta = lh - theta
-    # rtheta = rh + theta
-
-    # theta = adjust_angle(theta)
     
     r =  y
     return mfn.pol2car(self.origin, r, theta)
@@ -194,24 +215,9 @@ class Agent:
       trk_h = trk.get_track_heading()
       last_pt = trk.get_last_detection()
       pred_pt = trk.predict_next_box()
-    #   if self.pose_adjustments[-1] != None:
-    #     padj = self.pose_adjustments[-1]
-    #     origin = padj[0]
-    #     theta, rad = padj[1]
-    #     last_pt = mfn.pol2car(last_pt, rad, theta)
-    #     # est_pred_pt = mfn.pol2car(last_pt, trk_h[1], trk_h[3])
-    #     # pred_pt = est_pred_pt
-    #     pred_pt = mfn.pol2car(pred_pt, rad, theta)
-    #     # last_pt = mfn.pol2car(last_pt, -1 * rad, )
-    #   #   theta_adj
-    #   # elif self.pose_adjustments[-1] == None and trk_h[2] > 2:
-    #     # pred_pt = last_pt
-    #     # print("FLAGFLAGFLAG")
-    # else:
-    #   print("cannot estimate next detection!")
     
     nd = (last_pt, pred_pt)
-    # print(f"estimated: {nd}")
+    
     return nd
   
   def estimate_next_detection(self, idx = 0):
@@ -228,19 +234,30 @@ class Agent:
       last_pt = self.transform_from_local_coord(lx,ly)
       pred_pt = self.transform_from_local_coord(px,py)
     
-    
     nd = (last_pt,pred_pt)
-    # print(f"absolute: {nd}\n")
-    return nd
     
+    return nd
+  
+  def get_predictions(self):
+    predictions = []
+    if not self.obj_tracker.has_active_tracks():
+      return []
+    for i in range(len(self.obj_tracker.active_tracks)):
+      predictions.append(self.estimate_next_detection(i))
+    return predictions
+
   def is_detectable(self, target):
+    '''
+    Indicates whether a target point is detectable (within tolerance)
+
+    '''
     adj_win_bnd = WINDOW_WIDTH * TOLERANCE  
-    adj_rad_bnd = self.fov_radius * TOLERANCE
+    adj_rad_bnd = self.fov_radius * (TOLERANCE/1)
     if target[0] < 0 + adj_win_bnd or target[0] > WINDOW_WIDTH - adj_win_bnd:
-      return False
+      return False, ANGULAR
     if target[1] > self.fov_radius - adj_rad_bnd  or target[1] < 0 + adj_rad_bnd:
-      return False
-    return True
+      return False, RANGE
+    return True, VALID
 
   def is_visible(self, target):
     '''

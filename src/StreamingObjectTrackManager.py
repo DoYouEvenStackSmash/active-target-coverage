@@ -58,19 +58,45 @@ class ObjectTrackManager:
     self.imported = imported
     self.displacements = displacements
 
-  def add_displacement(self, displacement):
+  def add_angular_displacement(self, displacement):
+    '''
+    Apply a displacement to all active tracks (changing the reference origin)
+    displacement:  (origin, (theta, radius))
+    Does not return
+    '''
     if not self.has_active_tracks():
       return
-    padj = displacement
-    origin = padj[0]
-    theta, rad = padj[1]
+
+    origin = displacement[0]
+    theta, rad = displacement[1]
+
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
+      
       bbox = trk.path[-1].bbox
       x,y = mfn.pol2car((bbox[0],bbox[1]), rad, theta)
       bbox[0],bbox[1] = x,y
       trk.path[-1].bbox = bbox
 
+  def add_linear_displacement(self, displacement):
+    '''
+    Apply a displacement to all active tracks (changing the reference origin)
+    displacement:  (origin, (theta, radius))
+    Does not return
+    '''
+    if not self.has_active_tracks():
+      return
+
+    origin = displacement[0]
+    theta, rad = displacement[1]
+
+    for i in range(len(self.active_tracks)):
+      trk = self.active_tracks[i]
+      
+      bbox = trk.path[-1].bbox
+      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, trk.theta+theta)
+      bbox[0],bbox[1] = x,y
+      trk.path[-1].bbox = bbox
 
   def init_new_layer(self):
     '''
