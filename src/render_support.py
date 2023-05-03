@@ -120,7 +120,7 @@ class MathFxns:
     Normalizes a negative angle theta, created by arctan2
     Returns an angle between -pi/2 and 2pi
     '''
-    if rad_theta < -np.pi/2:
+    if rad_theta <= -np.pi/2:
       rad_theta = rad_theta + 2 * np.pi
     return rad_theta
 
