@@ -154,7 +154,7 @@
     {
       "track_id": 0,
       "category_id": 0,
-      "track_len": 37,
+      "track_len": 16,
       "steps": [
         0,
         1,
@@ -171,28 +171,7 @@
         12,
         13,
         14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36
+        15
       ]
     }
   ],
@@ -200,11 +179,11 @@
   "annotations": [
     {
       "id": 0,
-      "image_id": "frame_0",
+      "image_id": "frame_16",
       "category_id": 0,
       "bbox": [
-        49.50000000000001,
-        199.99999999999997,
+        99.1451568596027,
+        160.67650324364087,
         1,
         1
       ],
@@ -223,11 +202,11 @@
     },
     {
       "id": 1,
-      "image_id": "frame_1",
+      "image_id": "frame_17",
       "category_id": 0,
       "bbox": [
-        45.600000000000016,
-        200.00000000000003,
+        91.32924539188929,
+        140.39720017963913,
         1,
         1
       ],
@@ -242,15 +221,15 @@
         255,
         255
       ],
-      "displaced": false
+      "displaced": true
     },
     {
       "id": 2,
-      "image_id": "frame_2",
+      "image_id": "frame_18",
       "category_id": 0,
       "bbox": [
-        41.19999999999998,
-        200.00000000000006,
+        82.42626264064799,
+        124.6861073716297,
         1,
         1
       ],
@@ -265,15 +244,15 @@
         255,
         255
       ],
-      "displaced": false
+      "displaced": true
     },
     {
       "id": 3,
-      "image_id": "frame_3",
+      "image_id": "frame_19",
       "category_id": 0,
       "bbox": [
-        29.900000000000006,
-        199.99999999999991,
+        71.55265682576916,
+        114.40594906559035,
         1,
         1
       ],
@@ -288,15 +267,15 @@
         255,
         255
       ],
-      "displaced": false
+      "displaced": true
     },
     {
       "id": 4,
-      "image_id": "frame_4",
+      "image_id": "frame_20",
       "category_id": 0,
       "bbox": [
-        65.19999999999999,
-        199.99999999999997,
+        59.77885804184577,
+        110.95482335608305,
         1,
         1
       ],
@@ -315,701 +294,11 @@
     },
     {
       "id": 5,
-      "image_id": "frame_5",
-      "category_id": 0,
-      "bbox": [
-        49.99999999999996,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 6,
-      "image_id": "frame_6",
-      "category_id": 0,
-      "bbox": [
-        49.99999999999996,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 7,
-      "image_id": "frame_7",
-      "category_id": 0,
-      "bbox": [
-        46.69999999999999,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 8,
-      "image_id": "frame_8",
-      "category_id": 0,
-      "bbox": [
-        40.99999999999998,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 9,
-      "image_id": "frame_9",
-      "category_id": 0,
-      "bbox": [
-        33.10000000000002,
-        200.0,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 10,
-      "image_id": "frame_10",
-      "category_id": 0,
-      "bbox": [
-        27.000000000000007,
-        200.0,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 11,
-      "image_id": "frame_11",
-      "category_id": 0,
-      "bbox": [
-        40.70000000000006,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 12,
-      "image_id": "frame_12",
-      "category_id": 0,
-      "bbox": [
-        52.10000000000002,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 13,
-      "image_id": "frame_13",
-      "category_id": 0,
-      "bbox": [
-        61.69999999999997,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 14,
-      "image_id": "frame_14",
-      "category_id": 0,
-      "bbox": [
-        70.39999999999999,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 15,
-      "image_id": "frame_15",
-      "category_id": 0,
-      "bbox": [
-        79.39999999999998,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 16,
-      "image_id": "frame_16",
-      "category_id": 0,
-      "bbox": [
-        83.19999999999997,
-        200.00000000000009,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 17,
-      "image_id": "frame_17",
-      "category_id": 0,
-      "bbox": [
-        85.39999999999998,
-        199.99999999999991,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 18,
-      "image_id": "frame_18",
-      "category_id": 0,
-      "bbox": [
-        81.19999999999999,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 19,
-      "image_id": "frame_19",
-      "category_id": 0,
-      "bbox": [
-        73.79999999999997,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 20,
-      "image_id": "frame_20",
-      "category_id": 0,
-      "bbox": [
-        65.29999999999995,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 21,
       "image_id": "frame_21",
       "category_id": 0,
       "bbox": [
-        59.29999999999994,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 22,
-      "image_id": "frame_22",
-      "category_id": 0,
-      "bbox": [
-        54.40000000000005,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 23,
-      "image_id": "frame_23",
-      "category_id": 0,
-      "bbox": [
-        38.39999999999992,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 24,
-      "image_id": "frame_24",
-      "category_id": 0,
-      "bbox": [
-        30.69999999999995,
-        199.99999999999997,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 25,
-      "image_id": "frame_25",
-      "category_id": 0,
-      "bbox": [
-        22.099999999999977,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 26,
-      "image_id": "frame_26",
-      "category_id": 0,
-      "bbox": [
-        20.29999999999992,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 27,
-      "image_id": "frame_27",
-      "category_id": 0,
-      "bbox": [
-        28.400000000000038,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 28,
-      "image_id": "frame_28",
-      "category_id": 0,
-      "bbox": [
-        35.3,
-        200.0,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 29,
-      "image_id": "frame_29",
-      "category_id": 0,
-      "bbox": [
-        42.50000000000001,
-        200.00000000000006,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 30,
-      "image_id": "frame_30",
-      "category_id": 0,
-      "bbox": [
-        51.49999999999998,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 31,
-      "image_id": "frame_31",
-      "category_id": 0,
-      "bbox": [
-        60.599999999999945,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 32,
-      "image_id": "frame_32",
-      "category_id": 0,
-      "bbox": [
-        70.0,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 33,
-      "image_id": "frame_33",
-      "category_id": 0,
-      "bbox": [
-        74.9,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 34,
-      "image_id": "frame_34",
-      "category_id": 0,
-      "bbox": [
-        77.79999999999994,
-        200.00000000000003,
-        1,
-        1
-      ],
-      "area": 1,
-      "segmentation": [],
-      "iscrowd": 0,
-      "track_id": 0,
-      "trackmap_index": 0,
-      "vid_id": 0,
-      "track_color": [
-        255,
-        255,
-        255
-      ],
-      "displaced": false
-    },
-    {
-      "id": 35,
-      "image_id": "frame_35",
-      "category_id": 0,
-      "bbox": [
-        42.90000000000001,
-        200.0,
+        48.57433510518257,
+        114.65671408003053,
         1,
         1
       ],
@@ -1027,12 +316,219 @@
       "displaced": true
     },
     {
-      "id": 36,
-      "image_id": "frame_36",
+      "id": 6,
+      "image_id": "frame_22",
       "category_id": 0,
       "bbox": [
-        807.8000000000001,
-        200.00000000000003,
+        39.212996241600294,
+        124.68412545391662,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 7,
+      "image_id": "frame_23",
+      "category_id": 0,
+      "bbox": [
+        32.135157290662654,
+        139.6018081905877,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 8,
+      "image_id": "frame_24",
+      "category_id": 0,
+      "bbox": [
+        35.46560057000996,
+        138.79934424641877,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 9,
+      "image_id": "frame_25",
+      "category_id": 0,
+      "bbox": [
+        45.06332589637265,
+        124.02279431627373,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 10,
+      "image_id": "frame_26",
+      "category_id": 0,
+      "bbox": [
+        54.181470309178536,
+        114.7648587576192,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 11,
+      "image_id": "frame_27",
+      "category_id": 0,
+      "bbox": [
+        65.22049877357115,
+        111.897782345142,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 12,
+      "image_id": "frame_28",
+      "category_id": 0,
+      "bbox": [
+        76.00181521941185,
+        115.88965721389881,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 13,
+      "image_id": "frame_29",
+      "category_id": 0,
+      "bbox": [
+        85.57400549026029,
+        126.22476138134704,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 14,
+      "image_id": "frame_30",
+      "category_id": 0,
+      "bbox": [
+        93.41225210382937,
+        141.69869477713613,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": true
+    },
+    {
+      "id": 15,
+      "image_id": "frame_31",
+      "category_id": 0,
+      "bbox": [
+        99.626020634362,
+        161.03328483472578,
         1,
         1
       ],

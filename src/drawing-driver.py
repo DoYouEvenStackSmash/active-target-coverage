@@ -2,7 +2,7 @@
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
-from Agent import *
+#from Agent import *
 
 from PIL import Image, ImageDraw
 import collections
