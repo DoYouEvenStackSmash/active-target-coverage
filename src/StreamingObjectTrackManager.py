@@ -40,7 +40,8 @@ class ObjectTrackManager:
                 categories = CATEGORIES,
                 img_centers = [],
                 imported = False,
-                displacements = []
+                displacements = [],
+                parent_agent = None
               ):
     self.global_track_store = global_track_store
     self.inactive_tracks = inactive_tracks
@@ -57,6 +58,7 @@ class ObjectTrackManager:
     self.img_centers = img_centers
     self.imported = imported
     self.displacements = displacements
+    self.parent_agent = parent_agent
 
   def add_angular_displacement(self, displacement):
     '''

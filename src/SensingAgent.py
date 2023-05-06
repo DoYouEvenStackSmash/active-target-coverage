@@ -30,6 +30,16 @@ from Sensor import Sensor
 import pygame
 import time
 
+
+def adjust_angle(theta):
+  ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
+  if theta > np.pi:
+    theta = theta + -2 * np.pi
+  elif theta < -np.pi:
+    theta = theta + 2 * np.pi
+  
+  return theta
+
 class SensingAgent: 
   def __init__(self,
               exoskeleton = None,
@@ -42,46 +52,89 @@ class SensingAgent:
     self.obj_tracker = obj_tracker
     self._id = _id
 
-  def get_agent(self):
+  def get_origin(self):
+    '''
+    Accessor for the origin of the sensing agent in rigid body
+    returns an (x,y) point
+    '''
+    origin = self.exoskeleton.get_center()
+    return origin
+  
+  def get_fov_theta(self):
+    '''
+    Accessor for the orientation of the sensing agent as the rigid body
+    Returns an angle theta
+    '''
+    fov_theta = self.exoskeleton.get_rel_theta()
+    return fov_theta    
+
+  def get_fov_width(self):
+    '''
+    Accessor for the width of the fov of the sensing agent
+    returns a scalar value
+    '''
+    fov_width = self.sensor.get_fov_width()
+    return fov_width
+
+  def get_fov_radius(self):
+    '''
+    Accessor for the range of the sensing agent's sensor
+    returns a scalar value
+    '''
+    fov_radius = self.sensor.get_fov_radius()
+    return fov_radius
+
+  def get_components(self):
+    '''
+    Returns the attributes of an agent
+    '''
     return (self.exoskeleton, self.sensor)
-  
-  def get_last_detection(self):
-    last_detected, next_detected = self.estimate_rel_next_detection()
-    theta = 0
-    if len(next_detected):
-      theta, r = tfn.calculate_rotation(self.exoskeleton.get_rotation_center(), last_detected, next_detected)
-    return theta
 
-  def move_to_next(self):
-    theta = self.get_last_detection()
-    if theta == 0:
-      return
-    self.rotate_agent(theta)
-    self.obj_tracker.add_angular_displacement((0,(theta, 0)))
-
-
-  def rotate_agent(self, theta):
-    p = self.exoskeleton.get_rotation_center()
-    new_theta = self.exoskeleton.rotate_body(self.exoskeleton.get_rotation_center(), theta)
-    rot_mat = tfn.calculate_rotation_matrix(new_theta,1)
-    self.sensor.origin = tfn.rotate_point(p, self.sensor.origin, rot_mat)
-    self.sensor.fov_theta += new_theta
-  
   def get_center(self):
-    return self.exoskeleton.get_rotation_center()
+    '''
+    Accessor for rotation center of the agent
+    '''
+    return self.exoskeleton.get_center()
   
-  def get_sensor_origin(self):
-    return self.sensor.origin
+  def get_sensor(self):
+    '''
+    Accessor for the agent's sensor
+    '''
+    return self.sensor
 
-  def query_sensor_visible(self, target):
-    return self.sensor.is_visible(target)
+  def get_object_tracker(self):
+    '''
+    Accessor for the agent's object tracker
+    '''
 
-  def get_sensor_range(self):
-    return self.sensor.fov_radius
+  def translate_agent(self, target_pt):
+    '''
+    Wrapper for translating the rigid body of the agent
+    returns a displacement vector (theta, r)
+    '''
+    theta, r = self.exoskeleton.translate_body(target_pt)
+    return (theta, r)
 
-  def query_tracker_for_prediction(self):
-    c,pred = self.estimate_next_detection()
-    return (c,pred)
+  def rotate_agent(self, target_pt):
+    '''
+    Wrapper for rotating the rigid body of the agent
+    returns an angle theta
+    '''
+    rotation = self.exoskeleton.rotate_body(target_pt)
+    return rotation
+  
+  def is_visible(self, target_pt):
+    '''
+    Determines whether a target point is in the Sensor's sensor fov
+    Returns true/false
+    '''
+    rotation = self.exoskeleton.get_relative_rotation(target_pt)
+    theta, r = mfn.car2pol(self.exoskeleton.get_center(), target_pt)
+    if abs(rotation) > self.get_fov_width() / 2:
+      return False
+    if r > self.get_fov_radius():
+      return False
+    return True
 
   def export_tracks(self):
     '''
@@ -93,38 +146,3 @@ class SensingAgent:
     e = self.obj_tracker.export_loco_fmt()
     return e
 
-  def estimate_rel_next_detection(self, idx = 0):
-    '''
-    Estimates next detection in local coordinate system
-    returns a pair of points
-    '''
-    last_pt, pred_pt = (),()
-    
-    if self.obj_tracker.has_active_tracks():
-      trk = self.obj_tracker.active_tracks[idx]
-      trk_h = trk.get_track_heading()
-      last_pt = trk.get_last_detection()
-      pred_pt = trk.predict_next_box()
-    
-    nd = (last_pt, pred_pt)
-    
-    return nd
-  
-  def estimate_next_detection(self, idx = 0):
-    '''
-    Estimates next detection in external coordinate system
-    returns a pair of points
-    '''
-
-    last_pt,pred_pt = (),()
-    nd = self.estimate_rel_next_detection(idx)
-    if len(nd[0]) and len(nd[1]):
-      lx,ly = nd[0]
-      px,py = nd[1]
-      last_pt = self.sensor.transform_from_local_coord(lx,ly)
-      pred_pt = self.sensor.transform_from_local_coord(px,py)
-    
-    nd = (last_pt,pred_pt)
-    
-    return nd
-  

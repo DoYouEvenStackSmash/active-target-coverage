@@ -8,13 +8,30 @@ from support.transform_polygon import *
 from support.Polygon import *
 from support.Link import Link
 
+import collections
+# from aux_functions import *
+# from Dataloader import Dataloader
+from YoloBox import YoloBox
+from StreamingObjectTrackManager import ObjectTrackManager
+from ObjectTrack import ObjectTrack
+from AnnotationLoader import AnnotationLoader as al
+from OTFTrackerApi import StreamingAnnotations as sann
+# from Scene import *
+import json
 
+# import pygame
+# import numpy as np
+import sys
+# import time
 
 from RigidBody import RigidBody
 from Sensor import Sensor
 from SensingAgent import SensingAgent
+from Target import Target
+from Environment import Environment
 import pygame
 import time
+
 
 def draw_coordinate_frame(screen, S):
   '''
@@ -64,63 +81,59 @@ def draw_sensing_agent(screen, SA):
   draw_coordinate_frame(screen, s)
   draw_rigid_body(screen,ex)
 
-def repeatable_sensing_agent_test(screen, SA):
-  draw_sensing_agent(screen, SA)
-  pygame.display.update()
-  directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
-  offset = 50
-  origin = (500,500)
-  scaling = 2
-  x,y = origin
-  target_points = [(x - offset * scaling,y - offset * scaling), (x + offset * scaling, y - offset * scaling), (x + offset * scaling,y + offset * scaling), (x - offset * scaling, y + offset * scaling)]
-  origins = [(450, 500), (500, 450), (550, 500), (500,550)]
-  last = (600,500)
-  draw_sensing_agent(screen, SA)
+def repeatable_sensing_agent_test(screen, E):
   
-  for tpt in target_points:
-    pafn.frame_draw_dot(screen, tpt, pafn.colors["red"])
+  
+  step_size = 15
+  destinations = []
+  origin = (600,500)
+  for i in range(25):
+    x,y = origin
+    # destinations.append((x, y - step_size * i))
+    destinations.append((x - 300, y - step_size * i))
+  destinations.reverse()
+  for i in reversed(destinations):
+    destinations.append(i)
+  
+    # Tlist[t].origin = mfn.pol2car(Tlist[t].get_origin(), r, theta)
+    # Tlist[t].origin = pt
+  ptr = E.targets[0].get_origin()
+  pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
+  
+  
+  draw_sensing_agent(screen, E.agent)
   pygame.display.update()
   time.sleep(1)
-  for o in target_points:
+
+  translation_path = destinations
+  print("running\n")
+
+  rotate_counter = 0
+  for pt in translation_path[1:]:
+    
     pafn.clear_frame(screen)
-    pafn.frame_draw_dot(screen, o, pafn.colors["green"])
-
-    if last != None:
-      rad,pt = tfn.calculate_rotation(SA.get_center(), o ,last)
-    else:
-      rad = R.get_relative_rotation(o)
-    last = o
-    SA.rotate_agent(rad)
-    for tpt in target_points:
-      status = SA.sensor.is_visible(tpt)
-        
-      if status:
-        status2 = SA.sensor.is_detectable(SA.sensor.transform_to_local_coord(tpt))
-        if status:
-          pafn.frame_draw_dot(screen, tpt, pafn.colors["cyan"])
-        print(SA.sensor.transform_to_local_coord(tpt))
-      else:
-        pafn.frame_draw_dot(screen, tpt, pafn.colors["red"])
-    draw_sensing_agent(screen, SA)
-    pygame.display.update()
+    # pafn.frame_draw_dot(screen, o, pafn.colors["green"])
     
+    E.agent.move_to_next()
+    cpt,npt = E.agent.query_tracker_for_prediction()
+    # print(npt)
     
-    # print(rad)
-    # rot_mat = tfn.calculate_rotation_matrix(rad)
+    if len(npt):
+      
+      pafn.frame_draw_dot(screen, npt, pafn.colors["yellow"])
+      pafn.frame_draw_line(screen, (cpt, npt),pafn.colors["white"])
+    pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+    draw_sensing_agent(screen, E.agent)
+    E.targets[0].origin = pt
+    E.visible_targets()
     
-    # pafn.clear_frame(screen)
-    pafn.frame_draw_dot(screen, o, pafn.colors["green"])
-
-      # R.rotate_body(R.get_rotation_center(), rot_mat)
-      # tfn.rotate_point(R.get_rotation_center(), R.get_origin(), rot_mat)
-      # tfn.rotate_point(R.get_rotation_center(), R.get_endpoint(), rot_mat)
-    
-
-    
-    # pygame.display.update()  
-    time.sleep(0.01)
-    
-    time.sleep(1)
+    pygame.display.update()  
+    time.sleep(0.1)
+  e = E.agent.export_tracks()
+  f = open("out.json", "w")
+  f.write(json.dumps(e, indent = 2))
+  f.close()
+    # time.sleep(1)
 
 
 
@@ -132,18 +145,25 @@ def main():
   origin = (500,500)
   ox,oy = origin
   scale = 3
+  
   opts = [(ox - 10*scale, oy - 10*scale), (ox - 10*scale, oy + 10*scale), (ox + 30 * scale, oy)]
   mpt = gfn.get_midpoint(opts[0], opts[1])
   mpt2 = gfn.get_midpoint(mpt,opts[2])
   ap = Polygon(opts)
   rb = RigidBody(ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_body = ap)
   rb.prev = rb
+  rb.rotate_body(origin=rb.ref_center, theta=-3 * np.pi / 4)
+  # rb.rel_theta = 3 * np.pi / 2
   s = Sensor()
   s.fov_width = 3 * np.pi / 5
-  s.origin = opts[2]
+  s.origin = rb.ref_endpoint
+  s.fov_theta = rb.rel_theta
   A = SensingAgent(rb, s)
+  A.obj_tracker = ObjectTrackManager()
+  T = Target((500,550))
+  E = Environment(A, [T])
   
-  repeatable_sensing_agent_test(screen, A)
+  repeatable_sensing_agent_test(screen, E)
   
 
 if __name__ == '__main__':
