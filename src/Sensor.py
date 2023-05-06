@@ -120,19 +120,3 @@ class Sensor:
       horizontal_axis.append(mfn.pol2car(self.get_origin(), radius, i))
     return horizontal_axis
 
-  def is_detectable(self, target):
-    '''
-    Indicates whether a target point is detectable (within tolerance)
-    Returns a boolean indicator and a type identifier
-    '''
-    adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE  
-    adj_rad_bnd = self.fov_radius * (Sensor.TOLERANCE/1)
-
-    if target[0] < 0 + adj_win_bnd or target[0] > Sensor.WINDOW_WIDTH - adj_win_bnd:
-      return False, Sensor.ANGULAR
-
-    if target[1] > self.fov_radius - adj_rad_bnd or target[1] < 0 + adj_rad_bnd:
-      return False, Sensor.RANGE
-    
-    return True, Sensor.VALID
-  

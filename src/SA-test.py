@@ -19,6 +19,10 @@ from OTFTrackerApi import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
+from Target import Target
+from Environment import Environment
+import sys
+import json
 import pygame
 import time
 
@@ -87,6 +91,71 @@ def draw_sensing_agent(screen, sensing_agent):
   draw_coordinate_frame(screen, sensor)
   draw_rigid_body(screen, exoskeleton)
 
+def repeatable_environment_test(screen, sensing_agent, environment):
+  directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
+  target_points = [(450,450), (550, 450), (550,550), (450,550)]
+  draw_sensing_agent(screen, environment.agent)
+  pygame.display.update()
+    
+  step_size = 15
+  destinations = []
+  origin = (600,500)
+  for i in range(25):
+    x,y = origin
+    # destinations.append((x, y - step_size * i))
+    destinations.append((x - 300, y - step_size * i))
+  destinations.reverse()
+  for i in reversed(destinations):
+    destinations.append(i)
+  
+  
+  ptr = environment.targets[0].get_origin()
+  pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
+  translation_path = destinations
+  while 1:
+    for event in pygame.event.get():
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        if pygame.key.get_mods() == SPACE:
+          
+          continue
+        elif pygame.key.get_mods() == LSHIFT:  # rotate relative
+          for pt in translation_path[1:]:
+            pafn.clear_frame(screen)
+            sensing_agent.predict()
+            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            if len(pred_pt):
+              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+            draw_sensing_agent(screen, environment.agent)
+            environment.targets[0].origin = pt
+            environment.visible_targets()
+            pygame.display.update()
+            time.sleep(0.1)
+          
+          continue
+        elif pygame.key.get_mods() == LALT: # estimate
+          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
+            continue
+          p = pygame.mouse.get_pos()
+          pafn.clear_frame(screen)
+          rotation = sensing_agent.rotate_agent(p)
+          draw_sensing_agent(screen, sensing_agent)
+          pygame.display.update()
+          continue
+          
+        elif pygame.key.get_mods() == LCTRL:
+          e = environment.agent.export_tracks()
+          f = open("out.json", "w")
+          f.write(json.dumps(e, indent = 2))
+          f.close()
+          sys.exit()
+          continue
+        else:
+          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
+            continue
+          p = pygame.mouse.get_pos()
+
 
 def repeatable_sensing_agent(screen, sensing_agent):
   draw_sensing_agent(screen, sensing_agent)
@@ -94,7 +163,7 @@ def repeatable_sensing_agent(screen, sensing_agent):
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN:
-        if pygame.key.get_mods() == LCTRL:
+        if pygame.key.get_mods() == SPACE:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
@@ -123,12 +192,25 @@ def repeatable_sensing_agent(screen, sensing_agent):
             pafn.frame_draw_dot(screen, p, pafn.colors['red'])
           pygame.display.update()
           continue
+        elif pygame.key.get_mods() == LCTRL:
+          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
+            continue
+          p = pygame.mouse.get_pos()
+          dc = sensing_agent.transform_to_local_bbox(p)
+          print(f"original {p}\ndc {dc}")
+          continue
         else:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
-          print(p)
+          detectable,flag = sensing_agent.is_detectable(p)
+          if detectable:
+            pafn.frame_draw_dot(screen, p, pafn.colors['cyan'])
+          else:
+            pafn.frame_draw_dot(screen, p, pafn.colors['red'])
+          pygame.display.update()
 
+  
 
 def main():
   pygame.init()
@@ -145,7 +227,10 @@ def main():
   sensing_agent.exoskeleton = rb
   sensing_agent.sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
-  repeatable_sensing_agent(screen, sensing_agent)
+  target = Target((500,550))
+  environment = Environment(sensing_agent, [target])
+  # repeatable_sensing_agent(screen, sensing_agent)
+  repeatable_environment_test(screen, sensing_agent, environment)
 
 
 
