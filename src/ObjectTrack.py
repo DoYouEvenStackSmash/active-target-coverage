@@ -61,7 +61,7 @@ class ObjectTrack:
       lx,ly = posn
     
     new_posn = mfn.pol2car((lx,ly), self.v[-1], self.theta)
-    print(new_posn)
+    # print(new_posn)
     return new_posn
     # return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
   

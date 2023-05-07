@@ -90,19 +90,37 @@ class RigidBody:
     '''
     return self.origin
 
-
   def rotate_body(self, target_point):
     '''
     Rotation for the rigid body
     '''
     rotation = self.get_relative_rotation(target_point)
+    rotation = self.apply_rotation_to_body(rotation)
+    # rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
+    # self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
+    # self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
+    # rotate_polygon(self.body, rot_mat, self.get_center())
+    self.rel_theta += rotation
+    return rotation
+  
+  def apply_rotation_to_body(self, rotation):
+    '''
+    Applies a rotation to internal polygon
+    Does not return
+    '''
     rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
     self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
     self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
     rotate_polygon(self.body, rot_mat, self.get_center())
-    self.rel_theta += rotation
+        # correction for arctan identification
+    # rotation = self.rel_theta + rotation
+    # if rotation > np.pi:
+    #   rotation = rotation - 2 * np.pi
+    # if rotation < -np.pi:
+    #   rotation = rotation + 2 * np.pi
+    # self.rel_theta = rotation
     return rotation
-
+    
 
   def translate_body(self, target_point):
     '''
@@ -153,12 +171,14 @@ class RigidBody:
     Given a target point, computes the angle theta between the current
     endpoint and the target point for use during rotation
 
+    USES GLOBAL COORDINATES
+
     Returns a normalized angle theta
     '''
-  
+
     norm, dist = mfn.car2pol(self.get_center(), self.get_endpoint())
     rad, r = mfn.car2pol(self.get_center(), target_point)
-    
+
     norm = mfn.correct_angle(norm)
     rad = mfn.correct_angle(rad)
     
@@ -172,4 +192,3 @@ class RigidBody:
     
     return rotation
 
-    

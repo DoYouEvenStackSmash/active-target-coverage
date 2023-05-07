@@ -120,7 +120,7 @@ def repeatable_sensor_test(screen, E):
               npt = E.transform_from_local_coord(npt[0],npt[1])
               E.agent.rotate_to_target(pt)
               x,y,w,h = E.transform_to_local_coord(npt)
-              # print((x,y))
+              print((x,y))
               pafn.frame_draw_dot(screen, npt, pafn.colors["yellow"])
               pafn.frame_draw_line(screen, (cpt, npt),pafn.colors["white"])
             pafn.frame_draw_dot(screen, pt, pafn.colors["green"])

@@ -103,7 +103,7 @@ def repeatable_environment_test(screen, sensing_agent, environment):
   for i in range(25):
     x,y = origin
     # destinations.append((x, y - step_size * i))
-    destinations.append((x - 300, y - step_size * i))
+    destinations.append((x, y - step_size * i))
   destinations.reverse()
   for i in reversed(destinations):
     destinations.append(i)
@@ -122,10 +122,12 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           for pt in translation_path[1:]:
             pafn.clear_frame(screen)
             sensing_agent.predict()
-            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-            if len(pred_pt):
-              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            # if len(pred_pt):
+            #   # print((curr_pt,pred_pt))
+            #   pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+            #   pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+            #   pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
             pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
             draw_sensing_agent(screen, environment.agent)
             environment.targets[0].origin = pt
@@ -135,15 +137,15 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           
           continue
         elif pygame.key.get_mods() == LALT: # estimate
+          # sys.exit()
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
-          pafn.clear_frame(screen)
-          rotation = sensing_agent.rotate_agent(p)
-          draw_sensing_agent(screen, sensing_agent)
-          pygame.display.update()
+          dc = sensing_agent.transform_to_local_bbox(p)
+          print(f"original {p}\ndc {dc}")
           continue
-          
+
+          continue
         elif pygame.key.get_mods() == LCTRL:
           e = environment.agent.export_tracks()
           f = open("out.json", "w")
@@ -155,6 +157,12 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
+          pafn.clear_frame(screen)
+          rotation = sensing_agent.rotate_agent(p)
+          draw_sensing_agent(screen, sensing_agent)
+          pygame.display.update()
+          continue
+         
 
 
 def repeatable_sensing_agent(screen, sensing_agent):
@@ -203,7 +211,8 @@ def repeatable_sensing_agent(screen, sensing_agent):
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
-          detectable,flag = sensing_agent.is_detectable(p)
+          dc = sensing_agent.transform_to_local_bbox(p)
+          detectable,flag = sensing_agent.is_rel_detectable((dc[0],dc[1]))
           if detectable:
             pafn.frame_draw_dot(screen, p, pafn.colors['cyan'])
           else:
