@@ -14,6 +14,16 @@ from categories import CATEGORIES
   global_track_store: {track_id : ObjectTrack}
       lookup dictionary for directly accessing track objects by ID
 '''
+
+def adjust_angle(theta):
+  ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
+  if theta > np.pi:
+    theta = theta + -2 * np.pi
+  elif theta < -np.pi:
+    theta = theta + 2 * np.pi
+  
+  return theta
+
 LABELS = True
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
@@ -69,6 +79,29 @@ class ObjectTrackManager:
       estimates.append(trk.predict_next_box())
     return estimates
 
+  def add_angular_displacement(self, distance, angle):
+    if not self.has_active_tracks():
+      return
+    
+    print(self.parent_agent.get_fov_theta())
+    
+    for i in range(len(self.active_tracks)):
+      trk = self.active_tracks[i]
+      last_d, last_v, delta_v, theta = trk.get_track_heading()
+
+      disp = angle / self.parent_agent.get_fov_width() * 100
+      print(disp)
+      # disp = [-50,50]
+      new_posn = [last_d[0] + disp, last_d[1]]
+      print(f"trk_theta {trk.theta + angle}")
+      trk.theta = adjust_angle(trk.theta - angle)
+      # new_posn = mfn.pol2car((50,0), last_d[1], angle)
+      # bbox = 
+      trk.path[-1].bbox = [new_posn[0],new_posn[1], 1,1]
+      
+
+
+
   def add_linear_displacement(self, distance, angle):
     if not self.has_active_tracks():
       return
@@ -76,8 +109,8 @@ class ObjectTrackManager:
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
     
-      bbox = trk.get_last_detection()
-      new_posn = mfn.pol2car((bbox[0],bbox[1]), distance, angle)
+      last_d, last_v, delta_v, theta = trk.get_track_heading()
+      new_posn = mfn.pol2car((last_d[0],last_d[1]), last_d[1], angle)
       # trk.bbox = 
       trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
 

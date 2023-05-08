@@ -24,7 +24,7 @@ class Sensor:
   def __init__( self,
                 parent_agent,
                 sensor_radius = 300,
-                sensor_width = np.pi / 4):
+                sensor_width = np.pi / 3):
     self.parent_agent = parent_agent
     self.fov_radius = sensor_radius
     self.fov_width = sensor_width

@@ -37,7 +37,14 @@ OFFT = 20
 SPLINE_COUNT = 2
 TRANSLATE = False
 
-
+def adjust_angle(theta):
+  ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
+  if theta > np.pi:
+    theta = theta + -2 * np.pi
+  elif theta < -np.pi:
+    theta = theta + 2 * np.pi
+  
+  return theta
 def draw_coordinate_frame(screen, sensor):
   '''
   Helper function for displaying the sensor field of view
@@ -109,14 +116,14 @@ def repeatable_environment_test(screen, sensing_agent, environment):
 
   vert_destinations.reverse()
   # horiz_destinations.reverse()
-  for i in reversed(horiz_destinations):
+  for i in reversed(vert_destinations):#horiz_destinations):
     vert_destinations.append(i)
     horiz_destinations.append(i)
   
   
   ptr = environment.targets[0].get_origin()
   pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
-  translation_path = horiz_destinations
+  translation_path = vert_destinations
   # translation_path
   while 1:
     for event in pygame.event.get():
@@ -128,8 +135,11 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           for pt in translation_path[1:]:
             pafn.clear_frame(screen)
             # sensing_agent.predict()
+            # print(sensing_agent.estimate_next_rotation())
             curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            sensing_agent.estimate_next_rotation()
             if len(pred_pt):
+              
               # print((curr_pt,pred_pt))
               pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
               pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
@@ -168,13 +178,139 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
+          # pts.append(p)
+          # dc = sensing_agent.transform_to_local_bbox(p)
           pafn.clear_frame(screen)
+          orig_theta = sensing_agent.get_fov_theta()
           rotation = sensing_agent.rotate_agent(p)
+          
+          new_theta = sensing_agent.get_fov_theta()
+          print(new_theta - orig_theta)
+          dc = sensing_agent.transform_to_local_bbox(p)
+          # print(f"displacement: {rotation / sensing_agent.get_fov_width() * 100}")
+          # dc = sensing_agent.transform_to_local_bbox(p)
+          print(f"original {p}\ndc {dc}")
+          print(new_theta)
+          
+          # sensing_agent.obj_tracker.add_angular_displacement(0, -(new_theta - orig_theta))
+          
           draw_sensing_agent(screen, sensing_agent)
           pygame.display.update()
           continue
          
+def repeatable_step_test(screen, sensing_agent, environment):
+  directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
+  target_points = [(450,450), (550, 450), (550,550), (450,550)]
+  draw_sensing_agent(screen, environment.agent)
+  pygame.display.update()
+  
+  step_size = 25
+  vert_destinations = []
+  horiz_destinations = []
+  origin = (600,500)
+  for i in range(25):
+    x,y = origin
+    # destinations.append((x, y - step_size * i))
+    vert_destinations.append((x, y - step_size * i))
+    horiz_destinations.append((x - step_size * i, y))
+  
+  vert_destinations.reverse()
+  # horiz_destinations.reverse()
+  for i in reversed(vert_destinations):#horiz_destinations):
+    vert_destinations.append(i)
+    horiz_destinations.append(i)
+  
+  while 1:
+    for event in pygame.event.get():
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        if pygame.key.get_mods() == SPACE:
+          continue
+        elif pygame.key.get_mods() == LSHIFT:  # rotate relative
+          continue
+        elif pygame.key.get_mods() == LALT: # estimate
+            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 
+            if len(pred_pt):
+              # print((curr_pt,pred_pt))
+              pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            pygame.display.update()
+            continue
+        elif pygame.key.get_mods() == LCTRL:
+          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
+            continue
+          p = pygame.mouse.get_pos()
+          pafn.clear_frame(screen)
+          orig = sensing_agent.get_fov_theta()
+          rotation = sensing_agent.rotate_agent(p)
+          new_theta = sensing_agent.get_fov_theta()
+          print("checking...")
+          print(new_theta - orig)
+          print(rotation)
+          # sensing_agent.obj_tracker.add_angular_displacement(0,orig - new_theta)
+          draw_sensing_agent(screen, sensing_agent)
+          pygame.display.update()
+          continue
+          # pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+        else:
+          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
+            continue
+          p = pygame.mouse.get_pos()
+          translation_path = []
+          # translation_path = gfn.lerp_list(environment.targets[0].get_origin(), p, 10)
+          translation_path = vert_destinations
+          for pt in translation_path[1:]:
+            pafn.clear_frame(screen)
+            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            # specify displacement
+            est_rotation = ()
+            est_rotation = sensing_agent.estimate_next_rotation()
+            
+            pred_rotation = sensing_agent.exoskeleton.get_relative_rotation(pt)
+            if len(est_rotation):
+              
+              est_rotation = est_rotation[0]
+              print(est_rotation)
+              rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
+              sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+              sensing_agent.exoskeleton.rel_theta += rotation
+              # print(f"sensing: {sensing_agent.exoskeleton.rel_theta}")
+              # sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+              # draw_sensing_agent(screen, sensing_agent)
+              # pygame.display.update()
+              time.sleep(0.01)
+
+              # rotation = sensing_agent.apply_rotation_to_agent(-est_rotation)
+              # sensing_agent.exoskeleton.rel_theta += rotation
+              # sensing_agent.obj_tracker.add_angular_displacement(0, est_rotation)
+              # draw_sensing_agent(screen, sensing_agent)
+              # pygame.display.update()
+              # time.sleep(0.2)
+            # sensing_agent.obj_tracker.add_angular_displacement(0, -rotation)
+
+
+            # print(f"est:\t{est_rotation}\npred:\t{pred_rotation}")
+            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            if len(pred_pt):
+              # print((curr_pt,pred_pt))
+              pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["tangerine"])
+              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            # npt = sensing_agent.estimate_next_rotation()
+            # if len(npt):
+            #   npt = sensing_agent.transform_from_local_coord(npt[0], npt[1])
+            #   pafn.frame_draw_dot(screen, npt, pafn.colors["cyan"])
+            
+
+            draw_sensing_agent(screen, sensing_agent)
+            pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+            environment.targets[0].origin = pt
+            environment.visible_targets()
+            pygame.display.update()
+            time.sleep(0.1)
+            # sensing_agentestimate_next_rotation()
+          continue
 
 def repeatable_sensing_agent(screen, sensing_agent):
   draw_sensing_agent(screen, sensing_agent)
@@ -248,10 +384,12 @@ def main():
   sensing_agent.exoskeleton = rb
   sensing_agent.sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
+  sensing_agent.obj_tracker.parent_agent = sensing_agent
   target = Target((500,550))
   environment = Environment(sensing_agent, [target])
   # repeatable_sensing_agent(screen, sensing_agent)
-  repeatable_environment_test(screen, sensing_agent, environment)
+  # repeatable_environment_test(screen, sensing_agent, environment)
+  repeatable_step_test(screen, sensing_agent, environment)
 
 
 

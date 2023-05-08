@@ -148,8 +148,6 @@ class SensingAgent:
       return False
     return True
 
-
-
   def is_rel_detectable(self, target_pt):
     '''
     Indicates whether a target point is detectable (within tolerance)
@@ -212,34 +210,9 @@ class SensingAgent:
     y = r
     w = 1
     h = 1
-    print(f"post_transform: {ratio}, {(x,y)}")
-    return [x,y,w,h]
-  
-  def _transform_to_local_bbox(self, target):
-    '''
-    Calculates detection coordinates relative to Agent
-    returns a Yolo Formatted bbox
-    '''
-    tar_theta, tar_r = mfn.car2pol(self.get_center(), target)
-  
-    org_theta = self.get_fov_theta()
-    if org_theta < 0:
-      org_theta = 2 * np.pi + org_theta
-
-    lh = org_theta + self.get_fov_width() / 2
-    rh = org_theta - self.get_fov_width() / 2
-    if tar_theta < rh:
-      tar_theta = tar_theta + 2 * np.pi
-    
-    ratio = (lh - tar_theta) / (lh - rh)
-    
-    x = Sensor.WINDOW_WIDTH * ratio
-    y = tar_r
-    w = 1
-    h = 1
+    # print(f"post_transform: {ratio}, {(x,y)}")
     return [x,y,w,h]
 
-  
   def transform_from_local_coord(self, x, y, w=1, h=1):
     '''
     Transforms a bbox from sensor local coords to world coords
@@ -252,6 +225,24 @@ class SensingAgent:
 
     return pt
 
+  def estimate_next_rotation(self, idx = 0):
+    curr_pt, pred_pt = self.estimate_rel_next_detection()
+    if not len(pred_pt):
+      return ()
+    if curr_pt == pred_pt:
+      return ()
+    status, flag = self.is_rel_detectable(pred_pt)
+    if status:
+      return ()
+    print("rotation necessary")
+    partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
+    return (partial_rotation,())
+    
+    
+
+    # rotation = abs(pred_theta - curr_theta)
+    # print(status)
+  
   def estimate_rel_next_detection(self, idx = 0):
     '''
     Estimates next detection in local coordinate system
