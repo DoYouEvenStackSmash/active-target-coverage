@@ -204,7 +204,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
   draw_sensing_agent(screen, environment.agent)
   pygame.display.update()
   
-  step_size = 25
+  step_size = 35
   vert_destinations = []
   horiz_destinations = []
   origin = (600,500)
@@ -215,7 +215,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
     horiz_destinations.append((x - step_size * i, y))
   
   vert_destinations.reverse()
-  horiz_destinations.reverse()
+  # horiz_destinations.reverse()
   for i in reversed(vert_destinations):#horiz_destinations):
     vert_destinations.append(i)
     horiz_destinations.append(i)
@@ -233,15 +233,17 @@ def repeatable_step_test(screen, sensing_agent, environment):
           sys.exit()
           continue
         elif pygame.key.get_mods() == LALT: # estimate
-            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+          # horiz_destinations.reverse()
+          vert_destinations.reverse()
+            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 
-            if len(pred_pt):
-              # print((curr_pt,pred_pt))
-              pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
-            pygame.display.update()
-            continue
+            # if len(pred_pt):
+            #   # print((curr_pt,pred_pt))
+            #   pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+            #   pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+            #   pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            # pygame.display.update()
+          continue
         elif pygame.key.get_mods() == LCTRL:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
@@ -263,8 +265,8 @@ def repeatable_step_test(screen, sensing_agent, environment):
             continue
           p = pygame.mouse.get_pos()
           translation_path = []
-          translation_path = gfn.lerp_list(environment.targets[0].get_origin(), p, 10)
-          # translation_path = horiz_destinations
+          # translation_path = gfn.lerp_list(environment.targets[0].get_origin(), p, 10)
+          translation_path = vert_destinations
           for pt in translation_path[1:]:
             pafn.clear_frame(screen)
             # curr_pt, pred_pt = sensing_agent.estimate_next_detection()

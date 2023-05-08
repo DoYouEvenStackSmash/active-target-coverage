@@ -96,10 +96,6 @@ class RigidBody:
     '''
     rotation = self.get_relative_rotation(target_point)
     rotation = self.apply_rotation_to_body(rotation)
-    # rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
-    # self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
-    # self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
-    # rotate_polygon(self.body, rot_mat, self.get_center())
     self.rel_theta += rotation
     return rotation
   
@@ -117,6 +113,10 @@ class RigidBody:
     return rotation
     
   def apply_translation_to_body(self, translation_dist=0):
+    '''
+    Applies a translation to the rigid body
+    returns a displacement vector
+    '''
     self.ref_center = mfn.pol2car(self.get_center(), translation_dist, self.get_rel_theta())
     self.endpoint = mfn.pol2car(self.get_endpoint(), translation_dist, self.get_rel_theta())
     self.origin = mfn.pol2car(self.get_origin(), translation_dist, self.get_rel_theta())

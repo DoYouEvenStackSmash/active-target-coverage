@@ -122,16 +122,23 @@ class SensingAgent:
     returns an angle theta
     '''
     rotation = 0
-
     rotation = self.exoskeleton.rotate_body(target_pt)
     return rotation
 
   def apply_rotation_to_agent(self, rotation):
+    '''
+    Applies a rotation in radians to the exoskeleton
+    returns the angle in radians 
+    '''
     rotation = self.exoskeleton.apply_rotation_to_body(rotation)
     # self.exoskeleton.rel_theta += rotation
     return rotation
 
   def apply_translation_to_agent(self, translation_dist):
+    '''
+    Applies a translation as a vector to the exoskeleton
+    returns a vector
+    '''
     translation_dist = self.exoskeleton.apply_translation_to_body(translation_dist)
     return translation_dist
 
@@ -226,6 +233,10 @@ class SensingAgent:
     return pt
 
   def estimate_next_rotation(self, idx = 0):
+    '''
+    Uses past information to predict the next rotation if it exists
+    Returns () or the tuple containing the partial rotation
+    '''
     curr_pt, pred_pt = self.estimate_rel_next_detection()
     if not len(pred_pt):
       return ()
@@ -234,14 +245,12 @@ class SensingAgent:
     status, flag = self.is_rel_detectable(pred_pt)
     if status:
       return ()
+    if flag == Sensor.RANGE:
+      return ()
     print("rotation necessary")
     partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
     return (partial_rotation,())
-    
-    
 
-    # rotation = abs(pred_theta - curr_theta)
-    # print(status)
   
   def estimate_rel_next_detection(self, idx = 0):
     '''
@@ -265,7 +274,6 @@ class SensingAgent:
     Estimates next detection in external coordinate system
     returns a pair of points
     '''
-
     last_pt,pred_pt = (),()
     nd = self.estimate_rel_next_detection(idx)
     if len(nd[0]) and len(nd[1]):

@@ -67,8 +67,6 @@ class Environment:
   def add_target(self,T):
     self.targets.append(T)
   
-
-  
   def transform_from_local_coord(self, x, y, w=1, h=1):
     '''
     Transforms a bbox from Sensor local coordinates to world coordinates
