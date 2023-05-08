@@ -76,7 +76,7 @@ def drawing(screen):
   center = annos[0]["bbox"][0]
   for a in annos:
     x,y = a["bbox"][0], 400
-    x = (x - 75) * scaling + 400
+    x = (x - 50) * scaling + 400
     # if a['displaced']:
     #   disp = x - center
     #   center = x
