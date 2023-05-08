@@ -111,16 +111,18 @@ class RigidBody:
     rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
     self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
     self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
+    self.ref_center = tfn.rotate_point(self.get_center(), self.get_center(), rot_mat)
+    
     rotate_polygon(self.body, rot_mat, self.get_center())
-        # correction for arctan identification
-    # rotation = self.rel_theta + rotation
-    # if rotation > np.pi:
-    #   rotation = rotation - 2 * np.pi
-    # if rotation < -np.pi:
-    #   rotation = rotation + 2 * np.pi
-    # self.rel_theta = rotation
     return rotation
     
+  def apply_translation_to_body(self, translation_dist=0):
+    self.ref_center = mfn.pol2car(self.get_center(), translation_dist, self.get_rel_theta())
+    self.endpoint = mfn.pol2car(self.get_endpoint(), translation_dist, self.get_rel_theta())
+    self.origin = mfn.pol2car(self.get_origin(), translation_dist, self.get_rel_theta())
+    x_disp, y_disp = mfn.pol2car((0,0), translation_dist, self.get_rel_theta())
+    translate_polygon(self.body, x_disp, y_disp)
+    return translation_dist
 
   def translate_body(self, target_point):
     '''

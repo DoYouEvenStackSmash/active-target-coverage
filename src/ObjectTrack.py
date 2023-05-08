@@ -59,9 +59,14 @@ class ObjectTrack:
     
     if posn:
       lx,ly = posn
-    
+    # print(f"prediction_theta {self.theta}",end="\t")
+    # if self.theta < -np.pi/2:
+    #   self.theta = np.pi + self.theta
+    # if self.theta > np.pi/2:
+    #   self.theta = -np.pi + self.theta
+    # print(f"prediction_theta {self.theta}",end="\t")
     new_posn = mfn.pol2car((lx,ly), self.v[-1], self.theta)
-    # print(new_posn)
+    print(f"predicted bbox: {new_posn}")
     return new_posn
     # return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
   

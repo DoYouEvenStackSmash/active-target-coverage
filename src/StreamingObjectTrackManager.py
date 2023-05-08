@@ -21,7 +21,7 @@ class ObjectTrackManager:
   constants = { "avg_tolerance"   : 10, 
               "track_lifespan"  : 2,
               "default_avg_dist": 10,
-              "radial_exclusion": 500,
+              "radial_exclusion": 300,
             }
   display_constants = {"trail_len" : 0}
   def __init__(self,
@@ -60,49 +60,28 @@ class ObjectTrackManager:
     self.displacements = displacements
     self.parent_agent = parent_agent
 
-  def add_angular_displacement(self, displacement):
-    '''
-    Apply a displacement to all active tracks (changing the reference origin)
-    displacement:  (origin, (theta, radius))
-    Does not return
-    '''
+  def get_predictions(self):
     if not self.has_active_tracks():
-      return
-
-    origin = displacement[0]
-    theta, rad = displacement[1]
-    # print(f"theta: {theta}")
+      return []
+    estimates = []
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
-      
-      bbox = trk.path[-1].bbox
-      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, theta)
-      bbox[0],bbox[1] = x,y
-      trk.path[-1].bbox = bbox
-      trk.path[-1].displaced = True
-      
+      estimates.append(trk.predict_next_box())
+    return estimates
 
-  def add_linear_displacement(self, displacement):
-    '''
-    Apply a displacement to all active tracks (changing the reference origin)
-    displacement:  (origin, (theta, radius))
-    Does not return
-    '''
+  def add_linear_displacement(self, distance, angle):
     if not self.has_active_tracks():
       return
-
-    origin = displacement[0]
-    theta, rad = displacement[1]
-
+    
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
-      
-      bbox = trk.path[-1].bbox
-      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, trk.theta+theta)
-      bbox[0],bbox[1] = x,y
-      trk.path[-1].bbox = bbox
-      trk.path[-1].displaced = True
+    
+      bbox = trk.get_last_detection()
+      new_posn = mfn.pol2car((bbox[0],bbox[1]), distance, angle)
+      # trk.bbox = 
+      trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
 
+    
   def init_new_layer(self):
     '''
     Initialize a new empty layer

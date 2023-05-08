@@ -17,7 +17,8 @@ class Sensor:
   VALID = 0
   ANGULAR = 1
   RANGE = 2
-  TOLERANCE = 0.2
+  BOTH = 3
+  TOLERANCE = 0.1
   WINDOW_WIDTH = 100
 
   def __init__( self,

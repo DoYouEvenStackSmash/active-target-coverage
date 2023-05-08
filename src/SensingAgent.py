@@ -131,6 +131,10 @@ class SensingAgent:
     # self.exoskeleton.rel_theta += rotation
     return rotation
 
+  def apply_translation_to_agent(self, translation_dist):
+    translation_dist = self.exoskeleton.apply_translation_to_body(translation_dist)
+    return translation_dist
+
   def is_visible(self, target_pt):
     '''
     Determines whether a target point is in the Sensor's sensor fov
@@ -144,38 +148,6 @@ class SensingAgent:
       return False
     return True
 
-  def predict(self):
-    curr_pt, pred_pt = self.estimate_rel_next_detection()
-    if not len(pred_pt):
-      return
-    status, flag = self.is_rel_detectable(pred_pt)
-    if status:
-      print(status)
-      return
-    if flag == Sensor.ANGULAR:
-      if curr_pt == pred_pt:
-        return
-      print(f"curr: {curr_pt}")
-      print(f"pred: {pred_pt}")
-      # pred_pt = [pred_pt[0], pred_pt[1]]
-      
-      p_pt = (pred_pt[0] - 50, pred_pt[1])
-      c_pt = (curr_pt[0] - 50, curr_pt[1])
-      theta, r = mfn.car2pol((0,0), p_pt)
-      theta2, r2 = mfn.car2pol((0,0), c_pt)
-      distance = mfn.car2pol(p_pt, c_pt)[1]
-      ref_theta, ref_r = mfn.car2pol((0,0), (0,50))
-      # print(theta - ref_theta)
-      rotation = ref_theta - theta
-      print(rotation)
-      print("rotating")
-      rotation = self.apply_rotation_to_agent(rotation)
-      self.obj_tracker.add_angular_displacement(((0,0), (-rotation, distance)))
-      self.exoskeleton.rel_theta += rotation
-      # print(theta - theta2)
-      # print(theta2)
-      
-      
 
 
   def is_rel_detectable(self, target_pt):
@@ -188,13 +160,19 @@ class SensingAgent:
 
     target_x = target_pt[0]
     target_y = target_pt[1]
+    flags = 0
+    # range_flag = False
+    angle_flag = False
 
     if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
-      return False, Sensor.RANGE
+      flags += Sensor.RANGE
+      # range_flag = Tru
 
     if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
-      return False, Sensor.ANGULAR
-    
+      flags += Sensor.ANGULAR
+    if flags > 0:
+      return False, flags
+
     return True, Sensor.VALID
   
   def export_tracks(self):
@@ -225,16 +203,16 @@ class SensingAgent:
     returns a Yolo Formatted bbox
     '''
     
-
     target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
     ratio = (target_rotation / self.get_fov_width())
 
     r = mfn.euclidean_dist(self.get_center(), target_pt)
-    
+
     x = Sensor.WINDOW_WIDTH * ratio + 50
     y = r
     w = 1
     h = 1
+    print(f"post_transform: {ratio}, {(x,y)}")
     return [x,y,w,h]
   
   def _transform_to_local_bbox(self, target):
@@ -267,25 +245,13 @@ class SensingAgent:
     Transforms a bbox from sensor local coords to world coords
     returns a point
     '''
-    # theta = x / Sensor.WINDOW_WIDTH * self.get_fov_width()
-    theta, r = mfn.car2pol((50,0), (x,y))
-    # print(f"pt{(x,y)}")
-    
-    origin = self.get_center()
-    angle = self.get_fov_theta()
-    new_angle = self.get_fov_theta() + theta
-    if (new_angle > np.pi):
-      new_angle = -2 * np.pi + new_angle
-    if new_angle < -np.pi:
-      new_angle = 2 * np.pi + new_angle
+    theta = (x - 50) / Sensor.WINDOW_WIDTH * self.get_fov_width()
+    theta = adjust_angle(self.get_fov_theta() + theta)
+    r = y
+    pt = mfn.pol2car(self.get_center(), r, theta)
 
-    # m_theta = self.get_fov_theta()
-    
-    # m_center = self.get_center()
-    
-    pt = mfn.pol2car(self.get_center(), r, new_angle)
     return pt
-  
+
   def estimate_rel_next_detection(self, idx = 0):
     '''
     Estimates next detection in local coordinate system

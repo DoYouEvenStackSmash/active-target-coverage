@@ -97,21 +97,27 @@ def repeatable_environment_test(screen, sensing_agent, environment):
   draw_sensing_agent(screen, environment.agent)
   pygame.display.update()
     
-  step_size = 15
-  destinations = []
+  step_size = 25
+  vert_destinations = []
+  horiz_destinations = []
   origin = (600,500)
   for i in range(25):
     x,y = origin
     # destinations.append((x, y - step_size * i))
-    destinations.append((x, y - step_size * i))
-  destinations.reverse()
-  for i in reversed(destinations):
-    destinations.append(i)
+    vert_destinations.append((x, y - step_size * i))
+    horiz_destinations.append((x - step_size * i, y))
+
+  vert_destinations.reverse()
+  # horiz_destinations.reverse()
+  for i in reversed(horiz_destinations):
+    vert_destinations.append(i)
+    horiz_destinations.append(i)
   
   
   ptr = environment.targets[0].get_origin()
   pafn.frame_draw_dot(screen, ptr, pafn.colors["green"])
-  translation_path = destinations
+  translation_path = horiz_destinations
+  # translation_path
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN:
@@ -121,14 +127,15 @@ def repeatable_environment_test(screen, sensing_agent, environment):
         elif pygame.key.get_mods() == LSHIFT:  # rotate relative
           for pt in translation_path[1:]:
             pafn.clear_frame(screen)
-            sensing_agent.predict()
-            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-            # if len(pred_pt):
-            #   # print((curr_pt,pred_pt))
-            #   pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-            #   pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-            #   pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+            # sensing_agent.predict()
+            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            if len(pred_pt):
+              # print((curr_pt,pred_pt))
+              pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+              pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+              pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
             pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+
             draw_sensing_agent(screen, environment.agent)
             environment.targets[0].origin = pt
             environment.visible_targets()
@@ -145,14 +152,18 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           print(f"original {p}\ndc {dc}")
           continue
 
-          continue
         elif pygame.key.get_mods() == LCTRL:
-          e = environment.agent.export_tracks()
-          f = open("out.json", "w")
-          f.write(json.dumps(e, indent = 2))
-          f.close()
-          sys.exit()
+          pafn.clear_frame(screen)
+          draw_sensing_agent(screen, environment.agent)
+          curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+          if len(pred_pt):
+            # print((curr_pt,pred_pt))
+            pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+            pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+            pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
+          pygame.display.update()
           continue
+          # pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
         else:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
@@ -205,7 +216,8 @@ def repeatable_sensing_agent(screen, sensing_agent):
             continue
           p = pygame.mouse.get_pos()
           dc = sensing_agent.transform_to_local_bbox(p)
-          print(f"original {p}\ndc {dc}")
+          fc = sensing_agent.transform_from_local_coord(dc[0],dc[1])
+          print(f"original {p}\tdc {dc}\tfc {fc}")
           continue
         else:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
