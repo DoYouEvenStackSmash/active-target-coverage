@@ -24,15 +24,23 @@ class Agent:
   RANGE = 2
   TOLERANCE = 0.1
   WINDOW_WIDTH = 100
-  def __init__(self, origin = [0, 0], fov = [0, 100, np.pi / 2], _id = 0, obj_tracker = None):
+  
+  def __init__(self, 
+              origin = [0, 0],
+              orientation = 0,
+              sensors = [],
+              _id = 0,
+              obj_tracker = None,
+              body = None):
+    
     self.origin = origin
-    self.fov_theta = fov[0]
-    self.fov_radius = fov[1]
-    self.fov_width = fov[2]
+    self.orientation = orientation
+    self.sensors = []
     self._id = _id
     self.obj_tracker = obj_tracker
     self.color = None
     self.pose_adjustments = [None]
+    self.body = None
 
   def predict_targets_covered(self):
     '''
@@ -46,13 +54,62 @@ class Agent:
         
     return estimates
   
-  def rotate_sensor(self, target):
+  def rotate_agent_to_target(self, target_pt = None, target_displacement = None, sensor_idx = 0):
     '''
-    Rotates the sensor
-    Applies a displacement to all active tracks
+    Adjusts the sensor orientation to point at a target
+    Wrapper for calculate rotation and calculate translation
+
+    applies displacement to object tracker
     Does not return
     '''
+    rotation = None
+    translation = None
+    if target_displacement != None:
+      rotation = target_displacement[0]
+      translation = target_displacement[1]
+    elif target_pt != None:
+      translation = self.calculate_agent_translation(target_pt)
+      rotation = self.calculate_agent_rotation(target_pt)
+    else:
+      print("no displacement provided!")
+      return
+    self.sensors[0].adjust_fov(rotation)
+    total_rotation = self.chains[0].rotate_single_link(target_pt)
+
+    self.obj_tracker.add_angular_displacement(rotation)
     
+    self.chains[0].translate_chain(target_pt)
+    
+    self.sensors[0].adjust_origin(translation)
+    self.obj_tracker.add_linear_displacement(translation)
+
+  def rotate_chain_to_target(self, link_count = 2, target_pt = None, target_displacement = None, Olist = []):
+    '''
+    Applies a rotation followed by translation according to some displacement or target point
+    to all chains.
+    
+    Does not return
+    '''
+    total_rotation = 0
+    if target_pt == None:
+      print("no target point specified")
+      return
+    if link_count == 2:
+      intermediate_p = self.chains[0].preprocess_circles(target_pt)
+      end_p = target_pt
+      total_rotation = self.chains[0].rotate_two_link_chain(target_pt, intermediate_pt, steps=10, Olist = Olist)
+    elif link_count == 1:
+      total_rotation = self.chains[0].rotate_single_link(target_pt, Olist=Olist)
+    self.obj_tracker.add_angular_displacement(total_rotation)
+    self.sensors.adjust_fov(rotation)
+      
+
+  def calculate_agent_rotation(self, target, sensor_idx = 0):
+    '''
+    Calculates rotation adjustment to point at a target
+    returns an angle theta
+    '''
+
     theta = mfn.car2pol(self.origin, target)[0]
     
     x,y,w,h = self.transform_to_local_coord(target)
@@ -63,10 +120,51 @@ class Agent:
     pt = (x2,y2)
     
     displacement = (pt, mfn.car2pol(target_pt, pt))
+    return displacement
+
+  def calculate_agent_rotation(self, target, chain_idx = 0):
+    '''
+    calculates rotation adjustment to point at a target
+    returns an angle theta
+    '''
+    theta = mfn.car2pol(self.origin, target)[0]
     
-    self.obj_tracker.add_angular_displacement(displacement)
+    x,y,w,h = self.transform_to_local_coord(target)
     
+    pt = mfn.pol2car(self.origin, y, self.fov_theta)
+    x2,y2,w2,h2 = self.transform_to_local_coord(pt)
+    target_pt = (x,y)
+    pt = (x2,y2)
+    
+    displacement = (pt, mfn.car2pol(target_pt, pt))
+    return displacement
+  
+  def calculate_agent_translation(self, target):
+    '''
+    Calculates translation adjustment to move to at a target
+    Returns a distance d
+    '''
+    theta, r = mfn.car2pol(self.origin, target):
+    return r
+    
+
+
+  def rotate_sensor(self, target):
+    '''
+    Rotates the sensor
+    Applies a displacement to all active tracks
+    Does not return
+    '''
+    # print(f"angular: {displacement[1]}")
+    # print(self.fov_theta, theta)
+    distance = self.fov_theta - theta
+    if (distance > np.pi):
+      distance = 2 * np.pi - distance
+    if (distance < -np.pi):
+      distance = -2 * np.pi - distance
+
     self.fov_theta = theta
+    return distance
 
   def translate_sensor(self, target):
     '''
@@ -85,36 +183,19 @@ class Agent:
     self.obj_tracker.add_linear_displacement(displacement)
     
     self.origin = pt
-    
-    
-  def get_horizontal_axis(self, radius):
-    '''
-    Helper function for get_sensor_field
-    Gets a horizontal line from the agent's fov
-    Returns a list of points
-    '''
-    fov_offts = [ adjust_angle(self.fov_theta + self.fov_width / 2), 
-                  adjust_angle(self.fov_theta + self.fov_width / 4),
-                  adjust_angle(self.fov_theta),
-                  adjust_angle(self.fov_theta - self.fov_width / 4),
-                  adjust_angle(self.fov_theta - self.fov_width / 2) 
-                ]
-    horizontal_axis = []
 
-    for i in fov_offts:
-      horizontal_axis.append(mfn.pol2car(self.origin, radius, i))
-    return horizontal_axis
+    return displacement[1][1]
+    
   
-  def get_sensor_field(self, levels):
+
+  
+  def get_sensor_field(self, sensor_idx = 0):
     '''
-    Gets the coordinate frame of the sensor
-    Returns a list of lists of points [[(x1,y1),(x2,y2),...],[...],...]
+    Accessor for the field of view for a sensor
+    Returns a list of lists of points
     '''
-    y_step = self.fov_radius / levels
-    axes = []
-    for i in range(1, levels + 1):
-      axes.append(self.get_horizontal_axis(y_step * i))
-    return axes
+    return self.sensors[sensor_idx]
+  
 
   def get_polygon(self):  
     '''
@@ -159,7 +240,6 @@ class Agent:
     w = 1
     h = 1
     return [x,y,w,h]
-  
   
   def transform_from_local_coord(self, x, y, w=1, h=1):
     '''
@@ -226,43 +306,6 @@ class Agent:
       predictions.append(self.estimate_next_detection(i))
     return predictions
 
-  def is_detectable(self, target):
-    '''
-    Indicates whether a target point is detectable (within tolerance)
-    Returns a boolean indicator and a type identifier
-    '''
-    adj_win_bnd = Agent.WINDOW_WIDTH * Agent.TOLERANCE  
-    adj_rad_bnd = self.fov_radius * (Agent.TOLERANCE/1)
-
-    if target[0] < 0 + adj_win_bnd or target[0] > Agent.WINDOW_WIDTH - adj_win_bnd:
-      return False, Agent.ANGULAR
-
-    if target[1] > self.fov_radius - adj_rad_bnd  or target[1] < 0 + adj_rad_bnd:
-      return False, Agent.RANGE
-    
-    return True, Agent.VALID
-
-  def is_visible(self, target):
-    '''
-    Determines whether a target point is in the agent's sensor fov
-    Returns true/false
-    '''
-    tar_theta, tar_r = mfn.car2pol(self.origin, target)
-    
-    tar_theta = adjust_angle(tar_theta)
-    
-    org_theta = mfn.correct_angle(self.fov_theta)
-
-    lh = org_theta + self.fov_width / 2
-    rh = org_theta - self.fov_width / 2
-    if tar_theta < 0 and lh > 0 and rh > 0:
-      tar_theta = 2 * np.pi + tar_theta
-    if tar_r > self.fov_radius:
-      return False
-    if lh > tar_theta and rh < tar_theta:
-      return True
-    
-    return False
   
   def adjust_for_coverage(self):
     '''
@@ -288,14 +331,34 @@ class Agent:
         for p in rotation[start:]:
           if len(pred) > 0:
             if err_type == Agent.ANGULAR:
-              self.rotate_sensor(p)
-            elif err_type == Agent.RANGE:
-              self.translate_sensor(p)
+              disp = self.rotate_sensor(p)
+            # elif err_type == Agent.RANGE:
+            #   disp = self.translate_sensor(p)
           
         estimates = self.predict_targets_covered()
         j = 0
         break
+    
+  def publish_adjustment(self):
+    '''
+    Exposes a target point for an actor to improve coverage
+    '''
 
+    estimates = self.predict_targets_covered()
+    if len(estimates) == 0:
+      return (), Agent.VALID
+    for j in range(len(estimates)):
+      i = estimates[j]
+      indicator, err_type = self.is_detectable(i[1])
+      if indicator:
+        j+=1
+        continue
+      else:
+        pred = self.transform_from_local_coord(i[1][0],i[1][1])
+        curr = self.transform_from_local_coord(i[0][0],i[0][1])
+        return pred, err_type
+    return (), Agent.VALID
+  
   def export_tracks(self):
     '''
     Exports the recorded tracks from the agent's object tracker

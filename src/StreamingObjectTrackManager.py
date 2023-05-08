@@ -14,6 +14,16 @@ from categories import CATEGORIES
   global_track_store: {track_id : ObjectTrack}
       lookup dictionary for directly accessing track objects by ID
 '''
+
+def adjust_angle(theta):
+  ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
+  if theta > np.pi:
+    theta = theta + -2 * np.pi
+  elif theta < -np.pi:
+    theta = theta + 2 * np.pi
+  
+  return theta
+
 LABELS = True
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
@@ -21,7 +31,7 @@ class ObjectTrackManager:
   constants = { "avg_tolerance"   : 10, 
               "track_lifespan"  : 2,
               "default_avg_dist": 10,
-              "radial_exclusion": 500,
+              "radial_exclusion": 300,
             }
   display_constants = {"trail_len" : 0}
   def __init__(self,
@@ -40,7 +50,8 @@ class ObjectTrackManager:
                 categories = CATEGORIES,
                 img_centers = [],
                 imported = False,
-                displacements = []
+                displacements = [],
+                parent_agent = None
               ):
     self.global_track_store = global_track_store
     self.inactive_tracks = inactive_tracks
@@ -57,49 +68,53 @@ class ObjectTrackManager:
     self.img_centers = img_centers
     self.imported = imported
     self.displacements = displacements
+    self.parent_agent = parent_agent
 
-  def add_angular_displacement(self, displacement):
-    '''
-    Apply a displacement to all active tracks (changing the reference origin)
-    displacement:  (origin, (theta, radius))
-    Does not return
-    '''
+  def get_predictions(self):
     if not self.has_active_tracks():
-      return
-
-    origin = displacement[0]
-    theta, rad = displacement[1]
-
+      return []
+    estimates = []
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
-      
-      bbox = trk.path[-1].bbox
-      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, theta)
-      bbox[0],bbox[1] = x,y
-      trk.path[-1].bbox = bbox
-      trk.path[-1].displaced = True
+      estimates.append(trk.predict_next_box())
+    return estimates
 
-  def add_linear_displacement(self, displacement):
-    '''
-    Apply a displacement to all active tracks (changing the reference origin)
-    displacement:  (origin, (theta, radius))
-    Does not return
-    '''
+  def add_angular_displacement(self, distance, angle):
     if not self.has_active_tracks():
       return
-
-    origin = displacement[0]
-    theta, rad = displacement[1]
-
+    
+    print(self.parent_agent.get_fov_theta())
+    
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
-      
-      bbox = trk.path[-1].bbox
-      x,y = mfn.pol2car((bbox[0],bbox[1]), rad, trk.theta+theta)
-      bbox[0],bbox[1] = x,y
-      trk.path[-1].bbox = bbox
-      trk.path[-1].displaced = True
+      last_d, last_v, delta_v, theta = trk.get_track_heading()
 
+      disp = angle / self.parent_agent.get_fov_width() * 100
+      print(disp)
+      # disp = [-50,50]
+      new_posn = [last_d[0] + disp, last_d[1]]
+      print(f"trk_theta {trk.theta + angle}")
+      trk.theta = adjust_angle(trk.theta - angle)
+      # new_posn = mfn.pol2car((50,0), last_d[1], angle)
+      # bbox = 
+      trk.path[-1].bbox = [new_posn[0],new_posn[1], 1,1]
+      
+
+
+
+  def add_linear_displacement(self, distance, angle):
+    if not self.has_active_tracks():
+      return
+    
+    for i in range(len(self.active_tracks)):
+      trk = self.active_tracks[i]
+    
+      last_d, last_v, delta_v, theta = trk.get_track_heading()
+      new_posn = mfn.pol2car((last_d[0],last_d[1]), last_d[1], angle)
+      # trk.bbox = 
+      trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
+
+    
   def init_new_layer(self):
     '''
     Initialize a new empty layer

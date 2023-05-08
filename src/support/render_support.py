@@ -113,14 +113,14 @@ class MathFxns:
     ox, oy = pt
     x = r * np.cos(theta)
     y = r * np.sin(theta)
-    return (ox+ x, oy + y)
+    return [(ox, oy),(x, y)] 
   
   def correct_angle(rad_theta):
     '''
     Normalizes a negative angle theta, created by arctan2
     Returns an angle between -pi/2 and 2pi
     '''
-    if rad_theta <= -np.pi/2:
+    if rad_theta < -np.pi/2:
       rad_theta = rad_theta + 2 * np.pi
     return rad_theta
 
@@ -136,13 +136,6 @@ class GeometryFxns:
     rad,r = MathFxns.car2pol(pt1,pt2)
     nx = r * np.cos(rad + np.pi * sign / 3) 
     ny = r * np.sin(rad + np.pi * sign / 3) 
-    return (nx + pt1[0],ny + pt1[1])
-
-  def get_isosceles_vertex(pt1, pt2, sign=1, theta = 45):
-    rad,r = MathFxns.car2pol(pt1,pt2)
-    radians = theta * (np.pi / 180) * sign
-    nx = r * np.cos(rad + radians) 
-    ny = r * np.sin(rad + radians) 
     return (nx + pt1[0],ny + pt1[1])
 
   def get_midpoint(pt1, pt2):
@@ -176,29 +169,6 @@ class GeometryFxns:
       pts.append(GeometryFxns.lerp(p1, p2, step * i))
     pts.append(p2)
     return pts
-  
-  def get_unit_norm_angle(ray_origin, ray_target, switch = False):
-    '''
-    Returns the angle in radians of the vector normal to the line between two
-    points.
-    Switch is used by caller functions to flip the angle around the unit circle.
-    '''
-    x1,y1 = ray_origin
-    x2,y2 = ray_target
-    
-    rad_theta = np.arctan2(y2 - y1, x2 - x1)
-    # print(rad_theta)
-    rad_prime = rad_theta
-    if rad_prime < -np.pi / 2:
-      rad_prime = 2 * np.pi + rad_prime
-    rad_prime = rad_prime - np.pi / 2
-
-    if switch:
-      if rad_prime > 0:
-        return rad_prime - np.pi
-      return rad_prime + np.pi
-    return rad_prime
-
 
   def cubic_lerp_calculate(pts, n = 100):
     '''
@@ -262,7 +232,7 @@ class PygameArtFxns:
     Draws a polygon of specified color
     Returns nothing
     '''
-    pygame.draw.polygon(screen, color, point_set, width=2)
+    pygame.draw.polygon(screen, color, point_set, width=1)
 
   def frame_draw_line(screen, point_set, color = (0,0,0)):
     '''
@@ -285,7 +255,7 @@ class PygameArtFxns:
     Draws a single dot given a point (x, y)
     Returns nothing
     '''
-    pygame.draw.circle(screen, color, point, 5, width)
+    pygame.draw.circle(screen, color, point, 1, width)
 
   def clear_frame(screen, color=(0,0,0)):
     '''
