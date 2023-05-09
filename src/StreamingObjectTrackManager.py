@@ -99,9 +99,6 @@ class ObjectTrackManager:
       # bbox = 
       trk.path[-1].bbox = [new_posn[0],new_posn[1], 1,1]
       
-
-
-
   def add_linear_displacement(self, distance, angle):
     if not self.has_active_tracks():
       return
@@ -110,7 +107,8 @@ class ObjectTrackManager:
       trk = self.active_tracks[i]
     
       last_d, last_v, delta_v, theta = trk.get_track_heading()
-      new_posn = mfn.pol2car((last_d[0],last_d[1]), last_d[1], angle)
+      new_posn = [last_d[0], last_d[1] + distance]
+      # new_posn = mfn.pol2car((last_d[0],last_d[1]), last_d[1], angle)
       # trk.bbox = 
       trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
 
