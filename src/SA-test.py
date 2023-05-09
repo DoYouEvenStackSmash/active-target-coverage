@@ -375,7 +375,7 @@ def main():
   ap = Polygon(opts)
   rb = RigidBody(parent_agent=sensing_agent, ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_link = ap)
   sensor = Sensor(parent_agent = sensing_agent)
-  sensor.fov_width = np.pi / 6
+  sensor.fov_width = np.pi / 4
   sensing_agent.exoskeleton = rb
   sensing_agent.sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
