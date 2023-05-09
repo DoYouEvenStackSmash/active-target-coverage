@@ -199,7 +199,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
   draw_sensing_agent(screen, environment.agent)
   pygame.display.update()
   
-  step_size = 25
+  step_size = 35
   vert_destinations = []
   horiz_destinations = []
   origin = (600,500)
