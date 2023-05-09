@@ -71,6 +71,9 @@ class ObjectTrackManager:
     self.parent_agent = parent_agent
 
   def get_predictions(self):
+    '''
+    Get estimates from all active tracks
+    '''
     if not self.has_active_tracks():
       return []
     estimates = []
@@ -80,39 +83,37 @@ class ObjectTrackManager:
     return estimates
 
   def add_angular_displacement(self, distance, angle):
+    '''
+    Apply an angular displacement to offset a rotation by a parent agent
+    '''
     if not self.has_active_tracks():
       return
-    
-    print(self.parent_agent.get_fov_theta())
     
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
       last_d, last_v, delta_v, theta = trk.get_track_heading()
 
       disp = angle / self.parent_agent.get_fov_width() * 100
-      print(disp)
-      # disp = [-50,50]
+      
       new_posn = [last_d[0] + disp, last_d[1]]
-      print(f"trk_theta {trk.theta + angle}")
       trk.theta = adjust_angle(trk.theta - angle)
-      # new_posn = mfn.pol2car((50,0), last_d[1], angle)
-      # bbox = 
+      
       trk.path[-1].bbox = [new_posn[0],new_posn[1], 1,1]
       
   def add_linear_displacement(self, distance, angle):
+    '''
+    Apply a linear displacement to offset a translation by a parent agent
+    '''
     if not self.has_active_tracks():
       return
-    
     for i in range(len(self.active_tracks)):
       trk = self.active_tracks[i]
     
       last_d, last_v, delta_v, theta = trk.get_track_heading()
       new_posn = [last_d[0], last_d[1] + distance]
-      # new_posn = mfn.pol2car((last_d[0],last_d[1]), last_d[1], angle)
-      # trk.bbox = 
-      trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
 
-    
+      trk.path[-1].bbox = [new_posn[0],new_posn[1],1,1]
+  
   def init_new_layer(self):
     '''
     Initialize a new empty layer

@@ -155,8 +155,6 @@ class Agent:
     Applies a displacement to all active tracks
     Does not return
     '''
-    # print(f"angular: {displacement[1]}")
-    # print(self.fov_theta, theta)
     distance = self.fov_theta - theta
     if (distance > np.pi):
       distance = 2 * np.pi - distance

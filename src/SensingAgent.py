@@ -160,19 +160,21 @@ class SensingAgent:
     Indicates whether a target point is detectable (within tolerance)
     Returns a boolean indicator and a type identifier
     '''
+    # boundary conditions
     adj_win_bnd = (self.get_fov_width() / 2) - (self.get_fov_width() / 2) * Sensor.TOLERANCE * 2
     adj_rad_bnd = self.get_fov_radius()
 
     target_x = target_pt[0]
     target_y = target_pt[1]
     flags = 0
-    # range_flag = False
+    
     angle_flag = False
-
+    
+    # if range out of bounds
     if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
       flags += Sensor.RANGE
-      # range_flag = Tru
 
+    # if angle out of bounds
     if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
       flags += Sensor.ANGULAR
     if flags > 0:
@@ -207,7 +209,6 @@ class SensingAgent:
     Calculates detection coordinates relative to Sensor
     returns a Yolo Formatted bbox
     '''
-    
     target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
     ratio = (target_rotation / self.get_fov_width())
 
@@ -217,7 +218,7 @@ class SensingAgent:
     y = r
     w = 1
     h = 1
-    # print(f"post_transform: {ratio}, {(x,y)}")
+    
     return [x,y,w,h]
 
   def transform_from_local_coord(self, x, y, w=1, h=1):
@@ -238,29 +239,38 @@ class SensingAgent:
     Returns () or the tuple containing the partial rotation
     '''
     curr_pt, pred_pt = self.estimate_rel_next_detection()
+    
+    # if no estimate available
     if not len(pred_pt):
       return (None,None)
+    
+    # if first element in track, therefore duplicate
     if curr_pt == pred_pt:
       return (None,None)
+    
     status, flag = self.is_rel_detectable(pred_pt)
+    
+    # if predicted point is detectable from pov of SensingAgent
     if status:
       return (None,None)
+    
+    # if predicted point is out of coverage by range
     if flag == Sensor.RANGE:
       offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
       if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
         offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
       return (None, offset)
-    # print("rotation necessary")
+    
+    # if predicted point is out of coverage by angle
     if flag == Sensor.ANGULAR:
       partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
       return (partial_rotation,None)
     
+    # if predicted point is out of coverage by both angle and range
     if flag == Sensor.BOTH:
       offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
       if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
         offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
-
-      # return (None, (pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))))
       partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
       return (partial_rotation, offset)
 
