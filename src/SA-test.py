@@ -256,6 +256,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
           translation_path = []
           
           translation_path = vert_destinations
+          translation_path = gfn.lerp_list(environment.targets[0].get_origin(), p, 10)
           for i in range(1, len(translation_path)):
             pt = translation_path[i]
             pafn.clear_frame(screen)
