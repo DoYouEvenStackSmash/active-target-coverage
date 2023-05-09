@@ -239,17 +239,31 @@ class SensingAgent:
     '''
     curr_pt, pred_pt = self.estimate_rel_next_detection()
     if not len(pred_pt):
-      return ()
+      return (None,None)
     if curr_pt == pred_pt:
-      return ()
+      return (None,None)
     status, flag = self.is_rel_detectable(pred_pt)
     if status:
-      return ()
+      return (None,None)
     if flag == Sensor.RANGE:
-      return ()
-    print("rotation necessary")
-    partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
-    return (partial_rotation,())
+      offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
+      if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
+        offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+      return (None, offset)
+    # print("rotation necessary")
+    if flag == Sensor.ANGULAR:
+      partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
+      return (partial_rotation,None)
+    
+    if flag == Sensor.BOTH:
+      offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
+      if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
+        offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+
+      # return (None, (pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))))
+      partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
+      return (partial_rotation, offset)
+
 
   
   def estimate_rel_next_detection(self, idx = 0):

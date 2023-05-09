@@ -189,38 +189,28 @@ def do_rel_detection(screen, sensing_agent):
     status, flags = sensing_agent.is_rel_detectable(prev_pt)
     if flags == Sensor.ANGULAR:
       drive(screen, (500,500), pred_pt)
-    # print((curr_pt,pred_pt))
+    
     pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
     pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
     pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
-  # draw_sensing_agent(screen, sensing_agent)
-  # draw_outline(screen)
-  # pygame.display.update()
+
 turn_count = 0
+
 def do_est_rotation(screen, sensing_agent):
   est_rotation = ()
-  est_rotation = sensing_agent.estimate_next_rotation()
+  est_rotation,est_translation = sensing_agent.estimate_next_rotation()
 
-  # pred_rotation = sensing_agent.exoskeleton.get_relative_rotation(pt)
-  if not len(est_rotation):
+  if est_rotation == None:
     print("not_rotating")
     return
   global turn_count
-  if len(est_rotation):
+  if est_rotation != None:
     turn_count += 1
-    # pafn.clear_frame(screen)
-    est_rotation = est_rotation[0]
+
     print(est_rotation)
     rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
     sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
     sensing_agent.exoskeleton.rel_theta += rotation
-    # print(f"sensing: {sensing_agent.exoskeleton.rel_theta}")
-    # sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-    # draw_sensing_agent(screen, sensing_agent)
-    # pygame.display.update()
-    # time.sleep(0.01)
-  # draw_sensing_agent(screen, sensing_agent)
-  # draw_outline(screen)
 
 def yolo_test(screen, sensing_agent):
   s = json_loader("out.json")
@@ -270,11 +260,7 @@ def yolo_test(screen, sensing_agent):
             rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
             sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
             sensing_agent.exoskeleton.rel_theta += rotation
-            # print(f"sensing: {sensing_agent.exoskeleton.rel_theta}")
-            # sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-            # draw_sensing_agent(screen, sensing_agent)
-            # pygame.display.update()
-            # time.sleep(0.01)
+
           draw_sensing_agent(screen, sensing_agent)
           draw_outline(screen)
           pygame.display.update()
@@ -293,18 +279,9 @@ def yolo_test(screen, sensing_agent):
             draw_sensing_agent(screen, sensing_agent)
             draw_outline(screen)
             do_est_rotation(screen, sensing_agent)
-            # draw_sensing_agent(screen, sensing_agent)
-            
-            # time.sleep(0.1)
-            # pafn.clear_frame(screen)
-            
-            
-            # do_est_rotation(screen, sensing_agent)
+
             pygame.display.update()
-            # pygame.display.update()
-            
-            
-            # pygame.display.update()
+
             time.sleep(0.2)
           print(turn_count)
           sys.exit()
@@ -338,9 +315,11 @@ def sa_setup():
   ap = Polygon(opts)
   rb = RigidBody(parent_agent=sensing_agent, ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_link = ap)
   sensor = Sensor(parent_agent = sensing_agent)
+  
   sensing_agent.exoskeleton = rb
   sensing_agent.sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
+  
   sensing_agent.obj_tracker.parent_agent = sensing_agent
   return sensing_agent
 

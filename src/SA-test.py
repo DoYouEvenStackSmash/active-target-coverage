@@ -139,8 +139,7 @@ def repeatable_environment_test(screen, sensing_agent, environment):
             curr_pt, pred_pt = sensing_agent.estimate_next_detection()
             sensing_agent.estimate_next_rotation()
             if len(pred_pt):
-              
-              # print((curr_pt,pred_pt))
+
               pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
               pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
               pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
@@ -178,8 +177,7 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
-          # pts.append(p)
-          # dc = sensing_agent.transform_to_local_bbox(p)
+
           pafn.clear_frame(screen)
           orig_theta = sensing_agent.get_fov_theta()
           rotation = sensing_agent.rotate_agent(p)
@@ -187,12 +185,9 @@ def repeatable_environment_test(screen, sensing_agent, environment):
           new_theta = sensing_agent.get_fov_theta()
           print(new_theta - orig_theta)
           dc = sensing_agent.transform_to_local_bbox(p)
-          # print(f"displacement: {rotation / sensing_agent.get_fov_width() * 100}")
-          # dc = sensing_agent.transform_to_local_bbox(p)
+
           print(f"original {p}\ndc {dc}")
           print(new_theta)
-          
-          # sensing_agent.obj_tracker.add_angular_displacement(0, -(new_theta - orig_theta))
           
           draw_sensing_agent(screen, sensing_agent)
           pygame.display.update()
@@ -204,22 +199,23 @@ def repeatable_step_test(screen, sensing_agent, environment):
   draw_sensing_agent(screen, environment.agent)
   pygame.display.update()
   
-  step_size = 35
+  step_size = 25
   vert_destinations = []
   horiz_destinations = []
   origin = (600,500)
   for i in range(25):
     x,y = origin
-    # destinations.append((x, y - step_size * i))
+    
     vert_destinations.append((x, y - step_size * i))
     horiz_destinations.append((x - step_size * i, y))
   
   vert_destinations.reverse()
-  # horiz_destinations.reverse()
+  horiz_destinations.reverse()
   for i in reversed(vert_destinations):#horiz_destinations):
     vert_destinations.append(i)
     horiz_destinations.append(i)
-  # horiz_destinations.reverse()
+  
+  vert_destinations = horiz_destinations
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN:
@@ -233,16 +229,9 @@ def repeatable_step_test(screen, sensing_agent, environment):
           sys.exit()
           continue
         elif pygame.key.get_mods() == LALT: # estimate
-          # horiz_destinations.reverse()
+          
           vert_destinations.reverse()
-            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 
-            # if len(pred_pt):
-            #   # print((curr_pt,pred_pt))
-            #   pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-            #   pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-            #   pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
-            # pygame.display.update()
           continue
         elif pygame.key.get_mods() == LCTRL:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
@@ -255,43 +244,41 @@ def repeatable_step_test(screen, sensing_agent, environment):
           print("checking...")
           print(new_theta - orig)
           print(rotation)
-          # sensing_agent.obj_tracker.add_angular_displacement(0,orig - new_theta)
+
           draw_sensing_agent(screen, sensing_agent)
           pygame.display.update()
           continue
-          # pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+          
         else:
           while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
             continue
           p = pygame.mouse.get_pos()
           translation_path = []
-          # translation_path = gfn.lerp_list(environment.targets[0].get_origin(), p, 10)
+          
           translation_path = vert_destinations
-          for pt in translation_path[1:]:
+          for i in range(1, len(translation_path)):
+            pt = translation_path[i]
             pafn.clear_frame(screen)
-            # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-            # specify displacement
+
             est_rotation = ()
-            est_rotation = sensing_agent.estimate_next_rotation()
-            
             pred_rotation = sensing_agent.exoskeleton.get_relative_rotation(pt)
-            if len(est_rotation):
-              
-              est_rotation = est_rotation[0]
+            print(f"predicted: {pred_rotation}\t",end="")
+            est_rotation,est_translation = sensing_agent.estimate_next_rotation()
+            print(f"estimated: {est_rotation}")
+            
+            if est_rotation != None:
+              # est_rotation = est_rotation[0]
               print(est_rotation)
               rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
               sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
               sensing_agent.exoskeleton.rel_theta += rotation
-              # print(f"sensing: {sensing_agent.exoskeleton.rel_theta}")
-              # sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-              # draw_sensing_agent(screen, sensing_agent)
-              # pygame.display.update()
-              time.sleep(0.01)
 
-              # rotation = sensing_agent.apply_rotation_to_agent(-est_rotation)
-              # sensing_agent.exoskeleton.rel_theta += rotation
-              # sensing_agent.obj_tracker.add_angular_displacement(0, est_rotation)
-              # draw_sensing_agent(screen, sensing_agent)
+            if est_translation != None:
+              translation = sensing_agent.apply_translation_to_agent(est_translation)
+              sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
+
+            draw_sensing_agent(screen, sensing_agent)
+            pygame.display.update()
               # pygame.display.update()
               # time.sleep(0.2)
             # sensing_agent.obj_tracker.add_angular_displacement(0, -rotation)
@@ -388,6 +375,7 @@ def main():
   ap = Polygon(opts)
   rb = RigidBody(parent_agent=sensing_agent, ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_link = ap)
   sensor = Sensor(parent_agent = sensing_agent)
+  sensor.fov_width = np.pi / 6
   sensing_agent.exoskeleton = rb
   sensing_agent.sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
