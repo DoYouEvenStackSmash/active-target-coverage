@@ -33,9 +33,13 @@ import time
 
 class Environment:
   def __init__(self,agent = None,
-                    targets = []):
-    self.agent = agent
+                    agents = {},
+                    targets = [],
+                    counter = 0):
+    self._agent = agent
+    self.agents = agents
     self.targets = targets
+    self.counter = counter
   
   def visible_targets(self):
     '''
@@ -46,23 +50,46 @@ class Environment:
     '''
     pairs = []
     sortkey = lambda x: x[2]
-    frame_id = "frame_"+str(len(self.agent.obj_tracker.layers))
-    
-    for target in self.targets:
-      d = mfn.euclidean_dist(self.agent.get_origin(), target.get_origin())
-      pairs.append((self.agent, target, d))
+    frame_id = "frame_"+str(self.counter)
+    self.counter += 1
+    updates = {}
+    for k in self.agents:
+      updates[k] = []
+      agent = self.agents[k]
+      # agent.obj_tracker.init_new_layer()
+      for target in self.targets:
+        d = mfn.euclidean_dist(agent.get_origin(), target.get_origin())
+        pairs.append((agent._id, target, d))
     pairs = sorted(pairs, key=sortkey)
+    print(pairs)
     c = 0
     pl = []
-    add_list = []
-    while c < len(pairs):
-      if pairs[c][2] > pairs[c][0].get_fov_radius():
-        break
-      if pairs[c][0].is_visible(pairs[c][1].get_origin()):
-        add_list.append(pairs[c][1])
+    # updates = {"A": [], "B": []} 
+    # add_list = []
+    for c in range(len(pairs)):
+    # while c < len(pairs):
+      if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
+        continue
+      if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_origin()):
+
+        updates[pairs[c][0]].append(pairs[c][1])
+        # self.agents[pairs[c][0]].add_new_detection(frame_id,pairs[c][1])
+        # updates[pairs[c][0]].append()
+        # add_list.append(pairs[c][1])
         # add_list = self.notify_agent(pairs[c][1],frame_id, add_list)
-      c+=1
-    self.agent.new_detection_layer(frame_id, add_list)
+      # c+=1
+    
+    
+    for k in updates:
+      self.agents[k].new_detection_layer(frame_id, updates[k])
+      self.agents[k].obj_tracker.process_layer(-1)
+      self.agents[k].obj_tracker.init_new_layer()
+      print(f"agent {k},{self.agents[k].obj_tracker} layer {self.counter} has {-1 if not len(self.agents[k].obj_tracker.layers) else len(self.agents[k].obj_tracker.layers[-1])} items")
+    # self.agents["A"].obj_tracker.init_new_layer()
+    # print(f"updates: {updates}")
+    
+    #   self.agents[k].obj_tracker.process_layer(-1)
+    
 
   def add_target(self,T):
     self.targets.append(T)

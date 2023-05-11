@@ -204,6 +204,14 @@ class SensingAgent:
     self.obj_tracker.add_new_layer(detections)
     self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
+  def add_new_detection(self, frame_id, target_origin):
+    '''
+    Adds a single new detection to a layer
+    '''
+    dc = self.transform_to_local_bbox(target_origin)
+    yb = sann.register_annotation(0, dc, frame_id)
+    self.obj_tracker.add_new_element_to_layer(yb)
+
   def transform_to_local_bbox(self,target_pt):
     '''
     Calculates detection coordinates relative to Sensor

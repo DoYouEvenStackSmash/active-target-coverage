@@ -148,6 +148,8 @@ class ObjectTrackManager:
     '''
     Adds a new registered annotation to the latest layer
     '''
+    if len(self.layers) == 0:
+      self.init_new_layer()
     self.layers[-1].append(yolobox)
   
   def add_new_LOCO_annotations_to_layer(self, LOCO_annos):
@@ -238,18 +240,23 @@ class ObjectTrackManager:
     '''
     Update preexisting tracks with a single layer of entities
     '''
-    curr_layer = self.layers[layer_idx]
-    # if len(curr_layer) == 0:
-    #   return
-    fc = layer_idx
-    pred,pairs = [],[]
-
+    
     # reinitialize active tracks if there are none currently active
     # if (self.active_tracks == None or len(self.active_tracks) == 0):
+    if len(self.layers) == 0:
+      return
+    
+    curr_layer = self.layers[layer_idx]
     if not self.has_active_tracks():
       if len(curr_layer):
         self.initialize_tracks(layer_idx)
       return
+    
+    
+    # if len(curr_layer) == 0:
+    #   return
+    fc = layer_idx
+    pred,pairs = [],[]
     
     # gather predictions from track heads
     for t in self.active_tracks:
