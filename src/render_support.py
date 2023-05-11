@@ -245,7 +245,10 @@ class PygameArtFxns:
   "green" : (0,255,0),
   "magenta" : (255, 0, 255),
   "red" : (255, 0, 0),
-  "white" : (255,255,255)
+  "white" : (255,255,255),
+  "dimgray":(105,105,105),
+  "lightslategray":(119,136,153),
+  "silver":(192,192,192)
   
   }
   def create_display(width, height):
@@ -280,19 +283,19 @@ class PygameArtFxns:
     s,e = point_set
     pygame.draw.line(screen, color, s, e, width=4)
 
-  def frame_draw_dot(screen, point, color = (0,0,0), width = 4):
+  def frame_draw_dot(screen, point, color = (0,0,0), width = 0):
     '''
     Draws a single dot given a point (x, y)
     Returns nothing
     '''
-    pygame.draw.circle(screen, color, point, 5, width)
+    pygame.draw.circle(screen, color, point, 7, width)
 
-  def clear_frame(screen, color=(0,0,0)):
+  def clear_frame(screen, color=(255, 255, 255)):
     '''
     Resets the pygame display to a given color
     Returns nothing
     '''
-    pygame.Surface.fill(screen, color)
+    pygame.Surface.fill(screen, PygameArtFxns.colors["silver"])
 
   def draw_lines_between_points(screen, pts, color = (255,255,255)):
     '''

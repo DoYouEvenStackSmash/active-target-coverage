@@ -24,10 +24,12 @@ class Sensor:
   def __init__( self,
                 parent_agent,
                 sensor_radius = 300,
-                sensor_width = np.pi / 4):
+                sensor_width = np.pi / 4,
+                _id = None):
     self.parent_agent = parent_agent
     self.fov_radius = sensor_radius
     self.fov_width = sensor_width
+    self._id = _id
     
   def get_origin(self):
     '''
@@ -121,3 +123,29 @@ class Sensor:
       horizontal_axis.append(mfn.pol2car(self.get_origin(), radius, i))
     return horizontal_axis
 
+  def is_rel_detectable(self, target_pt):
+    '''
+    Indicates whether a target point is detectable (within tolerance)
+    Returns a boolean indicator and a type identifier
+    '''
+    # boundary conditions
+    adj_win_bnd = (self.get_fov_width() / 2) - (self.get_fov_width() / 2) * Sensor.TOLERANCE * 2
+    adj_rad_bnd = self.get_fov_radius()
+
+    target_x = target_pt[0]
+    target_y = target_pt[1]
+    flags = 0
+    
+    angle_flag = False
+    
+    # if range out of bounds
+    if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
+      flags += Sensor.RANGE
+
+    # if angle out of bounds
+    if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
+      flags += Sensor.ANGULAR
+    if flags > 0:
+      return False, flags
+
+    return True, Sensor.VALID
