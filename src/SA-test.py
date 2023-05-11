@@ -24,6 +24,7 @@ from Environment import Environment
 import sys
 import json
 import pygame
+import pygame.gfxdraw
 import time
 import os
 
@@ -52,6 +53,10 @@ def adjust_angle(theta):
     theta = theta + 2 * np.pi
   
   return theta
+
+DRAW_HORIZONTAL = False
+OUTLINE = False
+
 def draw_coordinate_frame(screen, sensor):
   '''
   Helper function for displaying the sensor field of view
@@ -60,25 +65,32 @@ def draw_coordinate_frame(screen, sensor):
   levels = 5
   coord_frame = sensor.get_visible_fov(levels)
   detect_frame = sensor.get_detectable_bounds(levels)
-  for c in range(levels):
-    for i in range(1,len(coord_frame[c])):
-      pafn.frame_draw_line(screen, (coord_frame[c][i-1], coord_frame[c][i]), pafn.colors['white'])
+  if OUTLINE:
+    for i in range(1, len(coord_frame[-1])):
+      pafn.frame_draw_line(screen, (coord_frame[-1][i-1], coord_frame[-1][i]), pafn.colors['white'])
+    # for endpoint in coord_frame[-1][:]:
+    #   pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['white'])
+  else:
+    for c in range(levels):
+      for i in range(1,len(coord_frame[c])):
+        pafn.frame_draw_line(screen, (coord_frame[c][i-1], coord_frame[c][i]), pafn.colors['white'])
+    for endpoint in coord_frame[-1]:
+      pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['white'])
   # for i in range(1, len(detect_frame[-1])):
 
-  for endpoint in coord_frame[-1]:
-    pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['white'])
-  spts = []
-  epts = []
+
+  # spts = []
+  # epts = []
   for endpoint in detect_frame[-1]:
     pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['tangerine'])
-    theta, r = mfn.car2pol(sensor.get_origin(), endpoint)
-    r2 = Sensor.TOLERANCE * r
-    r *= 1 - Sensor.TOLERANCE
-    pt2 = mfn.pol2car(sensor.get_origin(), r2, theta)
-    pt = mfn.pol2car(sensor.get_origin(), r, theta)
+  #   theta, r = mfn.car2pol(sensor.get_origin(), endpoint)
+  #   r2 = Sensor.TOLERANCE * r
+  #   r *= 1 - Sensor.TOLERANCE
+  #   pt2 = mfn.pol2car(sensor.get_origin(), r2, theta)
+  #   pt = mfn.pol2car(sensor.get_origin(), r, theta)
     
-    epts.append(pt)
-    spts.append(pt2)
+  #   epts.append(pt)
+  #   spts.append(pt2)
   
   # for i in range(1, len(epts)):
   #   pafn.frame_draw_bold_line(screen, (epts[i-1], epts[i]), pafn.colors['tangerine'])
@@ -102,7 +114,9 @@ def draw_all_links(screen, link):
   Does not return
   '''
   points = link.get_points()
+  # pafn.frame_draw_filled_polygon(screen, points, pafn.colors["white"])
   pafn.frame_draw_polygon(screen, points, pafn.colors["red"])
+  
 
 
 def draw_rigid_body(screen, rigid_body):
@@ -295,14 +309,10 @@ def repeatable_step_test(screen, sensing_agent, environment):
           
           p = pygame.mouse.get_pos()
           pts.append(p)
-          # pafn.frame_draw_dot(screen, p, pafn.colors["magenta"])
-          # pygame.display.update()
+
           for idx in range(len(arrs)):
             translation_path = arrs[idx]
-            # for p in translation_path:
-            #   pafn.frame_draw_dot(screen, p, pafn.colors['cyan'])
-            #   pygame.display.update()
-            #   time.sleep(0.005)
+
             for i in range(1, len(translation_path)):
               pt = translation_path[i]
               pafn.clear_frame(screen)
@@ -312,16 +322,9 @@ def repeatable_step_test(screen, sensing_agent, environment):
               print(f"predicted: {pred_rotation}\t",end="")
               est_rotation,est_translation = sensing_agent.estimate_next_rotation()
               print(f"estimated: {est_rotation}")
-              # global img
-              # img = img0
-              # rect = img.get_rect()
+
               if est_rotation != None:
-                # est_rotation = est_rotation[0]
-                # deg = est_rotation * (180 / np.pi)
-                # img = pygame.transform.rotozoom(img, deg, 1)
-                # rect = img.get_rect()
-                # rect.center = sensing_agent.get_center()
-                # print(est_rotation)
+
                 rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
                 sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
                 sensing_agent.exoskeleton.rel_theta += rotation
@@ -330,32 +333,15 @@ def repeatable_step_test(screen, sensing_agent, environment):
                 
                 translation = sensing_agent.apply_translation_to_agent(est_translation)
                 sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
-                
-                
-              # rect.center = sensing_agent.get_center()
-              # screen.blit(img, rect)
-                
-                # print(est_rotation)
 
-              # draw_sensing_agent(screen, sensing_agent)
-              # pygame.display.update()
-                # pygame.display.update()
-                # time.sleep(0.2)
-              # sensing_agent.obj_tracker.add_angular_displacement(0, -rotation)
-
-
-              # print(f"est:\t{est_rotation}\npred:\t{pred_rotation}")
               curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+              
               if len(pred_pt):
-                # print((curr_pt,pred_pt))
+                
                 pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["tangerine"])
                 pafn.frame_draw_line(screen, (curr_pt, pred_pt),pafn.colors["white"])
-              # npt = sensing_agent.estimate_next_rotation()
-              # if len(npt):
-              #   npt = sensing_agent.transform_from_local_coord(npt[0], npt[1])
-              #   pafn.frame_draw_dot(screen, npt, pafn.colors["cyan"])
-              
+
 
               draw_sensing_agent(screen, sensing_agent)
               pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
@@ -363,7 +349,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
               environment.visible_targets()
               pygame.display.update()
               time.sleep(0.2)
-              # sensing_agentestimate_next_rotation()
+            
           continue
 
 def repeatable_sensing_agent(screen, sensing_agent):
@@ -422,7 +408,7 @@ def repeatable_sensing_agent(screen, sensing_agent):
           pygame.display.update()
 
 def repeatable_multiagent_test(screen, environment):
-  time.sleep(3)
+  
   directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
   target_points = [(450,450), (550, 450), (550,550), (450,550)]
   # sensing_agents = [v for k,v in environment.agents.items()]
@@ -479,13 +465,13 @@ def repeatable_multiagent_test(screen, environment):
         est_rotation, est_translation = None,None
         est_rotation,est_translation = agent.estimate_next_rotation()
         
-        if est_rotation != None:
+        if est_rotation != None and agent.ALLOW_ROTATION:
           rotation = 0
           rotation = agent.apply_rotation_to_agent(est_rotation)
           agent.obj_tracker.add_angular_displacement(0, -est_rotation)
           agent.exoskeleton.rel_theta += rotation
 
-        if est_translation != None:
+        if est_translation != None and agent.ALLOW_TRANSLATION:
           translation = 0
           translation = agent.apply_translation_to_agent(est_translation)
           agent.obj_tracker.add_linear_displacement(-translation, 0)
@@ -506,11 +492,11 @@ def repeatable_multiagent_test(screen, environment):
       
       pygame.display.update()
       
-      time.sleep(0.09)
+      time.sleep(0.04)
 
 def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, orientation = (0,0)):
   ox,oy = origin
-  scale = 2
+  scale = 1.5
   opts = [(ox - 10*scale, oy - 10*scale), (ox - 10*scale, oy + 10*scale), (ox + 30 * scale, oy)]
   mpt = gfn.get_midpoint(opts[0], opts[1])
   mpt2 = gfn.get_midpoint(mpt,opts[2])
@@ -532,42 +518,21 @@ def main():
   screen = pafn.create_display(1000,1000)
   
   ox,oy = 400,400
-  ids = ["A", "B"]  
-  origins = [(800,300), (300,600)]
-  orientations = [(200,400), (400,400)]
+  ids = ["A", "B", "C"]  
+  origins = [(800,300), (300,600), (400,400)]
+  orientations = [(200,400), (400,400), (500,900)]
   environment = Environment()
 
-  # for i in range(2):
-  #   environment.agents[ids[i]] = 
-  Agents = [init_sensing_agent(SensingAgent(), origins[i], ids[i], orientations[i]) for i in range(2)]
+  Agents = [init_sensing_agent(SensingAgent(), origins[i], ids[i], orientations[i]) for i in range(3)]
   Agents[1].sensor.fov_radius = 150
+  Agents[2].sensor.fov_width = 2 * np.pi / 3
+  Agents[2].ALLOW_TRANSLATION = False
   target = Target((500,550))
   
   
-  environment.agents = {ids[0] : Agents[0], ids[1] : Agents[1]}
+  environment.agents = {ids[0] : Agents[0], ids[1] : Agents[1], ids[2]: Agents[2]}
   environment.add_target(target)
-  # environment.targets.append(target)
-  # opts = [(ox - 10*scale, oy - 10*scale), (ox - 10*scale, oy + 10*scale), (ox + 30 * scale, oy)]
-  # mpt = gfn.get_midpoint(opts[0], opts[1])
-  # mpt2 = gfn.get_midpoint(mpt,opts[2])
-  # ap = Polygon(opts)
-  # rb = RigidBody(parent_agent=sensing_agent, ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_link = ap)
-  # sensor = Sensor(parent_agent = sensing_agent)
-  # sensor.fov_width = np.pi / 4
-  # sensor.fov_radius = 300
-  # sensing_agent.exoskeleton = rb
-  # sensing_agent.sensor = sensor
-  # sensing_agent.obj_tracker = ObjectTrackManager()
-  # sensing_agent.obj_tracker.parent_agent = sensing_agent
-  # rotation = sensing_agent.rotate_agent((600,600))
-  
-  # environment = Environment(sensing_agent, [target])
-  # img.convert()
-  # rect = img.get_rect()
-  # rect.center = sensing_agent.get_center()
-  # pygame.display.update()
-  # repeatable_sensing_agent(screen, sensing_agent)
-  # repeatable_environment_test(screen, sensing_agent, environment)
+
   repeatable_multiagent_test(screen, environment)
   # repeatable_step_test(screen, sensing_agent, environment)
 

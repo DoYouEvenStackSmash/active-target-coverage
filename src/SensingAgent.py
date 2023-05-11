@@ -46,11 +46,15 @@ class SensingAgent:
               sensor = None,
               obj_tracker = None,
               _id = None,
+              rotation_flag = True,
+              translation_flag = True
               ):
     self.exoskeleton = exoskeleton
     self.sensor = sensor
     self.obj_tracker = obj_tracker
     self._id = _id
+    self.ALLOW_ROTATION = rotation_flag
+    self.ALLOW_TRANSLATION = translation_flag
 
   def get_origin(self):
     '''
@@ -207,6 +211,7 @@ class SensingAgent:
   def add_new_detection(self, frame_id, target_origin):
     '''
     Adds a single new detection to a layer
+    Does not return
     '''
     dc = self.transform_to_local_bbox(target_origin)
     yb = sann.register_annotation(0, dc, frame_id)
