@@ -307,6 +307,12 @@ class PygameArtFxns:
       
     # frame_draw_dot(screen, pts[-1], PygameArtFxns.colors["red"])
     PygameArtFxns.frame_draw_line(screen, (pts[-1], pts[0]), color)
-    
+  
+  def frame_draw_filled_polygon(screen, pts, color = (255,255,255)):
+    '''
+    Draws a filled polygon
+    Does not return
+    '''
+    pygame.gfxdraw.filled_polygon(screen, pts, color)
 
 

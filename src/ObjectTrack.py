@@ -52,30 +52,22 @@ class ObjectTrack:
     '''
     Predict next bounding box center
     '''
-    # lx,ly = 0,0
     lx,ly = self.path[-1].get_center_coord()
     if len(self.path) == 1:
       return (lx,ly)
     
     if posn:
       lx,ly = posn
-    # print(f"prediction_theta {self.theta}",end="\t")
-    # if self.theta < -np.pi/2:
-    #   self.theta = np.pi + self.theta
-    # if self.theta > np.pi/2:
-    #   self.theta = -np.pi + self.theta
-    # print(f"prediction_theta {self.theta}",end="\t")
+
     new_posn = mfn.pol2car((lx,ly), self.v[-1], self.theta)
-    # print(f"predicted bbox: {new_posn}")
+    
     return new_posn
-    # return (lx + (self.r * np.cos(self.theta)), ly + (self.r * np.sin(self.theta)))
-  
+    
   def get_track_heading(self):
     '''
     Accessor for track trajectory information
     Returns the track heading
     '''
-
     return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta)
   
   def is_alive(self, fc, expiration):

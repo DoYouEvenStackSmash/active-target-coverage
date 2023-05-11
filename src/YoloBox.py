@@ -24,7 +24,6 @@ class YoloBox:
     self.distance = distance
     self.displaced = False
 
-
   def get_corner_coords(self):
     '''
     Helper for translating yolo bbox to [(minx, miny), (maxx, maxy)]
