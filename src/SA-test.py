@@ -406,7 +406,7 @@ def repeatable_sensing_agent(screen, sensing_agent):
             continue
           p = pygame.mouse.get_pos()
           dc = sensing_agent.transform_to_local_bbox(p)
-          detectable,flag = sensing_agent.is_rel_detectable((dc[0],dc[1]))
+          detectable,flag = sensing_agent.is_detectable((dc[0],dc[1]))
           if detectable:
             pafn.frame_draw_dot(screen, p, pafn.colors['cyan'])
           else:
@@ -462,13 +462,13 @@ def repeatable_multiagent_test(screen, environment):
     translation_path = arrs[idx]
     if idx == 1:
       environment.agents["A"].exoskeleton.color = pafn.colors["yellow"]
-      # environment.agents["A"].ALLOW_TRANSLATION=True
+      environment.agents["A"].ALLOW_TRANSLATION=True
       # environment.agents["B"].exoskeleton.color = pafn.colors["white"]
       # time.sleep(0.5)
-    # if idx == 2:
+    if idx == 2:
       # time.sleep(0.2)
-      # environment.agents["B"].ALLOW_TRANSLATION=False
-      # environment.agents["B"].exoskeleton.color = pafn.colors["white"]
+      environment.agents["B"].ALLOW_TRANSLATION=False
+      environment.agents["B"].exoskeleton.color = pafn.colors["white"]
       # environment.agents["B"].fov_radius = 10
 
     for i in range(1, len(translation_path)):
@@ -567,11 +567,11 @@ def main():
   environment = Environment()
 
   Agents = [init_sensing_agent(SensingAgent(), origins[i], ids[i], orientations[i]) for i in range(3)]
-  Agents[0].ALLOW_TRANSLATION = True
+  Agents[0].ALLOW_TRANSLATION = False
   
-  Agents[1].centered_sensor.fov_radius = 200
+  Agents[1].centered_sensor.fov_radius = 110
   Agents[2].centered_sensor.fov_width = 1 * np.pi / 3
-  # Agents[2].ALLOW_TRANSLATION = False
+  Agents[2].ALLOW_TRANSLATION = False
   Agents[2].exoskeleton.color = pafn.colors["magenta"]
   # Agents[0].fov_radius = 200
   target = Target((600, 650))
@@ -581,7 +581,9 @@ def main():
   #   # environment.agents = {ids[0] : Agents[0], ids[1] : Agents[1], ids[2]: Agents[2]}
     environment.agents[ids[i]] = Agents[i]
   environment.add_target(target)
-  # sensing_agent = Agents[2]
+  sensing_agent = Agents[2]
+  # sensing_agent._id = -1
+  # repeatable_sensing_agent(screen, sensing_agent)
   repeatable_multiagent_test(screen, environment)
   # repeatable_step_test(screen, sensing_agent, environment)
 

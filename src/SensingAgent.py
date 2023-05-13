@@ -178,8 +178,8 @@ class SensingAgent:
     Returns a boolean indicator and a type identifier
     '''
     # boundary conditions
-    if sensor_id != -1:
-      return self.centered_sensor.is_rel_detectable(target_point)
+    if sensor_id == -1:
+      return self.centered_sensor.is_rel_detectable(target_pt)
     else:
       return self.sensors[sensor_id].is_rel_detectable(target_pt)
     
