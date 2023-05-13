@@ -42,13 +42,13 @@ def adjust_angle(theta):
 
 class SensingAgent: 
   def __init__(self,
-              exoskeleton = None,
-              centered_sensor = None,
-              obj_tracker = None,
-              _id = None,
-              sensors = [],
-              rotation_flag = True,
-              translation_flag = True
+              exoskeleton = None, # rigid body of the agent
+              centered_sensor = None, # default sensor, aligned with the axis of rotation for the agent
+              obj_tracker = None, # agent's object tracker
+              _id = None, # unique identifier for the agent
+              sensors = [], # list of additional sensors riding on the agent
+              rotation_flag = True, # flag allowing agent to rotate
+              translation_flag = True # flag allowing agent to translate
               ):
     self.exoskeleton = exoskeleton
     self.centered_sensor = centered_sensor

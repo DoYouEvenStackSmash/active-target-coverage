@@ -1,112 +1,113 @@
-from star_algorithm import *
+from support.star_algorithm import *
 from support.render_support import PygameArtFxns as pafn
 from support.render_support import GeometryFxns as gfn
 from support.render_support import MathFxns as mfn
 from support.render_support import TransformFxns as tfn
-
+DEBUG = False
+COLLISION_THRESHOLD = 10
 class CollisionDetection:
   def __init__(self, screen = None):
     self.screen = screen
 
-  def check_contact(A, O, VERBOSE = False):
-  '''
-  Collision detection wrapper for an Agent and an obstacle
-  Returns the distance between closest pair of points on agent and obstacle
-  '''
-  val = self.find_contact(build_star(A.get_front_edge(), O.get_front_edge()))
-  
-  # if collision, draw boundary region(minkowski sum)
-  if val < COLLISION_THRESHOLD:
-    obs_spc = construct_star_diagram(A, O)
-    pafn.frame_draw_polygon(self.screen, obs_spc, pafn.colors['yellow'])
-  return val
+  def check_contact(self, A, O, VERBOSE = False):
+    '''
+    Collision detection wrapper for an Agent and an obstacle
+    Returns the distance between closest pair of points on agent and obstacle
+    '''
+    val = self.find_contact(build_star(A.get_front_edge(), O.get_front_edge()))
+    
+    # if collision, draw boundary region(minkowski sum)
+    if val < COLLISION_THRESHOLD:
+      obs_spc = construct_star_diagram(A, O)
+      pafn.frame_draw_polygon(self.screen, obs_spc, pafn.colors['yellow'])
+    return val
 
   
-def find_contact(self, SL, VERBOSE = False):
-  '''
-  Algorithm for finding overlapping voronoi regions
-  Returns a scalar distance between the closest pair of points
-  '''
-  i1,i2 = 0,0
-  end_marker = 0
-  while SL[i1][1]._bounded_face == SL[i2][1]._bounded_face and i2 < len(SL):
-    i2+=1
-  # this is the wrapper position when we terminate the first while loop
-  end_marker = i2
-  wrap = lambda x : x % len(SL)
+  def find_contact(self, SL, VERBOSE = False):
+    '''
+    Algorithm for finding overlapping voronoi regions
+    Returns a scalar distance between the closest pair of points
+    '''
+    i1,i2 = 0,0
+    end_marker = 0
+    while SL[i1][1]._bounded_face == SL[i2][1]._bounded_face and i2 < len(SL):
+      i2+=1
+    # this is the wrapper position when we terminate the first while loop
+    end_marker = i2
+    wrap = lambda x : x % len(SL)
 
-  T_OOB_HYPOTENUSE = -3
-  T_OOB_NORM = -1
-  T_OOB_EDGE = -2
-  T_IN_VOR_EDGE = 1
-  END_FIRST_FLAG = False
-  '''
-    i is chasing j
-  '''
-  ev_records = []
-  vv_records = []
-  while 1:
-    E = SL[wrap(i1)][1]
-    V = SL[wrap(i2)][1].source_vertex
-    val = self.t_in_vor_edge(E, V.get_point_coordinate())
-    if val == T_IN_VOR_EDGE:
-      if self.t_in_V_region(V, self.calc_line_point(E, V)):
-        if DEBUG:
-          print("EV found!")
-        ev_records.append((E,V))
-        return EV_found(E, V, VERBOSE)
-        
-    if val == T_OOB_NORM: # candidate for VV, seeking symmetry
-      if self.t_in_V_region(E.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E.source_vertex.get_point_coordinate()):
-        if DEBUG:
-          print("VV found")
-        vv_records.append((E.source_vertex, V))
-        return VV_found(E.source_vertex, V, VERBOSE)
-        
-    if val == T_OOB_HYPOTENUSE:
-      E2 = E._next
-      if self.t_in_V_region(E2.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E2.source_vertex.get_point_coordinate()):
-        if DEBUG:
-          print("VV found")
-        vv_records.append((E2.source_vertex, V))
-        return VV_found(E2.source_vertex, V, VERBOSE)
-    e_hold = E._next
-    while SL[wrap(i1)][1] != e_hold:
+    T_OOB_HYPOTENUSE = -3
+    T_OOB_NORM = -1
+    T_OOB_EDGE = -2
+    T_IN_VOR_EDGE = 1
+    END_FIRST_FLAG = False
+    '''
+      i is chasing j
+    '''
+    ev_records = []
+    vv_records = []
+    while 1:
+      E = SL[wrap(i1)][1]
+      V = SL[wrap(i2)][1].source_vertex
+      val = self.t_in_vor_edge(E, V.get_point_coordinate())
+      if val == T_IN_VOR_EDGE:
+        if self.t_in_V_region(V, self.calc_line_point(E, V)):
+          if DEBUG:
+            print("EV found!")
+          ev_records.append((E,V))
+          return self.EV_found(E, V, VERBOSE)
+          
+      if val == T_OOB_NORM: # candidate for VV, seeking symmetry
+        if self.t_in_V_region(E.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E.source_vertex.get_point_coordinate()):
+          if DEBUG:
+            print("VV found")
+          vv_records.append((E.source_vertex, V))
+          return self.VV_found(E.source_vertex, V, VERBOSE)
+          
+      if val == T_OOB_HYPOTENUSE:
+        E2 = E._next
+        if self.t_in_V_region(E2.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E2.source_vertex.get_point_coordinate()):
+          if DEBUG:
+            print("VV found")
+          vv_records.append((E2.source_vertex, V))
+          return self.VV_found(E2.source_vertex, V, VERBOSE)
+      e_hold = E._next
+      while SL[wrap(i1)][1] != e_hold:
+        i1+=1
+      if i1 > i2:
+        temp = i1
+        i1 = i2
+        i2 = temp
+        if i2 == end_marker:
+          break
+    
+    END_SECOND_FLAG = False
+    while wrap(i1) != 0:
+      E = SL[wrap(i1)][1]
+      V = SL[wrap(i2)][1].source_vertex
+      val = self.t_in_vor_edge(E, V.get_point_coordinate())
+      if val == T_IN_VOR_EDGE:
+        if self.t_in_V_region(V, self.calc_line_point(E, V)):
+          if DEBUG:
+            print("EV found!")
+          ev_records.append((E,V))
+          return self.EV_found(E, V, VERBOSE)
+          
+      if val == T_OOB_NORM: # candidate for VV, seeking symmetry
+        if self.t_in_V_region(E.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E.source_vertex.get_point_coordinate()):
+          if DEBUG:
+            print("VV found")
+          vv_records.append((E.source_vertex, V))
+          return self.VV_found(E.source_vertex, V, VERBOSE)
+          
+      if val == T_OOB_HYPOTENUSE:
+        E2 = E._next
+        if self.t_in_V_region(E2.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E2.source_vertex.get_point_coordinate()):
+          if DEBUG:
+            print("VV found")
+          vv_records.append((E2.source_vertex, V))
+          return self.VV_found(E2.source_vertex, V, VERBOSE)
       i1+=1
-    if i1 > i2:
-      temp = i1
-      i1 = i2
-      i2 = temp
-      if i2 == end_marker:
-        break
-  
-  END_SECOND_FLAG = False
-  while wrap(i1) != 0:
-    E = SL[wrap(i1)][1]
-    V = SL[wrap(i2)][1].source_vertex
-    val = self.t_in_vor_edge(E, V.get_point_coordinate())
-    if val == T_IN_VOR_EDGE:
-      if self.t_in_V_region(V, self.calc_line_point(E, V)):
-        if DEBUG:
-          print("EV found!")
-        ev_records.append((E,V))
-        return EV_found(E, V, VERBOSE)
-        
-    if val == T_OOB_NORM: # candidate for VV, seeking symmetry
-      if self.t_in_V_region(E.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E.source_vertex.get_point_coordinate()):
-        if DEBUG:
-          print("VV found")
-        vv_records.append((E.source_vertex, V))
-        return VV_found(E.source_vertex, V, VERBOSE)
-        
-    if val == T_OOB_HYPOTENUSE:
-      E2 = E._next
-      if self.t_in_V_region(E2.source_vertex, V.get_point_coordinate()) and self.t_in_V_region(V, E2.source_vertex.get_point_coordinate()):
-        if DEBUG:
-          print("VV found")
-        vv_records.append((E2.source_vertex, V))
-        return VV_found(E2.source_vertex, V, VERBOSE)
-    i1+=1
 
   def mark_vertex_clear(self, v):
     '''
@@ -259,9 +260,9 @@ def find_contact(self, SL, VERBOSE = False):
     theta_at = mfn.car2pol(a, t)[0]
     
     # print(f"ab:\t{theta_ab}\nnorm:\t{theta_ab_norm}\nt:\t{theta_at}")
-    if (self.screen != None):
-      pafn.frame_draw_line(self.screen, [a, mfn.pol2car(a, r, theta_ab)], colors["red"])
-      pafn.frame_draw_line(self.screen, [a, mfn.pol2car(a, r, theta_ab_norm)], colors["yellow"])
+    # if (self.screen != None):
+    #   pafn.frame_draw_line(self.screen, [mfn.pol2car(a, r, theta_ab)], pafn.colors["red"])
+    #   pafn.frame_draw_line(self.screen, [mfn.pol2car(a, r, theta_ab_norm)], pafn.colors["yellow"])
       # pygame.display.update()
     
     if theta_ab < -np.pi / 2:
@@ -272,14 +273,14 @@ def find_contact(self, SL, VERBOSE = False):
 
     if not (theta_ab_norm <= theta_at):
       if (self.screen != None):
-        pafn.frame_draw_line(self.screen, [a, t], colors["tangerine"])
+        pafn.frame_draw_line(self.screen, [a, t], pafn.colors["tangerine"])
       # print("outside ab_norm!")
       # print(f"norm: {theta_ab_norm} >= {theta_at}")
       # print(f"{t} is out of region by angle test.")
       return -1
     if not (theta_at <= theta_ab):
       if (self.screen != None):
-        pafn.frame_draw_line(self.screen, [a, t], colors["tangerine"])
+        pafn.frame_draw_line(self.screen, [a, t], pafn.colors["tangerine"])
       # print("outside ab!")
       # print(f"{theta_ab} <= {theta_at}")
       # print(f"{t} is out of region by angle test.")
@@ -292,9 +293,9 @@ def find_contact(self, SL, VERBOSE = False):
     if (rho_at < h_max):
       # print(f"{t} is in vor(E)")
       if (self.screen != None):
-        pafn.frame_draw_line(self.screen, [a, t], colors["green"])
+        pafn.frame_draw_line(self.screen, [a, t], pafn.colors["green"])
       return 1
     if (self.screen != None):
-      pafn.frame_draw_line(self.screen, [a, t], colors["indigo"])
+      pafn.frame_draw_line(self.screen, [a, t], pafn.colors["indigo"])
     # print(f"{t} is out of region due to maximum hypotenuse_test.")
     return -3

@@ -35,23 +35,22 @@ class ObjectTrackManager:
             }
   display_constants = {"trail_len" : 0}
   def __init__(self,
-                global_track_store = {},
-                inactive_tracks = [],
-                active_tracks = None,
-                img_filenames = [],
-                annotation_list_fname = "",
-                filenames = [],
-                sys_paths = [],
-                frame_counter = 0,
-                layers = [],
-                linked_tracks = [],
-                trackmap = [],
-                fdict = {},
-                categories = CATEGORIES,
-                img_centers = [],
-                imported = False,
-                displacements = [],
-                parent_agent = None
+                global_track_store = {}, # Centralized storage for all tracks
+                inactive_tracks = [], # list of inactive tracks
+                active_tracks = None, # placeholder for deque of active tracks
+                img_filenames = [], # DATA AUGMENTATION: image filenames for associating detections with images
+                annotation_list_fname = "", # input list of annotations
+                filenames = [], # DATA AUGMENTATION: filenames for loaded detections
+                sys_paths = [], # DATA AUGMENTATION: paths to filenames for loaded detections
+                frame_counter = 0, # PROCESSING: clock counter for tracking track lifespan
+                layers = [], # PROCESSING: accumulator for detections by frame
+                linked_tracks = [], # EXPORT: list of linked tracks for export
+                trackmap = [], # EXPORT: list of identifiers for linked tracks
+                fdict = {}, # EXPORT: List of filenames for associating with tracks and their detections
+                categories = CATEGORIES, # class list for tracks and their identifiers
+                img_centers = [], # 
+                imported = False, # flag denoting whether this is a live tracker or loading track history
+                parent_agent = None # placeholder for parent agent
               ):
     self.global_track_store = global_track_store
     self.inactive_tracks = inactive_tracks
@@ -67,7 +66,6 @@ class ObjectTrackManager:
     self.categories = categories
     self.img_centers = img_centers
     self.imported = imported
-    self.displacements = displacements
     self.parent_agent = parent_agent
 
   def get_predictions(self):
@@ -240,42 +238,34 @@ class ObjectTrackManager:
     '''
     Update preexisting tracks with a single layer of entities
     '''
-    
-    # reinitialize active tracks if there are none currently active
-    # if (self.active_tracks == None or len(self.active_tracks) == 0):
     if len(self.layers) == 0:
       return
     
     curr_layer = self.layers[layer_idx]
+    # reinitialize active tracks if there are none currently active
     if not self.has_active_tracks():
       if len(curr_layer):
         self.initialize_tracks(layer_idx)
       return
     
-    
-    # if len(curr_layer) == 0:
-    #   return
     fc = layer_idx
     pred,pairs = [],[]
     
     # gather predictions from track heads
     for t in self.active_tracks:
-      # if t.is_alive(fc, ObjectTrackManager.constants["track_lifespan"])
       pred.append((t.track_id, t.predict_next_box()))
-      # else:
 
-    # create list of all pairs between track heads and curr layer
+    # create list of all pairs between track heads and detections in curr layer
     for c in range(len(curr_layer)):
       for p in pred:
         d = MathFxns.euclidean_dist(p[1],curr_layer[c].get_center_coord())
-        # print("fire")
         pairs.append((p[0], c, d))
     
+    # sort the list of pairs by euclidean distance
     sortkey = lambda s: s[2]
     pairs = sorted(pairs,key=sortkey)
     pc,tc,lc = 0,len(self.active_tracks),len(curr_layer)
-    # print(lc)
-    # print(tc)
+
     # update existing tracks with new entities
     while tc > 0 and lc > 0 and pc < len(pairs):
       elem = pairs[pc]
@@ -283,42 +273,45 @@ class ObjectTrackManager:
         pc += 1
         continue
       
-      '''
-        We add a simple check 
-      '''
+      # Gate check for global nearest neighbors
       if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
         tc-=1
         pc+=1
         continue
-      # add entity to closest track
+      
+      # add entity to nearest track
       T = self.global_track_store[elem[0]]
       T.add_new_step(curr_layer[elem[1]], fc)
+      
       # update counters
       tc -= 1
       lc -= 1
       pc += 1
     
-    # create new tracks from unused entities
+    # create new tracks from unmatched entities
     if lc > 0:
       while lc > 0 and pc < len(pairs):
         elem = pairs[pc]
         if curr_layer[elem[1]].parent_track != None:
           pc += 1
           continue
+        
         # create new ObjectTrack
         self.create_new_track(curr_layer[elem[1]],fc)
+        
         # update counters
         lc -= 1
         pc += 1
     
     if tc > 0:
-      # reap tracks which are no longer active
       fc += 1
       max_rot = len(self.active_tracks)
       for i in range(max_rot):
+        # pass over active tracks
         if self.active_tracks[-1].is_alive(fc, ObjectTrackManager.constants["track_lifespan"]):
           self.active_tracks.rotate()
         else:
+          # reap tracks which are no longer active
           self.inactive_tracks.append(self.active_tracks.pop())
   
 

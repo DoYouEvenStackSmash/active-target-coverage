@@ -1,6 +1,10 @@
 
 class Target:
-  def __init__(self, origin, color = None, _id = 0):
+  def __init__(self, 
+                origin, # global origin of the target wrt world frame
+                color = None, # color of target for rendering
+                _id = 0 # unique identifier for the target
+                ):
     self.origin = origin
     self.color = color
     self._id = _id

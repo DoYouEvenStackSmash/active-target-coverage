@@ -5,17 +5,19 @@ from render_support import MathFxns as mfn
 from render_support import TransformFxns as tfn
 from support.transform_polygon import *
 from support.Polygon import *
+from aux_functions import *
 
 class RigidBody:
   LINE_LEN = 30
   def __init__(self, 
-              parent_agent,
-              rigid_link = None,
-              ref_origin = (0,0),
-              endpoint = (0,0),
-              ref_center = (0,0),
-              point_set = [],
-              rel_theta = 0
+              parent_agent, # placeholder for parent agent of rigid body
+              rigid_link = None, # underlying Link object and implementation for transformations
+              ref_origin = (0,0), # global origin of the rigid body in the agent's world frame
+              endpoint = (0,0), # global coordinate of the end point in the agent's world frame
+              ref_center = (0,0), # global coordinate of the center point (central sensor) in the agent's world frame
+              point_set = [], # placeholder for the points in the rigid body. Superceded by rigid_link
+              rel_theta = 0, # global angle theta describing where the agent is oriented in the agent's world frame
+              color = None # Color for rendering agent details
               ):
     self.parent_agent = parent_agent
     self.origin = ref_origin
@@ -24,6 +26,7 @@ class RigidBody:
     self.point_set = point_set
     self.body = rigid_link
     self.rel_theta = rel_theta
+    self.color = rand_color()
   
 
   def get_rel_theta(self):
@@ -90,73 +93,6 @@ class RigidBody:
     '''
     return self.origin
 
-  def rotate_body(self, target_point):
-    '''
-    Rotation for the rigid body
-    '''
-    rotation = self.get_relative_rotation(target_point)
-    rotation = self.apply_rotation_to_body(rotation)
-    self.rel_theta += rotation
-    return rotation
-  
-  def apply_rotation_to_body(self, rotation):
-    '''
-    Applies a rotation to internal polygon
-    Does not return
-    '''
-    rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
-    self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
-    self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
-    self.ref_center = tfn.rotate_point(self.get_center(), self.get_center(), rot_mat)
-    
-    rotate_polygon(self.body, rot_mat, self.get_center())
-    return rotation
-    
-  def apply_translation_to_body(self, translation_dist=0):
-    '''
-    Applies a translation to the rigid body
-    returns a displacement vector
-    '''
-    self.ref_center = mfn.pol2car(self.get_center(), translation_dist, self.get_rel_theta())
-    self.endpoint = mfn.pol2car(self.get_endpoint(), translation_dist, self.get_rel_theta())
-    self.origin = mfn.pol2car(self.get_origin(), translation_dist, self.get_rel_theta())
-    x_disp, y_disp = mfn.pol2car((0,0), translation_dist, self.get_rel_theta())
-    translate_polygon(self.body, x_disp, y_disp)
-    return translation_dist
-
-  def translate_body(self, target_point):
-    '''
-    Translates internal polygon
-    Does not return
-    '''
-    theta, r = mfn.car2pol(self.get_center(), target_point)
-    pt2 = mfn.pol2car(self.get_center(), r, theta)
-    cx,cy = self.get_center()
-
-    x_disp,y_disp = pt2[0] - cx, pt2[1] - cy
-    self.endpoint = mfn.pol2car(self.endpoint, r, theta)
-    self.origin = mfn.pol2car(self.origin, r, theta)
-    self.ref_center = mfn.pol2car(self.ref_center, r, theta)
-    
-    translate_polygon(self.body, x_disp, y_disp)
-    return (theta, r)
-    
-
-  def update_orientation(self, point_set, theta):
-    '''
-    TODO rotate by angle
-    '''
-    self.point_set = point_set
-    self.rel_theta = theta
-  
-  def update_point_set(self, point_set):
-    '''
-    Replace existing point set with a new point set.
-    Used during rotations
-    Does not return
-    '''
-    self.point_set = point_set
-
   def get_normals(self):
     '''
     Calculates coordinate axes x,y in R2
@@ -194,3 +130,68 @@ class RigidBody:
     
     return rotation
 
+  def rotate_body(self, target_point):
+    '''
+    Rotation for the rigid body
+    '''
+    rotation = self.get_relative_rotation(target_point)
+    rotation = self.apply_rotation_to_body(rotation)
+    self.rel_theta += rotation
+    return rotation
+  
+  def translate_body(self, target_point):
+    '''
+    Translates internal polygon
+    Does not return
+    '''
+    theta, r = mfn.car2pol(self.get_center(), target_point)
+    pt2 = mfn.pol2car(self.get_center(), r, theta)
+    cx,cy = self.get_center()
+
+    x_disp,y_disp = pt2[0] - cx, pt2[1] - cy
+    self.endpoint = mfn.pol2car(self.endpoint, r, theta)
+    self.origin = mfn.pol2car(self.origin, r, theta)
+    self.ref_center = mfn.pol2car(self.ref_center, r, theta)
+    
+    translate_polygon(self.body, x_disp, y_disp)
+    return (theta, r)
+  
+  def apply_rotation_to_body(self, rotation):
+    '''
+    Applies a rotation to internal polygon
+    Does not return
+    '''
+    rot_mat = tfn.calculate_rotation_matrix(rotation, 1)    
+    self.endpoint = tfn.rotate_point(self.get_center(), self.get_endpoint(), rot_mat)
+    self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
+    self.ref_center = tfn.rotate_point(self.get_center(), self.get_center(), rot_mat)
+    
+    rotate_polygon(self.body, rot_mat, self.get_center())
+    return rotation
+    
+  def apply_translation_to_body(self, translation_dist=0):
+    '''
+    Applies a translation to the rigid body
+    returns a displacement vector
+    '''
+    self.ref_center = mfn.pol2car(self.get_center(), translation_dist, self.get_rel_theta())
+    self.endpoint = mfn.pol2car(self.get_endpoint(), translation_dist, self.get_rel_theta())
+    self.origin = mfn.pol2car(self.get_origin(), translation_dist, self.get_rel_theta())
+    x_disp, y_disp = mfn.pol2car((0,0), translation_dist, self.get_rel_theta())
+    translate_polygon(self.body, x_disp, y_disp)
+    return translation_dist
+    
+  def update_orientation(self, point_set, theta):
+    '''
+    TODO rotate by angle
+    '''
+    self.point_set = point_set
+    self.rel_theta = theta
+  
+  def update_point_set(self, point_set):
+    '''
+    Replace existing point set with a new point set.
+    Used during rotations
+    Does not return
+    '''
+    self.point_set = point_set

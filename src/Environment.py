@@ -32,12 +32,16 @@ import pygame
 import time
 
 class Environment:
-  def __init__(self,agent = None,
-                    agents = {},
-                    targets = [],
-                    counter = 0):
-    self._agent = agent
-    self.agents = agents
+  '''
+  Mock environment for simulating the world
+  '''
+  def __init__(self,agent = None, # single agent for backwards compatibility
+                    agents = {}, # dictionary of agents, accessible by their unique identifiers
+                    targets = [], # list of targets in the world
+                    counter = 0 # global counter for synchronizing "time"
+                    ):
+    self._agent = agent 
+    self.agents = agents 
     self.targets = targets
     self.counter = counter
   
@@ -54,19 +58,21 @@ class Environment:
     
     for k in self.agents:
       updates[k] = []
-      
       for target in self.targets:
         d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())
         pairs.append((self.agents[k]._id, target, d))
+    
     pairs = sorted(pairs, key=sortkey)
     # TODO: short circuit the for loop, minimum number of updates?
     
+    # iterate through all pairs and determine which agents can see which targets
     for c in range(len(pairs)):
       if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
         continue
       if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_origin()):
         updates[pairs[c][0]].append(pairs[c][1])
     
+    # update the trackers of all agents
     for k in updates:
       self.agents[k].new_detection_layer(frame_id, updates[k])
       self.agents[k].obj_tracker.process_layer(-1)
@@ -74,6 +80,9 @@ class Environment:
     
 
   def add_target(self,T):
+    '''
+    Add a target to the world
+    '''
     self.targets.append(T)
   
   def transform_from_local_coord(self, x, y, w=1, h=1):

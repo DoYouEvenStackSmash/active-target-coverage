@@ -7,6 +7,7 @@ from render_support import TransformFxns as tfn
 from support.transform_polygon import *
 from support.Polygon import *
 from support.Link import Link
+from support.CollisionDetection import CollisionDetection
 
 import collections
 # from aux_functions import *
@@ -75,7 +76,7 @@ def draw_coordinate_frame(screen, sensor):
       for i in range(1,len(coord_frame[c])):
         pafn.frame_draw_line(screen, (coord_frame[c][i-1], coord_frame[c][i]), pafn.colors['black'])
     for endpoint in coord_frame[-1]:
-      pafn.frame_draw_bold_line(screen, (sensor.get_origin(), endpoint), pafn.colors['dimgray'])
+      pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['dimgray'])
   # for i in range(1, len(detect_frame[-1])):
 
 
@@ -108,15 +109,17 @@ def draw_all_normals(screen, rigid_body):
   pafn.frame_draw_line(screen, (rigid_body.get_center(), n[1]), pafn.colors['yellow'])
   pafn.frame_draw_dot(screen, rigid_body.get_center(), pafn.colors['white'])
 
-def draw_all_links(screen, link):
+def draw_all_links(screen, link, color = None):
   '''
   Render function for all polygon links in the chain
   Does not return
   '''
+  if color == None:
+    color = pafn.colors["indigo"]
   points = link.get_points()
-  pafn.frame_draw_filled_polygon(screen, points, pafn.colors["indigo"])
+  pafn.frame_draw_filled_polygon(screen, points,color)
   pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
-  pafn.frame_draw_dot(screen, link.get_center(), pafn.colors['white'])
+  # pafn.frame_draw_dot(screen, link.get_center(), pafn.colors['white'])
   
 
 
@@ -125,7 +128,7 @@ def draw_rigid_body(screen, rigid_body):
   Wrapper for rendering all components of a rigid body
   '''
   draw_all_normals(screen, rigid_body)
-  draw_all_links(screen, rigid_body)
+  draw_all_links(screen, rigid_body, rigid_body.color)
 
 def draw_sensing_agent(screen, sensing_agent):
   '''
@@ -347,7 +350,7 @@ def repeatable_step_test(screen, sensing_agent, environment):
 
               for k,sensing_agent in environment.agents.items():
                 draw_sensing_agent(screen, sensing_agent)
-              pafn.frame_draw_dot(screen, pt, pafn.colors["red"])
+              pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
               environment.targets[0].origin = pt
               environment.visible_targets()
               pygame.display.update()
@@ -411,7 +414,8 @@ def repeatable_sensing_agent(screen, sensing_agent):
           pygame.display.update()
 
 def repeatable_multiagent_test(screen, environment):
-  
+  COLLISION_THRESHOLD = 10
+  cd = CollisionDetection(screen)
   directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
   target_points = [(450,450), (550, 450), (550,550), (450,550)]
   # sensing_agents = [v for k,v in environment.agents.items()]
@@ -456,10 +460,22 @@ def repeatable_multiagent_test(screen, environment):
   idx = 1
   for idx in range(len(arrs)):
     translation_path = arrs[idx]
+    if idx == 1:
+      environment.agents["A"].exoskeleton.color = pafn.colors["yellow"]
+      # environment.agents["A"].ALLOW_TRANSLATION=True
+      # environment.agents["B"].exoskeleton.color = pafn.colors["white"]
+      # time.sleep(0.5)
+    # if idx == 2:
+      # time.sleep(0.2)
+      # environment.agents["B"].ALLOW_TRANSLATION=False
+      # environment.agents["B"].exoskeleton.color = pafn.colors["white"]
+      # environment.agents["B"].fov_radius = 10
 
     for i in range(1, len(translation_path)):
       pt = translation_path[i]
       pafn.clear_frame(screen)
+      
+      # pygame.display.update()
       # print(pt)
       # continue
       for _id in environment.agents:
@@ -489,17 +505,40 @@ def repeatable_multiagent_test(screen, environment):
         # draw_sensing_agent(screen, sensing_agent)
       for k,sensing_agent in environment.agents.items():
         draw_sensing_agent(screen, sensing_agent)
+      # val = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
+      # print("VAL1")
+      # if val < COLLISION_THRESHOLD:
+      #   environment.agents["A"].ALLOW_TRANSLATION = False
+      #   environment.agents["B"].ALLOW_TRANSLATION = False
+      #   environment.agents["A"].ALLOW_ROTATION = False
+      #   environment.agents["B"].ALLOW_ROTATION = False
+      # val2 = cd.check_contact(environment.agents["C"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
+      # print("VAL2")
+      # if val2 < COLLISION_THRESHOLD and environment.agents["A"].ALLOW_TRANSLATION != False:
+      #   environment.agents["A"].ALLOW_TRANSLATION = False
+      #   environment.agents["C"].ALLOW_TRANSLATION = False
+      #   environment.agents["A"].ALLOW_ROTATION = False
+      #   environment.agents["C"].ALLOW_ROTATION = False
+      # val3 = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["C"].exoskeleton.body, True)
+      # print("VAL3")
+      # if val3 < COLLISION_THRESHOLD:
+      #   environment.agents["B"].ALLOW_TRANSLATION = False
+      #   environment.agents["C"].ALLOW_TRANSLATION = False
+      #   environment.agents["B"].ALLOW_ROTATION = False
+      #   environment.agents["C"].ALLOW_ROTATION = False
+      
+      # COLLISION_THRESHOLD = 10
       pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
       environment.targets[0].origin = pt
       environment.visible_targets()
       
       pygame.display.update()
       
-      time.sleep(0.07)
+      time.sleep(0.1)
 
 def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, orientation = (0,0)):
   ox,oy = origin
-  scale = 1.5
+  scale = 2
   opts = [(ox - 10*scale, oy - 10*scale), (ox - 10*scale, oy + 10*scale), (ox + 30 * scale, oy)]
   mpt = gfn.get_midpoint(opts[0], opts[1])
   mpt2 = gfn.get_midpoint(mpt,opts[2])
@@ -523,16 +562,18 @@ def main():
   
   ox,oy = 500,500
   ids = ["A", "B", "C"]  
-  origins = [(900,400), (400,700), (500,500)]
+  origins = [(900,600), (400,700), (400,400)]
   orientations = [(300,500), (500,500), (600,1000)]
   environment = Environment()
 
   Agents = [init_sensing_agent(SensingAgent(), origins[i], ids[i], orientations[i]) for i in range(3)]
-  Agents[0].ALLOW_TRANSLATION = False
-  Agents[1].centered_sensor.fov_radius = 150
-  Agents[2].centered_sensor.fov_width = 2 * np.pi / 3
-  Agents[2].ALLOW_TRANSLATION = False
-  Agents[0].fov_radius = 200
+  Agents[0].ALLOW_TRANSLATION = True
+  
+  Agents[1].centered_sensor.fov_radius = 200
+  Agents[2].centered_sensor.fov_width = 1 * np.pi / 3
+  # Agents[2].ALLOW_TRANSLATION = False
+  Agents[2].exoskeleton.color = pafn.colors["magenta"]
+  # Agents[0].fov_radius = 200
   target = Target((600, 650))
   vals = 3
   # environment.agents["C"] = Agents[2]

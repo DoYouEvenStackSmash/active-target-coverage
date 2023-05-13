@@ -248,7 +248,10 @@ class PygameArtFxns:
   "white" : (255,255,255),
   "dimgray":(105,105,105),
   "lightslategray":(119,136,153),
-  "silver":(192,192,192)
+  "silver":(192,192,192),
+  "forestgreen":(34,139,34),
+  "seagreen":(46,139,87),
+ 	"lawngreen":(124,252,0)
   
   }
   def create_display(width, height):
@@ -288,7 +291,7 @@ class PygameArtFxns:
     Draws a single dot given a point (x, y)
     Returns nothing
     '''
-    pygame.draw.circle(screen, color, point, 7, width)
+    pygame.draw.circle(screen, color, point, 9, width)
 
   def clear_frame(screen, color=(255, 255, 255)):
     '''

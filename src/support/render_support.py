@@ -123,6 +123,7 @@ class MathFxns:
     if rad_theta < -np.pi/2:
       rad_theta = rad_theta + 2 * np.pi
     return rad_theta
+    
 
 class GeometryFxns:
   '''
@@ -199,6 +200,28 @@ class GeometryFxns:
       p1.append(GeometryFxns.lerp(m1[i],m2[i],i * step))
     p1.append(GeometryFxns.lerp(m1[-1],m2[-1],1))
     return l1,l2,l3,m1,m2,p1
+  
+  def get_unit_norm_angle(ray_origin, ray_target, switch = False):
+    '''
+    Returns the angle in radians of the vector normal to the line between two
+    points.
+    Switch is used by caller functions to flip the angle around the unit circle.
+    '''
+    x1,y1 = ray_origin
+    x2,y2 = ray_target
+    
+    rad_theta = np.arctan2(y2 - y1, x2 - x1)
+    # print(rad_theta)
+    rad_prime = rad_theta
+    if rad_prime < -np.pi / 2:
+      rad_prime = 2 * np.pi + rad_prime
+    rad_prime = rad_prime - np.pi / 2
+
+    if switch:
+      if rad_prime > 0:
+        return rad_prime - np.pi
+      return rad_prime + np.pi
+    return rad_prime
     
 class PygameArtFxns:
   ''' set of colors '''

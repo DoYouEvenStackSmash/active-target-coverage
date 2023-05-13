@@ -22,10 +22,11 @@ class Sensor:
   WINDOW_WIDTH = 100
 
   def __init__( self,
-                parent_agent,
-                sensor_radius = 300,
-                sensor_width = np.pi / 4,
-                _id = None):
+                parent_agent, # parent agent which holds the sensor
+                sensor_radius = 300, # range of the sensor
+                sensor_width = np.pi / 4, # field of view of the sensor
+                _id = None # unique identifier for the sensor
+                ):
     self.parent_agent = parent_agent
     self.fov_radius = sensor_radius
     self.fov_width = sensor_width
