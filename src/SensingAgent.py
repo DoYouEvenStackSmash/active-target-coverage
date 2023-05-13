@@ -42,17 +42,19 @@ def adjust_angle(theta):
 
 class SensingAgent: 
   def __init__(self,
-              exoskeleton = None,
-              sensor = None,
-              obj_tracker = None,
-              _id = None,
-              rotation_flag = True,
-              translation_flag = True
+              exoskeleton = None, # rigid body of the agent
+              centered_sensor = None, # default sensor, aligned with the axis of rotation for the agent
+              obj_tracker = None, # agent's object tracker
+              _id = None, # unique identifier for the agent
+              sensors = [], # list of additional sensors riding on the agent
+              rotation_flag = True, # flag allowing agent to rotate
+              translation_flag = True # flag allowing agent to translate
               ):
     self.exoskeleton = exoskeleton
-    self.sensor = sensor
+    self.centered_sensor = centered_sensor
     self.obj_tracker = obj_tracker
     self._id = _id
+    self.sensors = sensors
     self.ALLOW_ROTATION = rotation_flag
     self.ALLOW_TRANSLATION = translation_flag
 
@@ -72,27 +74,35 @@ class SensingAgent:
     fov_theta = self.exoskeleton.get_rel_theta()
     return fov_theta    
 
-  def get_fov_width(self):
+  def get_fov_width(self, sensor_idx = -1):
     '''
     Accessor for the width of the fov of the sensing agent
     returns a scalar value
     '''
-    fov_width = self.sensor.get_fov_width()
+    fov_width = 0
+    if sensor_idx != -1:
+      fov_width = self.sensors[sensor_idx].get_fov_width()
+    else:
+      fov_width = self.centered_sensor.get_fov_width()
     return fov_width
 
-  def get_fov_radius(self):
+  def get_fov_radius(self, sensor_idx = -1):
     '''
     Accessor for the range of the sensing agent's sensor
     returns a scalar value
     '''
-    fov_radius = self.sensor.get_fov_radius()
+    fov_radius = 0
+    if sensor_idx != -1:
+      fov_radius = self.sensors[sensor_idx].get_fov_radius()
+    else:
+      fov_radius = self.centered_sensor.get_fov_radius()
     return fov_radius
 
   def get_components(self):
     '''
     Returns the attributes of an agent
     '''
-    return (self.exoskeleton, self.sensor)
+    return (self.exoskeleton, self.centered_sensor)
 
   def get_center(self):
     '''
@@ -100,11 +110,14 @@ class SensingAgent:
     '''
     return self.exoskeleton.get_center()
   
-  def get_sensor(self):
+  def get_sensor(self, sensor_idx = -1):
     '''
     Accessor for the agent's sensor
     '''
-    return self.sensor
+    if sensor_idx != -1:
+      return self.sensors[sensor_idx]
+    else:
+      return self.centered_sensor
 
   def get_object_tracker(self):
     '''
@@ -159,32 +172,37 @@ class SensingAgent:
       return False
     return True
 
-  def is_rel_detectable(self, target_pt):
+  def is_detectable(self, target_pt, sensor_id = -1):
     '''
     Indicates whether a target point is detectable (within tolerance)
     Returns a boolean indicator and a type identifier
     '''
     # boundary conditions
-    adj_win_bnd = (self.get_fov_width() / 2) - (self.get_fov_width() / 2) * Sensor.TOLERANCE * 2
-    adj_rad_bnd = self.get_fov_radius()
-
-    target_x = target_pt[0]
-    target_y = target_pt[1]
-    flags = 0
+    if sensor_id == -1:
+      return self.centered_sensor.is_rel_detectable(target_pt)
+    else:
+      return self.sensors[sensor_id].is_rel_detectable(target_pt)
     
-    angle_flag = False
+    # adj_win_bnd = (self.get_fov_width() / 2) - (self.get_fov_width() / 2) * Sensor.TOLERANCE * 2
+    # adj_rad_bnd = self.get_fov_radius()
+
+    # target_x = target_pt[0]
+    # target_y = target_pt[1]
+    # flags = 0
     
-    # if range out of bounds
-    if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
-      flags += Sensor.RANGE
+    # angle_flag = False
+    
+    # # if range out of bounds
+    # if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
+    #   flags += Sensor.RANGE
 
-    # if angle out of bounds
-    if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
-      flags += Sensor.ANGULAR
-    if flags > 0:
-      return False, flags
+    # # if angle out of bounds
+    # if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
+    #   flags += Sensor.ANGULAR
+    # if flags > 0:
+    #   return False, flags
 
-    return True, Sensor.VALID
+    # return True, Sensor.VALID
   
   def export_tracks(self):
     '''
@@ -246,7 +264,7 @@ class SensingAgent:
 
     return pt
 
-  def estimate_next_rotation(self, idx = 0):
+  def estimate_pose_update(self, idx = 0):
     '''
     Uses past information to predict the next rotation if it exists
     Returns () or the tuple containing the partial rotation
@@ -261,7 +279,7 @@ class SensingAgent:
     if curr_pt == pred_pt:
       return (None,None)
     
-    status, flag = self.is_rel_detectable(pred_pt)
+    status, flag = self.centered_sensor.is_rel_detectable(pred_pt)
     
     # if predicted point is detectable from pov of SensingAgent
     if status:
@@ -286,7 +304,6 @@ class SensingAgent:
         offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
       partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
       return (partial_rotation, offset)
-
 
   
   def estimate_rel_next_detection(self, idx = 0):

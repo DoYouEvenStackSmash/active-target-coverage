@@ -10,11 +10,12 @@ from support.Polygon import *
 class Link:
   LINE_LEN = 30
   def __init__(self, point_set = [], 
-              endpoint = (0,0),
-              _prev = None,
-              _next = None, 
-              theta = 0,
-              rigid_body = None):
+              endpoint = (0,0), # endpoint of the link in a global coordinate frame
+              _prev = None, # reference to previous link for use in a chain
+              _next = None, # reference to next link for use in a chain
+              theta = 0, # angle of the link relative to some coordinate frame
+              rigid_body = None # rigid body of the link
+              ):
     self.point_set = point_set
     self.body = rigid_body
     self.rel_theta = theta

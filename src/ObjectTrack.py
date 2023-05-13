@@ -7,17 +7,16 @@ from render_support import PygameArtFxns as pafn
 
 class ObjectTrack:
   def __init__(self, track_id, class_id):
-    self.r = 0
-    self.theta = 0
-    self.delta_theta = [0]
-    self.delta_v = [0]
-    self.v = [0]
-    self.path = []
-    self.track_id = track_id
+    self.r = 0 # distance between two most recent elements in the track
+    self.theta = 0 # angle between two most recent elements in the track
+    self.delta_theta = [0] # change in angle after adding element to the track
+    self.delta_v = [0] # change in velocity (acceleration) after adding element to the track
+    self.v = [0] # velocity between every adjacent pair of elements in the track
+    self.path = [] # list of all detections in the track
+    self.track_id = track_id # unique identifier for the track
     self.color = rand_color()
     self.last_frame = -1
-    self.class_id = class_id
-    self.displacements = [None]
+    self.class_id = class_id # track classification for use with an Object Detector
 
   def add_new_step(self, yb, frame_id):
     ''' 
@@ -165,7 +164,6 @@ class ObjectTrack:
       fid = None
       # if fdict != None:
       #   fid = fdict[f'{yb.img_filename[:-3]}png']
-      # else:
       fid = yb.img_filename
       steps.append({
               "id":-1, 
