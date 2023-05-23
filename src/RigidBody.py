@@ -6,7 +6,7 @@ from render_support import TransformFxns as tfn
 from support.transform_polygon import *
 from support.Polygon import *
 from aux_functions import *
-
+import time
 from State import State
 
 class RigidBody:
@@ -33,9 +33,8 @@ class RigidBody:
     self.color = rand_color()
     self.time_stamp = time_stamp
     self.states = states
-    self.time_stamp = time_stamp
   
-  def _heartbeat(self):
+  def heartbeat(self):
     '''
     Internal heartbeat. Records a new state.
     Does not return
@@ -43,7 +42,7 @@ class RigidBody:
     self.increment_clock()
     
     new_state = State(self.get_center(), self.get_rel_theta(), self.get_clock())
-    
+
     self.states.append(new_state)
   
   def increment_clock(self):

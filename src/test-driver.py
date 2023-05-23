@@ -28,7 +28,57 @@ import os
 
 from drawing_functions import *
 
-def mouse_test(screen, sensing_agent, environment):
+def agent_update(sensing_agent):
+  '''
+  Updates the pose of a single agent
+  '''
+  est_rotation,est_translation = sensing_agent.estimate_pose_update()
+
+  if est_rotation != None:
+
+    rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
+    sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+    sensing_agent.exoskeleton.rel_theta += rotation
+
+  if est_translation != None:
+    
+    translation = sensing_agent.apply_translation_to_agent(est_translation)
+    sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
+  return sensing_agent
+  
+
+def multi_agent_mouse_test(screen, environment):
+  pt = None
+  last_pt = None
+  while 1:
+    for event in pygame.event.get():
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        for _id in environment.agents:
+          sensing_agent = environment.agents[_id]
+          e = sensing_agent.export_tracks()
+          f = open(f"{_id}_out.json", "w")
+          f.write(json.dumps(e, indent=2))
+          f.close()
+          sys.exit()
+      pt = pygame.mouse.get_pos()
+      if last_pt == pt:
+        continue
+
+      last_pt = pt
+      pafn.clear_frame(screen)
+      
+      for k in environment.agents:
+        environment.agents[k] = agent_update(environment.agents[k])
+      
+      for k in environment.agents:
+        sensing_agent = environment.agents[k]
+        draw_sensing_agent(screen, sensing_agent)
+      environment.targets[0].origin = pt
+      pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
+      environment.visible_targets()
+      pygame.display.update()
+
+def single_agent_mouse_test(screen, sensing_agent, environment):
   pt = None
   last_pt = None
   while 1:
@@ -93,6 +143,8 @@ def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, o
   sensor.fov_width = np.pi / 4
   
   sensing_agent.exoskeleton = rb
+  sensing_agent.exoskeleton.states = []
+  
   sensing_agent.centered_sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
   sensing_agent.obj_tracker.parent_agent = sensing_agent
@@ -101,17 +153,28 @@ def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, o
   return sensing_agent
 
 def main():
-  ox,oy = 500,500
-  target = Target((600, 650),_id=41)
+  origins = [(900,600), (400,700), (400,400)]
+  
   
   environment = Environment()
-  sensing_agent = init_sensing_agent(SensingAgent(), (ox,oy), "A")
+  sensing_agent = init_sensing_agent(SensingAgent(), origins[2], "A")
+  sensing_agent.ALLOW_TRANSLATION = False
+  
+  
+  
+  sensing_agent_2 = init_sensing_agent(SensingAgent(), origins[1], "B")
+  
+  target = Target((600, 950),_id=41)
+  # target_2 = Target(sensing_agent_2.exoskeleton.origin, _id=42)
   environment.add_target(target)
+  # environment.add_target(target_2)
   environment.agents["A"] = sensing_agent
+  environment.agents["B"] = sensing_agent_2
   pygame.init()
   screen = pafn.create_display(1000,1000)
   pafn.clear_frame(screen)
-  mouse_test(screen, sensing_agent, environment)
+  # single_agent_mouse_test(screen, sensing_agent, environment)
+  multi_agent_mouse_test(screen, environment)
 
 if __name__ == '__main__':
   main()

@@ -68,12 +68,12 @@ class SensingAgent:
     self.ALLOW_TRANSLATION = translation_flag
 
 
-  def _heartbeat(self):
+  def heartbeat(self):
     '''
     Exoskeleton heartbeat
     Does not return
     '''
-    self.exoskeleton._heartbeat()
+    self.exoskeleton.heartbeat()
   
   def get_origin(self):
     '''
@@ -164,6 +164,9 @@ class SensingAgent:
     Applies a rotation in radians to the exoskeleton
     returns the angle in radians 
     '''
+    if not self.ALLOW_ROTATION:
+      return 0
+      
     rotation = self.exoskeleton.apply_rotation_to_body(rotation)
     # self.exoskeleton.rel_theta += rotation
     return rotation
@@ -173,6 +176,9 @@ class SensingAgent:
     Applies a translation as a vector to the exoskeleton
     returns a vector
     '''
+    if not self.ALLOW_TRANSLATION:
+      return 0
+    
     translation_dist = self.exoskeleton.apply_translation_to_body(translation_dist)
     return translation_dist
 
@@ -208,6 +214,7 @@ class SensingAgent:
     self.obj_tracker.close_all_tracks()
     self.obj_tracker.link_all_tracks(0)
     e = self.obj_tracker.export_loco_fmt()
+    print(f"exporting states of {self}")
     e["states"] = [s.to_json() for s in self.exoskeleton.states]
     return e
 

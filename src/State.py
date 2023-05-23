@@ -7,6 +7,7 @@ class State:
     self.position = position
     self.orientation = orientation
     self.time_stamp = time_stamp
+    
 
   def get_position(self):
     '''
