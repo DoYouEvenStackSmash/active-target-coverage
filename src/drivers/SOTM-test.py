@@ -9,6 +9,7 @@ from support.Polygon import *
 from support.Link import Link
 
 import collections
+
 # from aux_functions import *
 # from Dataloader import Dataloader
 from YoloBox import YoloBox
@@ -36,56 +37,62 @@ SPACE = 32
 OFFT = 20
 SPLINE_COUNT = 2
 TRANSLATE = False
+
+
 def repeatable_otm(screen, otm):
-  counter = 0
-  origin = (500,500)
-  displacement = False
-  # draw_sensing_agent(screen, sensing_agent)
-  pygame.display.update()
-  while 1:
-    for event in pygame.event.get():
-      if event.type == pygame.MOUSEBUTTONDOWN:
-        if pygame.key.get_mods() == SPACE:
-          continue
-        elif pygame.key.get_mods() == LSHIFT:  # rotate relative
-          continue
-        elif pygame.key.get_mods() == LALT: # estimate
-          estimates = otm.get_predictions()
-          if not len(estimates):
-            continue
-          for p in estimates:
-            pafn.frame_draw_dot(screen, (p[0] + 500,p[1] + 500), pafn.colors['yellow'])
-          pygame.display.update()
-          continue
-        elif pygame.key.get_mods() == LCTRL:
-          center = (0,0)
-          theta, r = mfn.car2pol(origin, center)
-          otm.add_linear_displacement(r, theta)
-          continue
-        else:
-          while pygame.MOUSEBUTTONUP not in [event.type for event in pygame.event.get()]:
-            continue
-          p = pygame.mouse.get_pos()
-          print(p)
-          counter+=1
-          bbox = []
-          # if displacement == True:
-          bbox = [p[0],p[1],1,1]
+    counter = 0
+    origin = (500, 500)
+    displacement = False
+    # draw_sensing_agent(screen, sensing_agent)
+    pygame.display.update()
+    while 1:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.key.get_mods() == SPACE:
+                    continue
+                elif pygame.key.get_mods() == LSHIFT:  # rotate relative
+                    continue
+                elif pygame.key.get_mods() == LALT:  # estimate
+                    estimates = otm.get_predictions()
+                    if not len(estimates):
+                        continue
+                    for p in estimates:
+                        pafn.frame_draw_dot(
+                            screen, (p[0] + 500, p[1] + 500), pafn.colors["yellow"]
+                        )
+                    pygame.display.update()
+                    continue
+                elif pygame.key.get_mods() == LCTRL:
+                    center = (0, 0)
+                    theta, r = mfn.car2pol(origin, center)
+                    otm.add_linear_displacement(r, theta)
+                    continue
+                else:
+                    while pygame.MOUSEBUTTONUP not in [
+                        event.type for event in pygame.event.get()
+                    ]:
+                        continue
+                    p = pygame.mouse.get_pos()
+                    print(p)
+                    counter += 1
+                    bbox = []
+                    # if displacement == True:
+                    bbox = [p[0], p[1], 1, 1]
 
-          pafn.frame_draw_dot(screen, p, pafn.colors['green'])
-          yb_arr = [sann.register_annotation(0,bbox,f"frame_{counter}")]
-          otm.add_new_layer(yb_arr)
-          otm.process_layer(len(otm.layers) - 1)
-          pygame.display.update()
-
+                    pafn.frame_draw_dot(screen, p, pafn.colors["green"])
+                    yb_arr = [sann.register_annotation(0, bbox, f"frame_{counter}")]
+                    otm.add_new_layer(yb_arr)
+                    otm.process_layer(len(otm.layers) - 1)
+                    pygame.display.update()
 
 
 def main():
-  pygame.init()
-  screen = pafn.create_display(1000,1000)
-  otm = ObjectTrackManager()
+    pygame.init()
+    screen = pafn.create_display(1000, 1000)
+    otm = ObjectTrackManager()
 
-  repeatable_otm(screen, otm)
+    repeatable_otm(screen, otm)
 
-if __name__ == '__main__':
-  main()
+
+if __name__ == "__main__":
+    main()
