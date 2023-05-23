@@ -101,10 +101,13 @@ class ObjectTrackManager:
             last_d, last_v, delta_v, theta = trk.get_track_heading()
 
             disp = angle / self.parent_agent.get_fov_width() * 100
-
+            
+            # new_pt = mfn.pol2car((last_d[0], last_d[1]), )
+            
             new_posn = [last_d[0] + disp, last_d[1]]
             # print(angle)
             # print(trk.theta)
+            
             trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
             # print(trk.theta)
             # print(trk.theta)

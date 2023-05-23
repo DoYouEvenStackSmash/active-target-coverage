@@ -41,9 +41,9 @@ class ObjectTrack:
         center = self.path[-1].get_center_coord()
         theta, r = mfn.car2pol(center, pt)
         if len(self.v) > 1 and r != 0:
-          self.delta_v.append(min(1.1, r / self.v[-1]))
+          self.delta_v.append(min(1.1, (r / self.v[-1]) / self.delta_v[-1] ))
+          print(self.delta_v[-1])
         self.v.append(r)
-        
 
         self.r = r
 
@@ -66,7 +66,7 @@ class ObjectTrack:
         # consider acceleration in estimate
         
         if len(self.delta_v) > 1:
-          r = r * self.delta_v[-1]
+          r = r * abs(self.delta_v[-1])
 
         new_posn = mfn.pol2car((lx, ly), r, self.theta[-1])
 
@@ -77,7 +77,7 @@ class ObjectTrack:
         Accessor for track trajectory information
         Returns the track heading
         """
-        return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta[-1])
+        return (self.get_last_detection(),self.r, self.delta_v[-1], self.theta[-1])
 
     def is_alive(self, fc, expiration):
         """

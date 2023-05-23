@@ -1,0 +1,728 @@
+{
+  "constants": {
+    "avg_tolerance": 10,
+    "track_lifespan": 2,
+    "default_avg_dist": 10,
+    "radial_exclusion": 300
+  },
+  "categories": [
+    {
+      "id": 0,
+      "name": "fish",
+      "supercategory": "None"
+    },
+    {
+      "id": 1,
+      "name": "atlantic creolefish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 2,
+      "name": "atlantic spadefish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 3,
+      "name": "bar jack",
+      "supercategory": "fish"
+    },
+    {
+      "id": 4,
+      "name": "black margate",
+      "supercategory": "fish"
+    },
+    {
+      "id": 5,
+      "name": "blue tang surgeon",
+      "supercategory": "fish"
+    },
+    {
+      "id": 6,
+      "name": "brown chromis",
+      "supercategory": "fish"
+    },
+    {
+      "id": 7,
+      "name": "creolefish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 8,
+      "name": "cuban hogfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 9,
+      "name": "doctorfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 10,
+      "name": "french angelfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 11,
+      "name": "french grunt",
+      "supercategory": "fish"
+    },
+    {
+      "id": 12,
+      "name": "gray angelfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 13,
+      "name": "indian triggerfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 14,
+      "name": "lookdown",
+      "supercategory": "fish"
+    },
+    {
+      "id": 15,
+      "name": "ocean surgeon",
+      "supercategory": "fish"
+    },
+    {
+      "id": 16,
+      "name": "porkfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 17,
+      "name": "purple queen anthias",
+      "supercategory": "fish"
+    },
+    {
+      "id": 18,
+      "name": "queen triggerfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 19,
+      "name": "sheepshead",
+      "supercategory": "fish"
+    },
+    {
+      "id": 20,
+      "name": "smallmouth grunt",
+      "supercategory": "fish"
+    },
+    {
+      "id": 21,
+      "name": "tomtate grunt",
+      "supercategory": "fish"
+    },
+    {
+      "id": 22,
+      "name": "white grunt",
+      "supercategory": "fish"
+    },
+    {
+      "id": 23,
+      "name": "white margate",
+      "supercategory": "fish"
+    },
+    {
+      "id": 24,
+      "name": "yellow bar jack",
+      "supercategory": "fish"
+    },
+    {
+      "id": 25,
+      "name": "reef butterflyfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 26,
+      "name": "albino???",
+      "supercategory": "fish"
+    },
+    {
+      "id": 27,
+      "name": "undocumented",
+      "supercategory": "fish"
+    }
+  ],
+  "trackmap": [
+    0
+  ],
+  "linked_tracks": [
+    {
+      "track_id": 0,
+      "category_id": 41,
+      "track_len": 17,
+      "steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    }
+  ],
+  "images": [],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 1,
+      "category_id": 41,
+      "bbox": [
+        50.0,
+        80.0,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 1
+    },
+    {
+      "id": 1,
+      "image_id": 2,
+      "category_id": 41,
+      "bbox": [
+        15.836696359047394,
+        83.2820411905367,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 2
+    },
+    {
+      "id": 2,
+      "image_id": 3,
+      "category_id": 41,
+      "bbox": [
+        32.00073087375405,
+        87.01478538302447,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 3
+    },
+    {
+      "id": 3,
+      "image_id": 4,
+      "category_id": 41,
+      "bbox": [
+        47.315424800623404,
+        91.65151389911678,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 4
+    },
+    {
+      "id": 4,
+      "image_id": 5,
+      "category_id": 41,
+      "bbox": [
+        19.020192956131254,
+        101.9803902718557,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 5
+    },
+    {
+      "id": 5,
+      "image_id": 6,
+      "category_id": 41,
+      "bbox": [
+        44.61125137335987,
+        111.35528725660048,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 6
+    },
+    {
+      "id": 6,
+      "image_id": 7,
+      "category_id": 41,
+      "bbox": [
+        56.75443618895838,
+        115.01489957716866,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 7
+    },
+    {
+      "id": 7,
+      "image_id": 8,
+      "category_id": 41,
+      "bbox": [
+        68.61462677629021,
+        117.74591973880777,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 8
+    },
+    {
+      "id": 8,
+      "image_id": 9,
+      "category_id": 41,
+      "bbox": [
+        24.406586203491685,
+        120.0,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 9
+    },
+    {
+      "id": 9,
+      "image_id": 10,
+      "category_id": 41,
+      "bbox": [
+        47.67332601849924,
+        117.74591973880777,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 10
+    },
+    {
+      "id": 10,
+      "image_id": 11,
+      "category_id": 41,
+      "bbox": [
+        59.53351660583107,
+        115.01489957716866,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 11
+    },
+    {
+      "id": 11,
+      "image_id": 12,
+      "category_id": 41,
+      "bbox": [
+        36.642496702841626,
+        111.35528725660048,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 12
+    },
+    {
+      "id": 12,
+      "image_id": 13,
+      "category_id": 41,
+      "bbox": [
+        21.849835741048594,
+        101.9803902718557,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 13
+    },
+    {
+      "id": 13,
+      "image_id": 14,
+      "category_id": 41,
+      "bbox": [
+        50.01329669002019,
+        91.65151389911678,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 14
+    },
+    {
+      "id": 14,
+      "image_id": 15,
+      "category_id": 41,
+      "bbox": [
+        65.32799061688955,
+        87.01478538302447,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 15
+    },
+    {
+      "id": 15,
+      "image_id": 16,
+      "category_id": 41,
+      "bbox": [
+        32.21956203382267,
+        83.2820411905367,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 16
+    },
+    {
+      "id": 16,
+      "image_id": 17,
+      "category_id": 41,
+      "bbox": [
+        66.3828656747753,
+        80.0,
+        1,
+        1
+      ],
+      "area": 1,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        240
+      ],
+      "displaced": false,
+      "state_id": 17
+    }
+  ],
+  "states": [
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 0.0,
+      "time_stamp": 1
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 0.0,
+      "time_stamp": 2
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 1.2879262048892897,
+      "time_stamp": 3
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 1.2879262048892897,
+      "time_stamp": 4
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 1.2879262048892897,
+      "time_stamp": 5
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 2.3521474919566616,
+      "time_stamp": 6
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 2.3521474919566616,
+      "time_stamp": 7
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 2.3521474919566616,
+      "time_stamp": 8
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": 2.3521474919566616,
+      "time_stamp": 9
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -2.659168169009427,
+      "time_stamp": 10
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -2.659168169009427,
+      "time_stamp": 11
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -2.659168169009427,
+      "time_stamp": 12
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -1.9987889679997664,
+      "time_stamp": 13
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -1.2375737912451703,
+      "time_stamp": 14
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -1.2375737912451703,
+      "time_stamp": 15
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -1.2375737912451703,
+      "time_stamp": 16
+    },
+    {
+      "position": [
+        420.0,
+        400.0
+      ],
+      "orientation": -0.3088097426917331,
+      "time_stamp": 17
+    }
+  ]
+}

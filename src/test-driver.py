@@ -179,7 +179,7 @@ def interactive_single_agent_test(screen, sensing_agent, environment):
 
 
 def init_sensing_agent(
-    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(0, 0)
+    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 400)
 ):
     ox, oy = origin
     scale = 2
@@ -201,7 +201,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 2 * np.pi / 3
+    sensor.fov_width = 3 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
@@ -218,6 +218,41 @@ def init_sensing_agent(
     rotation = sensing_agent.rotate_agent(orientation)
     return sensing_agent
 
+def circular_test(screen, sensing_agent, environment):
+  target_angles = [0, -0.5235987755982988, -0.7853981633974483, -1.0471975511965976, -1.5707963267948966, -2.0943951023931953, -2.356194490192345, -2.6179938779914944, -3.141592653589793, 2.6179938779914944, 2.356194490192345, 2.0943951023931953, 1.5707963267948966, 1.0471975511965976, 0.7853981633974483, 0.5235987755982988, 0]
+  target_angles.reverse()
+  target_points = [mfn.pol2car((400,400), 100, i) for i in target_angles]
+  last_pt = None
+  for pt in target_points:
+    if pt == last_pt:
+      continue
+    last_pt = pt
+    pafn.clear_frame(screen)
+
+
+    agent_update(sensing_agent)
+
+    curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+
+    if len(pred_pt):
+        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+        pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+
+    # for k, sensing_agent in environment.agents.items():
+    draw_sensing_agent(screen, sensing_agent)
+    pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
+    pygame.display.update()
+    environment.targets[0].origin = pt
+    environment.visible_targets()
+    time.sleep(0.5)
+  e = sensing_agent.export_tracks()
+  f = open("out.json", "w")
+  f.write(json.dumps(e, indent=2))
+  f.close()
+  sys.exit()
+
+
 
 def main():
     origins = [(900, 600), (400, 700), (400, 400)]
@@ -228,15 +263,16 @@ def main():
 
     sensing_agent_2 = init_sensing_agent(SensingAgent(), origins[1], "B")
 
-    target = Target((600, 950), _id=41)
+    target = Target((950, 950), _id=41)
     # target_2 = Target(sensing_agent_2.exoskeleton.origin, _id=42)
     environment.add_target(target)
     # environment.add_target(target_2)
     environment.agents["A"] = sensing_agent
-    environment.agents["B"] = sensing_agent_2
+    # environment.agents["B"] = sensing_agent_2
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
+    # circular_test(screen, sensing_agent, environment)
     interactive_single_agent_test(screen, sensing_agent, environment)
     # single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
