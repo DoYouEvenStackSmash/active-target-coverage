@@ -10,28 +10,20 @@ from support.Link import Link
 
 import collections
 
-# from aux_functions import *
-# from Dataloader import Dataloader
 from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
 from OTFTrackerApi import StreamingAnnotations as sann
 
-# from Scene import *
 import json
 from State import State
 
-# import pygame
-# import numpy as np
 import sys
-
-# import time
 
 from RigidBody import RigidBody
 from Sensor import Sensor
 
-# from SensingAgent import SensingAgent
 import pygame
 import time
 from typing import Any, List, Dict, Set

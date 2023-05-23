@@ -43,7 +43,6 @@ def agent_update(sensing_agent):
     if est_translation != None:
         translation = sensing_agent.apply_translation_to_agent(est_translation)
         sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
-    return sensing_agent
 
 
 def multi_agent_mouse_test(screen, environment):
@@ -67,7 +66,7 @@ def multi_agent_mouse_test(screen, environment):
             pafn.clear_frame(screen)
 
             for k in environment.agents:
-                environment.agents[k] = agent_update(environment.agents[k])
+                agent_update(environment.agents[k])
 
             for k in environment.agents:
                 sensing_agent = environment.agents[k]
