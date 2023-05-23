@@ -219,7 +219,7 @@ class SensingAgent:
     def new_detection_layer(self, frame_id, detection_list):
         """
         Ingest for a new layer of detections from the outside world.
-        
+
         Creates a new list of yoloboxes associated with current state.
         Adds layer of yoloboxes to tracker and processes layer.
         Does not return

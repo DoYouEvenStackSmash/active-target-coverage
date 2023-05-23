@@ -36,9 +36,15 @@ def agent_update(sensing_agent):
     est_rotation, est_translation = sensing_agent.estimate_pose_update()
 
     if est_rotation != None:
+        if est_rotation > np.pi or est_rotation < -np.pi:
+            print("rotation OOB")
         rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
         sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
         sensing_agent.exoskeleton.rel_theta += rotation
+        if sensing_agent.exoskeleton.rel_theta < -np.pi:
+            sensing_agent.exoskeleton.rel_theta = 2 * np.pi + sensing_agent.exoskeleton.rel_theta
+        if sensing_agent.exoskeleton.rel_theta > np.pi:
+            sensing_agent.exoskeleton.rel_theta = -2 * np.pi + sensing_agent.exoskeleton.rel_theta
 
     if est_translation != None:
         translation = sensing_agent.apply_translation_to_agent(est_translation)
