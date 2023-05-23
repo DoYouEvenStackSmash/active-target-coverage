@@ -152,8 +152,8 @@ def interactive_single_agent_test(screen, sensing_agent, environment):
                     ]:
                         continue
                     pt = pygame.mouse.get_pos()
-                    if last_pt == pt:
-                        continue
+                    # if last_pt == pt:
+                    #     continue
 
                     last_pt = pt
                     print(pt)
@@ -220,7 +220,7 @@ def init_sensing_agent(
 
 def circular_test(screen, sensing_agent, environment):
   target_angles = [0, -0.5235987755982988, -0.7853981633974483, -1.0471975511965976, -1.5707963267948966, -2.0943951023931953, -2.356194490192345, -2.6179938779914944, -3.141592653589793, 2.6179938779914944, 2.356194490192345, 2.0943951023931953, 1.5707963267948966, 1.0471975511965976, 0.7853981633974483, 0.5235987755982988, 0]
-  target_angles.reverse()
+  # target_angles.reverse()
   target_points = [mfn.pol2car((400,400), 100, i) for i in target_angles]
   last_pt = None
   for pt in target_points:
@@ -245,7 +245,7 @@ def circular_test(screen, sensing_agent, environment):
     pygame.display.update()
     environment.targets[0].origin = pt
     environment.visible_targets()
-    time.sleep(0.5)
+    time.sleep(1)
   e = sensing_agent.export_tracks()
   f = open("out.json", "w")
   f.write(json.dumps(e, indent=2))
@@ -272,8 +272,8 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
-    # circular_test(screen, sensing_agent, environment)
-    interactive_single_agent_test(screen, sensing_agent, environment)
+    circular_test(screen, sensing_agent, environment)
+    # interactive_single_agent_test(screen, sensing_agent, environment)
     # single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
 

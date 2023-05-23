@@ -5,6 +5,7 @@ sys.path.append("..")
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+from render_support import TransformFxns as tfn
 from aux_functions import *
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
@@ -99,20 +100,24 @@ class ObjectTrackManager:
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
             last_d, last_v, delta_v, theta = trk.get_track_heading()
-
+            # print(f"angle:\t{angle}")
+            
             disp = angle / self.parent_agent.get_fov_width() * 100
+            print(f"angle: {angle}\tdisp: {disp}")
             
-            # new_pt = mfn.pol2car((last_d[0], last_d[1]), )
+            x,y =  last_d
+            nx,ny = [last_d[0] + disp, last_d[1]]
             
-            new_posn = [last_d[0] + disp, last_d[1]]
-            # print(angle)
-            # print(trk.theta)
+            rot_mat = None
+            # if disp * trk.theta[-1] > 0:
+            #     trk.theta[-1] = trk.theta[-1] + angle
+            #     # rot_mat = tfn.calculate_rotation_matrix(disp,1)
+            # else:
+            #     trk.theta[-1] = trk.theta[-1] - angle
+                # rot_mat = tfn.calculate_rotation_matrix(-disp,1)
+            # nx,ny = tfn.rotate_point(self.parent_agent.get_center(), (x,y), rot_mat)
             
-            trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
-            # print(trk.theta)
-            # print(trk.theta)
-
-            trk.path[-1].bbox = [new_posn[0], new_posn[1], 1, 1]
+            trk.path[-1].bbox = [nx,ny, 1, 1]
 
     def add_linear_displacement(self, distance, angle):
         """

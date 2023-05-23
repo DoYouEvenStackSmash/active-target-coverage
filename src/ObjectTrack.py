@@ -59,14 +59,14 @@ class ObjectTrack:
         if len(self.path) == 1:
             return (lx, ly)
 
-        if posn:
-            lx, ly = pos
+        # if posn:
+        #     lx, ly = pos
         r = self.v[-1]
         
         # consider acceleration in estimate
         
-        if len(self.delta_v) > 1:
-          r = r * abs(self.delta_v[-1])
+        # if len(self.delta_v) > 1:
+        #   r = r * abs(self.delta_v[-1])
 
         new_posn = mfn.pol2car((lx, ly), r, self.theta[-1])
 
