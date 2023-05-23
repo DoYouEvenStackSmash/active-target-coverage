@@ -525,7 +525,7 @@ def repeatable_multiagent_test(screen, environment):
 
             pygame.display.update()
 
-            time.sleep(0.05)
+            time.sleep(0.2)
 
 
 def init_sensing_agent(
