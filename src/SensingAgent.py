@@ -208,6 +208,7 @@ class SensingAgent:
     self.obj_tracker.close_all_tracks()
     self.obj_tracker.link_all_tracks(0)
     e = self.obj_tracker.export_loco_fmt()
+    e["states"] = [s.to_json() for s in self.exoskeleton.states]
     return e
 
   def new_detection_layer(self,frame_id,add_list):
@@ -215,9 +216,10 @@ class SensingAgent:
     Ingest for a new layer of detections from the outside world
     '''
     detections = []
+    curr_state = self.exoskeleton.get_age()
     for a in add_list:
       dc = self.transform_to_local_bbox(a.get_origin())
-      yb = sann.register_annotation(a.get_id(), dc, frame_id)
+      yb = sann.register_annotation(a.get_id(), dc, curr_state)
       detections.append(yb)
     self.obj_tracker.add_new_layer(detections)
     self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)

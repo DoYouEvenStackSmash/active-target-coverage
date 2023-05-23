@@ -67,6 +67,13 @@ class RigidBody:
     '''
     return self.states[-1]
   
+  def get_age(self):
+    '''
+    Alternative accessor to state list
+    Returns an integer
+    '''
+    return len(self.states)
+  
 
   def get_rel_theta(self):
     '''

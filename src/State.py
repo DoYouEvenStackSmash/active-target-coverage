@@ -25,3 +25,8 @@ class State:
     Generic accessor for time stamp
     '''
     return self.time_stamp
+
+  def to_json(self):
+    return {"position": self.position,
+            "orientation": self.orientation,
+            "time_stamp": self.time_stamp}
