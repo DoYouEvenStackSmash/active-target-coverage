@@ -29,6 +29,8 @@ import pygame.gfxdraw
 import time
 import os
 
+from drawing_functions import *
+
 COLLISION_THRESHOLD = 10
 VERBOSE = True
 SAMPLE_RATE = 400
@@ -45,98 +47,6 @@ TRANSLATE = False
 
 # img = pygame.image.load(path)
 
-
-def adjust_angle(theta):
-  ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
-  if theta > np.pi:
-    theta = theta + -2 * np.pi
-  elif theta < -np.pi:
-    theta = theta + 2 * np.pi
-  
-  return theta
-
-DRAW_HORIZONTAL = False
-OUTLINE = False
-
-def draw_coordinate_frame(screen, sensor):
-  '''
-  Helper function for displaying the sensor field of view
-  Does not return
-  '''
-  levels = 5
-  coord_frame = sensor.get_visible_fov(levels)
-  detect_frame = sensor.get_detectable_bounds(levels)
-  if OUTLINE:
-    for i in range(1, len(coord_frame[-1])):
-      pafn.frame_draw_line(screen, (coord_frame[-1][i-1], coord_frame[-1][i]), pafn.colors['black'])
-    # for endpoint in coord_frame[-1][:]:
-    #   pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['white'])
-  else:
-    for c in range(levels):
-      for i in range(1,len(coord_frame[c])):
-        pafn.frame_draw_line(screen, (coord_frame[c][i-1], coord_frame[c][i]), pafn.colors['black'])
-    for endpoint in coord_frame[-1]:
-      pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['dimgray'])
-  # for i in range(1, len(detect_frame[-1])):
-
-
-  # spts = []
-  # epts = []
-  for endpoint in detect_frame[-1]:
-    pafn.frame_draw_line(screen, (sensor.get_origin(), endpoint), pafn.colors['tangerine'])
-  #   theta, r = mfn.car2pol(sensor.get_origin(), endpoint)
-  #   r2 = Sensor.TOLERANCE * r
-  #   r *= 1 - Sensor.TOLERANCE
-  #   pt2 = mfn.pol2car(sensor.get_origin(), r2, theta)
-  #   pt = mfn.pol2car(sensor.get_origin(), r, theta)
-    
-  #   epts.append(pt)
-  #   spts.append(pt2)
-  
-  # for i in range(1, len(epts)):
-  #   pafn.frame_draw_bold_line(screen, (epts[i-1], epts[i]), pafn.colors['tangerine'])
-  #   pafn.frame_draw_bold_line(screen, (spts[i-1], spts[i]), pafn.colors['tangerine'])
-
-
-
-def draw_all_normals(screen, rigid_body):
-  '''
-  Render function for all coordinate frames in a chain
-  Does not return
-  '''
-  n = rigid_body.get_normals()
-  pafn.frame_draw_line(screen, (rigid_body.get_center(), n[0]), pafn.colors['tangerine'])
-  pafn.frame_draw_line(screen, (rigid_body.get_center(), n[1]), pafn.colors['yellow'])
-  pafn.frame_draw_dot(screen, rigid_body.get_center(), pafn.colors['white'])
-
-def draw_all_links(screen, link, color = None):
-  '''
-  Render function for all polygon links in the chain
-  Does not return
-  '''
-  if color == None:
-    color = pafn.colors["indigo"]
-  points = link.get_points()
-  pafn.frame_draw_filled_polygon(screen, points,color)
-  pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
-  # pafn.frame_draw_dot(screen, link.get_center(), pafn.colors['white'])
-  
-
-
-def draw_rigid_body(screen, rigid_body):
-  '''
-  Wrapper for rendering all components of a rigid body
-  '''
-  draw_all_normals(screen, rigid_body)
-  draw_all_links(screen, rigid_body, rigid_body.color)
-
-def draw_sensing_agent(screen, sensing_agent):
-  '''
-  Wrapper for rendering all components of an agent
-  '''
-  exoskeleton,sensor = sensing_agent.get_components()
-  draw_coordinate_frame(screen, sensor)
-  draw_rigid_body(screen, exoskeleton)
 
 def repeatable_environment_test(screen, sensing_agent, environment):
   directions = [-np.pi, -np.pi / 2, 0,  np.pi / 2]
@@ -505,27 +415,27 @@ def repeatable_multiagent_test(screen, environment):
         # draw_sensing_agent(screen, sensing_agent)
       for k,sensing_agent in environment.agents.items():
         draw_sensing_agent(screen, sensing_agent)
-      # val = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
-      # print("VAL1")
-      # if val < COLLISION_THRESHOLD:
-      #   environment.agents["A"].ALLOW_TRANSLATION = False
-      #   environment.agents["B"].ALLOW_TRANSLATION = False
-      #   environment.agents["A"].ALLOW_ROTATION = False
-      #   environment.agents["B"].ALLOW_ROTATION = False
-      # val2 = cd.check_contact(environment.agents["C"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
-      # print("VAL2")
-      # if val2 < COLLISION_THRESHOLD and environment.agents["A"].ALLOW_TRANSLATION != False:
-      #   environment.agents["A"].ALLOW_TRANSLATION = False
-      #   environment.agents["C"].ALLOW_TRANSLATION = False
-      #   environment.agents["A"].ALLOW_ROTATION = False
-      #   environment.agents["C"].ALLOW_ROTATION = False
-      # val3 = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["C"].exoskeleton.body, True)
-      # print("VAL3")
-      # if val3 < COLLISION_THRESHOLD:
-      #   environment.agents["B"].ALLOW_TRANSLATION = False
-      #   environment.agents["C"].ALLOW_TRANSLATION = False
-      #   environment.agents["B"].ALLOW_ROTATION = False
-      #   environment.agents["C"].ALLOW_ROTATION = False
+      val = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
+      print("VAL1")
+      if val < COLLISION_THRESHOLD:
+        environment.agents["A"].ALLOW_TRANSLATION = False
+        environment.agents["B"].ALLOW_TRANSLATION = False
+        environment.agents["A"].ALLOW_ROTATION = False
+        environment.agents["B"].ALLOW_ROTATION = False
+      val2 = cd.check_contact(environment.agents["C"].exoskeleton.body,environment.agents["B"].exoskeleton.body, True)
+      print("VAL2")
+      if val2 < COLLISION_THRESHOLD and environment.agents["A"].ALLOW_TRANSLATION != False:
+        environment.agents["A"].ALLOW_TRANSLATION = False
+        environment.agents["C"].ALLOW_TRANSLATION = False
+        environment.agents["A"].ALLOW_ROTATION = False
+        environment.agents["C"].ALLOW_ROTATION = False
+      val3 = cd.check_contact(environment.agents["A"].exoskeleton.body,environment.agents["C"].exoskeleton.body, True)
+      print("VAL3")
+      if val3 < COLLISION_THRESHOLD:
+        environment.agents["B"].ALLOW_TRANSLATION = False
+        environment.agents["C"].ALLOW_TRANSLATION = False
+        environment.agents["B"].ALLOW_ROTATION = False
+        environment.agents["C"].ALLOW_ROTATION = False
       
       # COLLISION_THRESHOLD = 10
       pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
@@ -534,7 +444,7 @@ def repeatable_multiagent_test(screen, environment):
       
       pygame.display.update()
       
-      time.sleep(0.1)
+      time.sleep(0.05)
 
 def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, orientation = (0,0)):
   ox,oy = origin
@@ -571,7 +481,7 @@ def main():
   
   Agents[1].centered_sensor.fov_radius = 110
   Agents[2].centered_sensor.fov_width = 1 * np.pi / 3
-  Agents[2].ALLOW_TRANSLATION = False
+  # Agents[2].ALLOW_TRANSLATION = False
   Agents[2].exoskeleton.color = pafn.colors["magenta"]
   # Agents[0].fov_radius = 200
   target = Target((600, 650))
@@ -584,7 +494,8 @@ def main():
   sensing_agent = Agents[2]
   # sensing_agent._id = -1
   # repeatable_sensing_agent(screen, sensing_agent)
-  repeatable_multiagent_test(screen, environment)
+  repeatable_environment_test(screen, sensing_agent, environment)
+  # repeatable_multiagent_test(screen, environment)
   # repeatable_step_test(screen, sensing_agent, environment)
 
 

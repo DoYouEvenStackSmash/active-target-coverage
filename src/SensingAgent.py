@@ -18,7 +18,7 @@ from AnnotationLoader import AnnotationLoader as al
 from OTFTrackerApi import StreamingAnnotations as sann
 # from Scene import *
 import json
-
+from State import State
 # import pygame
 # import numpy as np
 import sys
@@ -26,10 +26,11 @@ import sys
 
 from RigidBody import RigidBody
 from Sensor import Sensor
+
 # from SensingAgent import SensingAgent
 import pygame
 import time
-
+from typing import Any,List,Dict,Set
 
 def adjust_angle(theta):
   ''' adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]'''
@@ -40,7 +41,15 @@ def adjust_angle(theta):
   
   return theta
 
-class SensingAgent: 
+class SensingAgent:
+  exoskeleton: RigidBody
+  centered_sensor: Sensor
+  obj_tracker: ObjectTrackManager
+  _id: Any
+  sensors: List[Sensor]
+  rotation_flag: bool
+  translation_flag: bool
+
   def __init__(self,
               exoskeleton = None, # rigid body of the agent
               centered_sensor = None, # default sensor, aligned with the axis of rotation for the agent
@@ -58,6 +67,14 @@ class SensingAgent:
     self.ALLOW_ROTATION = rotation_flag
     self.ALLOW_TRANSLATION = translation_flag
 
+
+  def _heartbeat(self):
+    '''
+    Exoskeleton heartbeat
+    Does not return
+    '''
+    self.exoskeleton._heartbeat()
+  
   def get_origin(self):
     '''
     Accessor for the origin of the sensing agent in rigid body
@@ -182,27 +199,6 @@ class SensingAgent:
       return self.centered_sensor.is_rel_detectable(target_pt)
     else:
       return self.sensors[sensor_id].is_rel_detectable(target_pt)
-    
-    # adj_win_bnd = (self.get_fov_width() / 2) - (self.get_fov_width() / 2) * Sensor.TOLERANCE * 2
-    # adj_rad_bnd = self.get_fov_radius()
-
-    # target_x = target_pt[0]
-    # target_y = target_pt[1]
-    # flags = 0
-    
-    # angle_flag = False
-    
-    # # if range out of bounds
-    # if target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE:
-    #   flags += Sensor.RANGE
-
-    # # if angle out of bounds
-    # if target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE:
-    #   flags += Sensor.ANGULAR
-    # if flags > 0:
-    #   return False, flags
-
-    # return True, Sensor.VALID
   
   def export_tracks(self):
     '''
@@ -212,6 +208,7 @@ class SensingAgent:
     self.obj_tracker.close_all_tracks()
     self.obj_tracker.link_all_tracks(0)
     e = self.obj_tracker.export_loco_fmt()
+    e["states"] = [s.to_json() for s in self.exoskeleton.states]
     return e
 
   def new_detection_layer(self,frame_id,add_list):
@@ -219,9 +216,10 @@ class SensingAgent:
     Ingest for a new layer of detections from the outside world
     '''
     detections = []
+    curr_state = self.exoskeleton.get_age()
     for a in add_list:
       dc = self.transform_to_local_bbox(a.get_origin())
-      yb = sann.register_annotation(0, dc, frame_id)
+      yb = sann.register_annotation(a.get_id(), dc, curr_state)
       detections.append(yb)
     self.obj_tracker.add_new_layer(detections)
     self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
@@ -339,3 +337,4 @@ class SensingAgent:
     nd = (last_pt,pred_pt)
     
     return nd
+

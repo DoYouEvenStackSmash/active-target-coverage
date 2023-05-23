@@ -10,20 +10,16 @@ from support.Polygon import *
 from support.Link import Link
 
 import collections
-# from aux_functions import *
-# from Dataloader import Dataloader
+
 from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
 from OTFTrackerApi import StreamingAnnotations as sann
-# from Scene import *
+
 import json
 
-# import pygame
-# import numpy as np
 import sys
-# import time
 
 from RigidBody import RigidBody
 from Sensor import Sensor
@@ -57,6 +53,7 @@ class Environment:
     updates = {}
     
     for k in self.agents:
+      self.agents[k]._heartbeat()
       updates[k] = []
       for target in self.targets:
         d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())
