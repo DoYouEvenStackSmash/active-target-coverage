@@ -1,7 +1,5 @@
-Agent==0.1.2
 numpy==1.23.5
 numpy==1.21.5
-objects==0.3.1
 opencv_contrib_python==4.5.5.62
 opencv_python==4.7.0.68
 opencv_python_headless==4.5.4.60
