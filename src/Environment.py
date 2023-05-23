@@ -73,11 +73,8 @@ class Environment:
                 updates[pairs[c][0]].append(pairs[c][1])
 
         # update the trackers of all agents
-        print(updates)
         for k in updates:
             self.agents[k].new_detection_layer(frame_id, updates[k])
-            self.agents[k].obj_tracker.process_layer(-1)
-            self.agents[k].obj_tracker.init_new_layer()
 
     def add_target(self, T):
         """
