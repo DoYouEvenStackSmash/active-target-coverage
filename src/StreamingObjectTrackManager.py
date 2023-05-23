@@ -105,30 +105,21 @@ class ObjectTrackManager:
             disp = angle / self.parent_agent.get_fov_width() * 100
             print(f"angle: {angle}\tdisp: {disp}")
             if disp < 0:
-                trk.theta[-1] = trk.theta[-1] + angle + np.pi / 2
+                trk.theta[-1] = adjust_angle(trk.theta[-1] + angle + np.pi / 2)
             if disp > 0:
                 if trk.theta[-1] < -np.pi / 2:
-                    trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)# - np.pi / 2
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)
                 else:
-                    trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)# + np.pi / 2
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)
             
-            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
-            print(f"trk.theta[-1]: {trk.theta[-1]}\torig_theta: {orig_theta}")
-            # trk.theta[-1] = adjust_angle(trk.theta[-1] + )
-            # trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
+            # orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
+            # print(f"trk.theta[-1]: {trk.theta[-1]}\torig_theta: {orig_theta}")
+            # # trk.theta[-1] = adjust_angle(trk.theta[-1] + )
+            # # trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
             x,y =  last_d
             nx,ny = [last_d[0] + disp, last_d[1]]
             
             rot_mat = None
-            # if angle 
-            # if disp * trk.theta[-1] > 0:
-
-            # trk.theta[-1] = self.parent_agent.get_fov_theta() + angle + trk.theta[-1]
-            #     # rot_mat = tfn.calculate_rotation_matrix(disp,1)
-            # else:
-            #     trk.theta[-1] = trk.theta[-1] - angle
-                # rot_mat = tfn.calculate_rotation_matrix(-disp,1)
-            # nx,ny = tfn.rotate_point(self.parent_agent.get_center(), (x,y), rot_mat)
             
             trk.path[-1].bbox = [nx,ny, 1, 1]
 
