@@ -90,7 +90,7 @@ class ObjectTrackManager:
             estimates.append(trk.predict_next_box())
         return estimates
 
-    def add_angular_displacement(self, distance, angle):
+    def add_angular_displacement(self, distance, angle, direction = 1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
@@ -104,13 +104,26 @@ class ObjectTrackManager:
             
             disp = angle / self.parent_agent.get_fov_width() * 100
             print(f"angle: {angle}\tdisp: {disp}")
+            if disp < 0:
+                trk.theta[-1] = trk.theta[-1] + angle + np.pi / 2
+            if disp > 0:
+                if trk.theta[-1] < -np.pi / 2:
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)# - np.pi / 2
+                else:
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)# + np.pi / 2
             
+            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
+            print(f"trk.theta[-1]: {trk.theta[-1]}\torig_theta: {orig_theta}")
+            # trk.theta[-1] = adjust_angle(trk.theta[-1] + )
+            # trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
             x,y =  last_d
             nx,ny = [last_d[0] + disp, last_d[1]]
             
             rot_mat = None
+            # if angle 
             # if disp * trk.theta[-1] > 0:
-            #     trk.theta[-1] = trk.theta[-1] + angle
+
+            # trk.theta[-1] = self.parent_agent.get_fov_theta() + angle + trk.theta[-1]
             #     # rot_mat = tfn.calculate_rotation_matrix(disp,1)
             # else:
             #     trk.theta[-1] = trk.theta[-1] - angle

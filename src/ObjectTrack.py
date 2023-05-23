@@ -39,13 +39,14 @@ class ObjectTrack:
         Assumes path is not empty
         """
         center = self.path[-1].get_center_coord()
-        theta, r = mfn.car2pol(center, pt)
-        if len(self.v) > 1 and r != 0:
-          self.delta_v.append(min(1.1, (r / self.v[-1]) / self.delta_v[-1] ))
-          print(self.delta_v[-1])
-        self.v.append(r)
+        theta, distance = mfn.car2pol(center, pt)
 
-        self.r = r
+        if len(self.v) > 1 and distance != 0:
+          self.delta_v.append(min(1.1, distance / self.v[-1]))
+        
+        self.v.append(distance)
+
+        self.r = distance
 
         self.theta.append(theta)
 
@@ -61,14 +62,19 @@ class ObjectTrack:
 
         # if posn:
         #     lx, ly = pos
-        r = self.v[-1]
-        
+        last_distance = self.v[-1]
+        distance = 0
         # consider acceleration in estimate
         
-        # if len(self.delta_v) > 1:
+        last_change_in_distance = self.delta_v[-1]
+        print(last_change_in_distance)
+        if last_change_in_distance != 0:
+          distance = last_distance * last_change_in_distance
+        else:
+          distance = last_distance
         #   r = r * abs(self.delta_v[-1])
 
-        new_posn = mfn.pol2car((lx, ly), r, self.theta[-1])
+        new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
 
         return new_posn
 

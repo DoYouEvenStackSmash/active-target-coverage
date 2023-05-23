@@ -39,13 +39,14 @@ def agent_update(sensing_agent):
         if est_rotation > np.pi or est_rotation < -np.pi:
             print("rotation OOB")
         rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
-        sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+        direction = 1 if est_rotation > 0 else -1
+        print(f"sensing_agent theta: {sensing_agent.exoskeleton.rel_theta}")
         sensing_agent.exoskeleton.rel_theta += rotation
         if sensing_agent.exoskeleton.rel_theta < -np.pi:
             sensing_agent.exoskeleton.rel_theta = 2 * np.pi + sensing_agent.exoskeleton.rel_theta
         if sensing_agent.exoskeleton.rel_theta > np.pi:
             sensing_agent.exoskeleton.rel_theta = -2 * np.pi + sensing_agent.exoskeleton.rel_theta
-
+        sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation, direction)
     if est_translation != None:
         translation = sensing_agent.apply_translation_to_agent(est_translation)
         sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
@@ -220,7 +221,7 @@ def init_sensing_agent(
 
 def circular_test(screen, sensing_agent, environment):
   target_angles = [0, -0.5235987755982988, -0.7853981633974483, -1.0471975511965976, -1.5707963267948966, -2.0943951023931953, -2.356194490192345, -2.6179938779914944, -3.141592653589793, 2.6179938779914944, 2.356194490192345, 2.0943951023931953, 1.5707963267948966, 1.0471975511965976, 0.7853981633974483, 0.5235987755982988, 0]
-  # target_angles.reverse()
+  target_angles.reverse()
   target_points = [mfn.pol2car((400,400), 100, i) for i in target_angles]
   last_pt = None
   for pt in target_points:
