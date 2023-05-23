@@ -28,7 +28,7 @@ import os
 
 from drawing_functions import *
 
-
+LCTRL = 64
 def agent_update(sensing_agent):
     """
     Updates the pose of a single agent
@@ -73,6 +73,13 @@ def multi_agent_mouse_test(screen, environment):
 
             for k in environment.agents:
                 agent_update(environment.agents[k])
+            
+                curr_pt, pred_pt = environment.agents[k].estimate_next_detection()
+
+                if len(pred_pt):
+                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                    pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
 
             for k in environment.agents:
                 sensing_agent = environment.agents[k]
@@ -103,17 +110,7 @@ def single_agent_mouse_test(screen, sensing_agent, environment):
 
             pafn.clear_frame(screen)
 
-            est_rotation, est_translation = sensing_agent.estimate_pose_update()
-            print(f"estimated: {est_rotation}")
-
-            if est_rotation != None:
-                rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
-                sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-                sensing_agent.exoskeleton.rel_theta += rotation
-
-            if est_translation != None:
-                translation = sensing_agent.apply_translation_to_agent(est_translation)
-                sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
+            agent_update(sensing_agent)
 
             curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 
@@ -129,6 +126,56 @@ def single_agent_mouse_test(screen, sensing_agent, environment):
             environment.visible_targets()
             pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
             pygame.display.update()
+
+def interactive_single_agent_test(screen, sensing_agent, environment):
+    pt = None
+    last_pt = None
+    while 1:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.key.get_mods() == LCTRL:
+                    pafn.clear_frame(screen)
+                    draw_sensing_agent(screen, sensing_agent)
+                    curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+                    if len(pred_pt):
+                        # print((curr_pt,pred_pt))
+                        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+                        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                        pafn.frame_draw_line(
+                            screen, (curr_pt, pred_pt), pafn.colors["white"]
+                        )
+                    pygame.display.update()
+                    continue
+                else:
+                    while pygame.MOUSEBUTTONUP not in [
+                        event.type for event in pygame.event.get()
+                    ]:
+                        continue
+                    pt = pygame.mouse.get_pos()
+                    if last_pt == pt:
+                        continue
+
+                    last_pt = pt
+                    print(pt)
+
+                    pafn.clear_frame(screen)
+
+                    agent_update(sensing_agent)
+
+                    curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+
+                    if len(pred_pt):
+                        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                        pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+
+                    # for k, sensing_agent in environment.agents.items():
+                    draw_sensing_agent(screen, sensing_agent)
+                    pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
+                    environment.targets[0].origin = pt
+                    environment.visible_targets()
+                    
+                    pygame.display.update()
 
 
 def init_sensing_agent(
@@ -154,7 +201,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = np.pi / 4
+    sensor.fov_width = 2 * np.pi / 3
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
@@ -190,8 +237,9 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
+    interactive_single_agent_test(screen, sensing_agent, environment)
     # single_agent_mouse_test(screen, sensing_agent, environment)
-    multi_agent_mouse_test(screen, environment)
+    # multi_agent_mouse_test(screen, environment)
 
 
 if __name__ == "__main__":

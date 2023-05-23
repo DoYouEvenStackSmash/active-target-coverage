@@ -48,6 +48,27 @@ TRANSLATE = False
 
 # img = pygame.image.load(path)
 
+def agent_update(sensing_agent):
+    """
+    Updates the pose of a single agent
+    """
+    est_rotation, est_translation = sensing_agent.estimate_pose_update()
+
+    if est_rotation != None:
+        if est_rotation > np.pi or est_rotation < -np.pi:
+            print("rotation OOB")
+        rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
+        sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+        sensing_agent.exoskeleton.rel_theta += rotation
+        if sensing_agent.exoskeleton.rel_theta < -np.pi:
+            sensing_agent.exoskeleton.rel_theta = 2 * np.pi + sensing_agent.exoskeleton.rel_theta
+        if sensing_agent.exoskeleton.rel_theta > np.pi:
+            sensing_agent.exoskeleton.rel_theta = -2 * np.pi + sensing_agent.exoskeleton.rel_theta
+
+    if est_translation != None:
+        translation = sensing_agent.apply_translation_to_agent(est_translation)
+        sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
+
 
 def repeatable_environment_test(screen, sensing_agent, environment):
     directions = [-np.pi, -np.pi / 2, 0, np.pi / 2]
@@ -249,28 +270,29 @@ def repeatable_step_test(screen, sensing_agent, environment):
                                 sensing_agent.exoskeleton.get_relative_rotation(pt)
                             )
                             print(f"predicted: {pred_rotation}\t", end="")
-                            (
-                                est_rotation,
-                                est_translation,
-                            ) = sensing_agent.estimate_pose_update()
-                            print(f"estimated: {est_rotation}")
+                            agent_update(sensing_agent)
+                            # (
+                            #     est_rotation,
+                            #     est_translation,
+                            # ) = sensing_agent.estimate_pose_update()
+                            # print(f"estimated: {est_rotation}")
 
-                            if est_rotation != None:
-                                rotation = sensing_agent.apply_rotation_to_agent(
-                                    est_rotation
-                                )
-                                sensing_agent.obj_tracker.add_angular_displacement(
-                                    0, -est_rotation
-                                )
-                                sensing_agent.exoskeleton.rel_theta += rotation
+                            # if est_rotation != None:
+                            #     rotation = sensing_agent.apply_rotation_to_agent(
+                            #         est_rotation
+                            #     )
+                            #     sensing_agent.obj_tracker.add_angular_displacement(
+                            #         0, -est_rotation
+                            #     )
+                            #     sensing_agent.exoskeleton.rel_theta += rotation
 
-                            if est_translation != None:
-                                translation = sensing_agent.apply_translation_to_agent(
-                                    est_translation
-                                )
-                                sensing_agent.obj_tracker.add_linear_displacement(
-                                    -translation, 0
-                                )
+                            # if est_translation != None:
+                            #     translation = sensing_agent.apply_translation_to_agent(
+                            #         est_translation
+                            #     )
+                            #     sensing_agent.obj_tracker.add_linear_displacement(
+                            #         -translation, 0
+                            #     )
 
                             curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 
@@ -432,19 +454,20 @@ def repeatable_multiagent_test(screen, environment):
             for _id in environment.agents:
                 agent = environment.agents[_id]
                 pred_rotation = agent.exoskeleton.get_relative_rotation(pt)
-                est_rotation, est_translation = None, None
-                est_rotation, est_translation = agent.estimate_pose_update()
+                agent_update(agent)
+                # est_rotation, est_translation = None, None
+                # est_rotation, est_translation = agent.estimate_pose_update()
 
-                if est_rotation != None and agent.ALLOW_ROTATION:
-                    rotation = 0
-                    rotation = agent.apply_rotation_to_agent(est_rotation)
-                    agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-                    agent.exoskeleton.rel_theta += rotation
+                # if est_rotation != None and agent.ALLOW_ROTATION:
+                #     rotation = 0
+                #     rotation = agent.apply_rotation_to_agent(est_rotation)
+                #     agent.obj_tracker.add_angular_displacement(0, -est_rotation)
+                #     agent.exoskeleton.rel_theta += rotation
 
-                if est_translation != None and agent.ALLOW_TRANSLATION:
-                    translation = 0
-                    translation = agent.apply_translation_to_agent(est_translation)
-                    agent.obj_tracker.add_linear_displacement(-translation, 0)
+                # if est_translation != None and agent.ALLOW_TRANSLATION:
+                #     translation = 0
+                #     translation = agent.apply_translation_to_agent(est_translation)
+                #     agent.obj_tracker.add_linear_displacement(-translation, 0)
 
                 curr_pt, pred_pt = agent.estimate_next_detection()
                 # # environment.agents[_id] = sensing_agent
@@ -458,44 +481,44 @@ def repeatable_multiagent_test(screen, environment):
                 # draw_sensing_agent(screen, sensing_agent)
             for k, sensing_agent in environment.agents.items():
                 draw_sensing_agent(screen, sensing_agent)
-            val = cd.check_contact(
-                environment.agents["A"].exoskeleton.body,
-                environment.agents["B"].exoskeleton.body,
-                True,
-            )
-            print("VAL1")
-            if val < COLLISION_THRESHOLD:
-                environment.agents["A"].ALLOW_TRANSLATION = False
-                environment.agents["B"].ALLOW_TRANSLATION = False
-                environment.agents["A"].ALLOW_ROTATION = False
-                environment.agents["B"].ALLOW_ROTATION = False
-            val2 = cd.check_contact(
-                environment.agents["C"].exoskeleton.body,
-                environment.agents["B"].exoskeleton.body,
-                True,
-            )
-            print("VAL2")
-            if (
-                val2 < COLLISION_THRESHOLD
-                and environment.agents["A"].ALLOW_TRANSLATION != False
-            ):
-                environment.agents["A"].ALLOW_TRANSLATION = False
-                environment.agents["C"].ALLOW_TRANSLATION = False
-                environment.agents["A"].ALLOW_ROTATION = False
-                environment.agents["C"].ALLOW_ROTATION = False
-            val3 = cd.check_contact(
-                environment.agents["A"].exoskeleton.body,
-                environment.agents["C"].exoskeleton.body,
-                True,
-            )
-            print("VAL3")
-            if val3 < COLLISION_THRESHOLD:
-                environment.agents["B"].ALLOW_TRANSLATION = False
-                environment.agents["C"].ALLOW_TRANSLATION = False
-                environment.agents["B"].ALLOW_ROTATION = False
-                environment.agents["C"].ALLOW_ROTATION = False
+            # val = cd.check_contact(
+            #     environment.agents["A"].exoskeleton.body,
+            #     environment.agents["B"].exoskeleton.body,
+            #     True,
+            # )
+            # print("VAL1")
+            # if val < COLLISION_THRESHOLD:
+            #     environment.agents["A"].ALLOW_TRANSLATION = False
+            #     environment.agents["B"].ALLOW_TRANSLATION = False
+            #     environment.agents["A"].ALLOW_ROTATION = False
+            #     environment.agents["B"].ALLOW_ROTATION = False
+            # val2 = cd.check_contact(
+            #     environment.agents["C"].exoskeleton.body,
+            #     environment.agents["B"].exoskeleton.body,
+            #     True,
+            # )
+            # print("VAL2")
+            # if (
+            #     val2 < COLLISION_THRESHOLD
+            #     and environment.agents["A"].ALLOW_TRANSLATION != False
+            # ):
+            #     environment.agents["A"].ALLOW_TRANSLATION = False
+            #     environment.agents["C"].ALLOW_TRANSLATION = False
+            #     environment.agents["A"].ALLOW_ROTATION = False
+            #     environment.agents["C"].ALLOW_ROTATION = False
+            # val3 = cd.check_contact(
+            #     environment.agents["A"].exoskeleton.body,
+            #     environment.agents["C"].exoskeleton.body,
+            #     True,
+            # )
+            # print("VAL3")
+            # if val3 < COLLISION_THRESHOLD:
+            #     environment.agents["B"].ALLOW_TRANSLATION = False
+            #     environment.agents["C"].ALLOW_TRANSLATION = False
+            #     environment.agents["B"].ALLOW_ROTATION = False
+            #     environment.agents["C"].ALLOW_ROTATION = False
 
-            # COLLISION_THRESHOLD = 10
+            # # COLLISION_THRESHOLD = 10
             pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
             environment.targets[0].origin = pt
             environment.visible_targets()
@@ -515,6 +538,8 @@ def init_sensing_agent(
         (ox - 10 * scale, oy + 10 * scale),
         (ox + 30 * scale, oy),
     ]
+    # print(opts)
+
     mpt = gfn.get_midpoint(opts[0], opts[1])
     mpt2 = gfn.get_midpoint(mpt, opts[2])
     ap = Polygon(opts)
@@ -527,10 +552,17 @@ def init_sensing_agent(
     )
     sensor = Sensor(parent_agent=sensing_agent)
     sensor.fov_width = np.pi / 4
-    # sensor.fov_radius = 250
+
     sensing_agent.exoskeleton = rb
+    sensing_agent.exoskeleton.states = []
+
     sensing_agent.centered_sensor = sensor
     sensing_agent.obj_tracker = ObjectTrackManager()
+    sensing_agent.obj_tracker.linked_tracks = []
+    sensing_agent.obj_tracker.layers = []
+    sensing_agent.obj_tracker.trackmap = []
+    sensing_agent.obj_tracker.global_track_store = {}
+
     sensing_agent.obj_tracker.parent_agent = sensing_agent
     sensing_agent._id = _id
     rotation = sensing_agent.rotate_agent(orientation)
