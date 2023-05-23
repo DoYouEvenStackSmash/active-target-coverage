@@ -56,19 +56,12 @@ class Environment:
         updates = {}
 
         for k in self.agents:
-            # print(f"heartbeating {k}")
-            sensing_agent = self.agents[k]
-            sensing_agent.heartbeat()
-            print(f"agent {k}")
-            # print(len(self.agents["A"].exoskeleton.states))
+            self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
                 d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())
                 pairs.append((self.agents[k]._id, target, d))
 
-        # self.agents["A"].exoskeleton.heartbeat()
-        # self.agents["B"].exoskeleton.heartbeat()
-        # print(self.agents)
         pairs = sorted(pairs, key=sortkey)
         # TODO: short circuit the for loop, minimum number of updates?
 
@@ -80,6 +73,7 @@ class Environment:
                 updates[pairs[c][0]].append(pairs[c][1])
 
         # update the trackers of all agents
+        print(updates)
         for k in updates:
             self.agents[k].new_detection_layer(frame_id, updates[k])
             self.agents[k].obj_tracker.process_layer(-1)

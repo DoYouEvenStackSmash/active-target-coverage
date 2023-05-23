@@ -58,7 +58,7 @@ def multi_agent_mouse_test(screen, environment):
                     f = open(f"{_id}_out.json", "w")
                     f.write(json.dumps(e, indent=2))
                     f.close()
-                    sys.exit()
+                sys.exit()
             pt = pygame.mouse.get_pos()
             if last_pt == pt:
                 continue
@@ -156,6 +156,11 @@ def init_sensing_agent(
 
     sensing_agent.centered_sensor = sensor
     sensing_agent.obj_tracker = ObjectTrackManager()
+    sensing_agent.obj_tracker.linked_tracks = []
+    sensing_agent.obj_tracker.layers = []
+    sensing_agent.obj_tracker.trackmap = []
+    sensing_agent.obj_tracker.global_track_store = {}
+
     sensing_agent.obj_tracker.parent_agent = sensing_agent
     sensing_agent._id = _id
     rotation = sensing_agent.rotate_agent(orientation)
