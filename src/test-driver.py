@@ -7,8 +7,7 @@ from render_support import TransformFxns as tfn
 import pygame
 
 import collections
-# from aux_functions import *
-# from Dataloader import Dataloader
+
 from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
@@ -19,6 +18,7 @@ from SensingAgent import SensingAgent
 from Sensor import Sensor
 from Target import Target
 from Environment import Environment
+
 import sys
 import json
 import pygame
@@ -33,6 +33,12 @@ def mouse_test(screen, sensing_agent, environment):
   last_pt = None
   while 1:
     for event in pygame.event.get():
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        e = sensing_agent.export_tracks()
+        f = open("out.json", "w")
+        f.write(json.dumps(e, indent=2))
+        f.close()
+        sys.exit()
       pt = pygame.mouse.get_pos()
       if last_pt == pt:
         continue
@@ -77,13 +83,15 @@ def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, o
   ox,oy = origin
   scale = 2
   opts = [(ox - 10*scale, oy - 10*scale), (ox - 10*scale, oy + 10*scale), (ox + 30 * scale, oy)]
+  # print(opts)
+  
   mpt = gfn.get_midpoint(opts[0], opts[1])
   mpt2 = gfn.get_midpoint(mpt,opts[2])
   ap = Polygon(opts)
   rb = RigidBody(parent_agent=sensing_agent, ref_origin = mpt, ref_center = mpt2, endpoint = opts[2], rigid_link = ap)
   sensor = Sensor(parent_agent = sensing_agent)
   sensor.fov_width = np.pi / 4
-  # sensor.fov_radius = 250
+  
   sensing_agent.exoskeleton = rb
   sensing_agent.centered_sensor = sensor
   sensing_agent.obj_tracker = ObjectTrackManager()
@@ -94,7 +102,8 @@ def init_sensing_agent(sensing_agent = SensingAgent(),origin = (0,0), _id = 0, o
 
 def main():
   ox,oy = 500,500
-  target = Target((600, 650))
+  target = Target((600, 650),_id=41)
+  
   environment = Environment()
   sensing_agent = init_sensing_agent(SensingAgent(), (ox,oy), "A")
   environment.add_target(target)

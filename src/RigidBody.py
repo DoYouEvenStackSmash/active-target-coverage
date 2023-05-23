@@ -7,6 +7,8 @@ from support.transform_polygon import *
 from support.Polygon import *
 from aux_functions import *
 
+from State import State
+
 class RigidBody:
   LINE_LEN = 30
   def __init__(self, 
@@ -17,7 +19,9 @@ class RigidBody:
               ref_center = (0,0), # global coordinate of the center point (central sensor) in the agent's world frame
               point_set = [], # placeholder for the points in the rigid body. Superceded by rigid_link
               rel_theta = 0, # global angle theta describing where the agent is oriented in the agent's world frame
-              color = None # Color for rendering agent details
+              color = None, # Color for rendering agent details
+              time_stamp = 0, # some float with significance to a reference clock
+              states = [] # list of rigid body states
               ):
     self.parent_agent = parent_agent
     self.origin = ref_origin
@@ -27,6 +31,41 @@ class RigidBody:
     self.body = rigid_link
     self.rel_theta = rel_theta
     self.color = rand_color()
+    self.time_stamp = time_stamp
+    self.states = states
+    self.time_stamp = time_stamp
+  
+  def _heartbeat(self):
+    '''
+    Internal heartbeat. Records a new state.
+    Does not return
+    '''
+    self.increment_clock()
+    
+    new_state = State(self.get_center(), self.get_rel_theta(), self.get_clock())
+    
+    self.states.append(new_state)
+  
+  def increment_clock(self):
+    '''
+    Accumulator for internal clock
+    Does not return
+    '''
+    self.time_stamp += 1
+
+  def get_clock(self):
+    '''
+    Accessor for internal clock
+    returns a float
+    '''
+    return self.time_stamp
+  
+  def get_last_state(self):
+    '''
+    Accessor for states buffer
+    Returns a State
+    '''
+    return self.states[-1]
   
 
   def get_rel_theta(self):
