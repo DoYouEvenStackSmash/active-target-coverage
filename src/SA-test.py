@@ -48,6 +48,7 @@ TRANSLATE = False
 
 # img = pygame.image.load(path)
 
+
 def agent_update(sensing_agent):
     """
     Updates the pose of a single agent
@@ -61,9 +62,13 @@ def agent_update(sensing_agent):
         sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation)
         sensing_agent.exoskeleton.rel_theta += rotation
         if sensing_agent.exoskeleton.rel_theta < -np.pi:
-            sensing_agent.exoskeleton.rel_theta = 2 * np.pi + sensing_agent.exoskeleton.rel_theta
+            sensing_agent.exoskeleton.rel_theta = (
+                2 * np.pi + sensing_agent.exoskeleton.rel_theta
+            )
         if sensing_agent.exoskeleton.rel_theta > np.pi:
-            sensing_agent.exoskeleton.rel_theta = -2 * np.pi + sensing_agent.exoskeleton.rel_theta
+            sensing_agent.exoskeleton.rel_theta = (
+                -2 * np.pi + sensing_agent.exoskeleton.rel_theta
+            )
 
     if est_translation != None:
         translation = sensing_agent.apply_translation_to_agent(est_translation)

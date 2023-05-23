@@ -90,7 +90,7 @@ class ObjectTrackManager:
             estimates.append(trk.predict_next_box())
         return estimates
 
-    def add_angular_displacement(self, distance, angle, direction = 1):
+    def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
@@ -100,10 +100,9 @@ class ObjectTrackManager:
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
             last_d, last_v, delta_v, theta = trk.get_track_heading()
-            # print(f"angle:\t{angle}")
-            
+
             disp = angle / self.parent_agent.get_fov_width() * 100
-            print(f"angle: {angle}\tdisp: {disp}")
+
             if disp < 0:
                 trk.theta[-1] = adjust_angle(trk.theta[-1] + angle + np.pi / 2)
             if disp > 0:
@@ -111,17 +110,11 @@ class ObjectTrackManager:
                     trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)
                 else:
                     trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)
-            
-            # orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
-            # print(f"trk.theta[-1]: {trk.theta[-1]}\torig_theta: {orig_theta}")
-            # # trk.theta[-1] = adjust_angle(trk.theta[-1] + )
-            # # trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
-            x,y =  last_d
-            nx,ny = [last_d[0] + disp, last_d[1]]
-            
-            rot_mat = None
-            
-            trk.path[-1].bbox = [nx,ny, 1, 1]
+
+            x, y = last_d
+            nx, ny = [last_d[0] + disp, last_d[1]]
+
+            trk.path[-1].bbox = [nx, ny, 1, 1]
 
     def add_linear_displacement(self, distance, angle):
         """
@@ -343,8 +336,8 @@ class ObjectTrackManager:
         steps = self.export_linked_loco_tracks(fdict)
 
         """
-    Generate new images with which to populate a LOCO of the REFLECTED images
-    """
+        Generate new images with which to populate a LOCO of the REFLECTED images
+        """
 
         # construct "linked_tracks" : []
         linked_tracks = [
