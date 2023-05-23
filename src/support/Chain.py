@@ -79,7 +79,7 @@ class Chain:
     total_rotation = 0
     for i in range(steps):
       for A in Olist:
-        v = ColDet.check_contact(self.links[0]).get_body(), A)
+        v = ColDet.check_contact(self.links[0].get_body(), A)
         if v < COLLISION_THRESHOLD:
           return total_rotation
       self.links[-1].rotate_body(self.links[-1].get_origin(), rot_mat2)
