@@ -1,0 +1,58 @@
+table Category {
+  id:int;
+  name:string;
+  supercategory:string;
+}
+
+table Track {
+  track_id:int;
+  category_id:int;
+  track_len:int;
+  steps:[int];
+}
+
+table Image {
+  id:int;
+  file_name:string;
+  height:int;
+  width:int;
+}
+struct Bbox {
+  x:float;
+  y:float;
+  w:float;
+  h:float;
+}
+
+table Annotation {
+  id:int;
+  image_id:int;
+  category_id:int;
+  bbox:Bbox;
+  area:float;
+  segmentation:[ubyte];
+  iscrowd:int;
+  track_id:int;
+  trackmap_index:int;
+  vid_id:int;
+  track_color:[int];
+  displaced:bool;
+  state_id:int;
+}
+
+table State {
+  position:[float];
+  orientation:float;
+  time_stamp:int;
+}
+
+table TopLoco {
+  constants:[ubyte] (flexbuffer);
+  categories:[Category];
+  trackmap:[int];
+  linked_tracks:[Track];
+  images:[Image];
+  annotations:[Annotation];
+  states:[State];
+}
+root_type TopLoco;
