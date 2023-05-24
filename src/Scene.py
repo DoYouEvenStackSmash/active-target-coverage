@@ -7,7 +7,7 @@ from render_support import PygameArtFxns as pafn
 
 from PIL import Image, ImageDraw
 import collections
-from aux_functions import *
+# from aux_functions import *
 
 # from Dataloader import Dataloader
 from YoloBox import YoloBox
@@ -35,108 +35,52 @@ SPLINE_COUNT = 2
 TRANSLATE = False
 
 
-def get_tracks(steps):
-    trail = []
-    for s in steps:
-        x, y, w, h = s["bbox"]
-        trail.append((x, y))
-    return trail
+def adjust_angle(theta):
+    """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
+    if theta > np.pi:
+        theta = theta + -2 * np.pi
+    elif theta < -np.pi:
+        theta = theta + 2 * np.pi
 
+    return theta
 
-def visible_targets(A, Tlist):
-    """
-    Determines visible targets in the vicinity of agent A and updates
-    the agent A's tracker.
-
-    Does not return
-    """
-    pairs = []
-    sortkey = lambda x: x[2]
-    frame_id = "frame_" + str(len(A.obj_tracker.layers))
-
-    for target in Tlist:
-        d = mfn.euclidean_dist(A.origin, target.get_origin())
-        pairs.append((A, target, d))
-    pairs = sorted(pairs, key=sortkey)
-    c = 0
-    pl = []
-    add_list = []
-    while c < len(pairs):
-        if pairs[c][2] > pairs[c][0].fov_radius:
-            break
-        if pairs[c][0].is_visible(pairs[c][1].get_origin()):
-            dc = A.transform_to_local_coord(pairs[c][1].get_origin())
-
-            yb = sann.register_annotation(0, dc, frame_id)
-            add_list.append(yb)
-        c += 1
-    A.obj_tracker.add_new_layer(add_list)
-    A.obj_tracker.process_layer(len(A.obj_tracker.layers) - 1)
-
-
-def draw_coordinate_frame(screen, A):
-    """
-    Helper function for displaying the curved coordinate fov of agent A
-
-    Does not return
-    """
-    coord_frame = A.get_sensor_field(5)
-    for level in coord_frame:
-        for i in range(1, len(level)):
-            pafn.frame_draw_line(screen, (level[i - 1], level[i]), pafn.colors["white"])
-    for endpoint in coord_frame[-1]:
-        pafn.frame_draw_line(screen, (A.origin, endpoint), pafn.colors["white"])
-
-
-def import_loco_fmt(s, sys_path):
+def import_agent_record(screen, agent_record):
     """
     Imports a LOCO formatted json
 
     Returns a json of some sort
     """
 
-    # set up trackmap for accessing tracks
-    # self.imported = True
-    # trackmap = s['trackmap']
-    # lt = s['linked_tracks']
-    # for i,track_id in enumerate(trackmap):
-    #   if track_id not in self.global_track_store or track_id == -1:
-    #     self.global_track_store[track_id] = ObjectTrack(track_id, lt[i]['category_id'])
-    #     self.global_track_store[track_id].class_id = lt[i]['category_id']
-    #   else: #already present
-    #     continue
+    fov_width = agent_record['sensor_params']['fov_width']
+    fov_radius = agent_record['sensor_params']['fov_radius']
 
-    # load image filenames
-    # images = s['images']
-    # # construct file dict for accessing file ids
-    # # construct sys_paths list for convenience
-    # # initialize layers to populate with YoloBoxes
-    # for i,imf in enumerate(images):
-    #   self.filenames.append(imf['file_name'])
-    #   self.sys_paths.append(sys_path)
-    #   self.fdict[imf['file_name']] = i
-    #   self.layers.append([])
-    #   self.img_centers.append(tuple((int(imf['width']/2), int(imf['height']/2))))
+    trackmap = agent_record['trackmap']
+    lt = agent_record['linked_tracks']
 
-    # load annotations
-    steps = s["annotations"]
-    # for st in steps:
-    #   # skip step if track is invalid
-    #   if trackmap[st['trackmap_index']] == -1:
-    #     continue
-    #   track = self.get_track(trackmap[st['trackmap_index']])
-    #   yb = YoloBox( track.class_id,
-    #                 st['bbox'],
-    #                 f'{self.filenames[st["image_id"]][:-3]}txt',
-    #                 self.img_centers[st["image_id"]])
+    get_center = lambda state: state['position']
+    get_orientation = lambda state: state['orientation']
+    annotations = agent_record['annotations']
+    states = agent_record['states']
+    # for anno in annotations:
 
-    #   # add YoloBox to the appropriate layer based on the image filename
-    #   self.layers[self.fdict[self.filenames[st['image_id']]]].append(yb)
-    #   # add the yolobox to the correct track
-    #   track.add_new_step(yb,0)
-    # bboxes = []
 
-    return steps
+    for track in lt:
+        pts = []
+        color = None
+        for step_id in track['steps']:
+            anno = annotations[step_id]
+            color = anno['track_color']
+            state = states[anno['state_id']]
+            x,y,w,h = anno['bbox']
+            theta = (x - 50) / Sensor.WINDOW_WIDTH * fov_width
+            theta = adjust_angle(get_orientation(state) + theta)
+            r = y
+            pt = mfn.pol2car(get_center(state), r, theta)
+            pts.append[pt]
+        
+        render_path(screen, pts, color)
+    pygame.display.update()
+    
 
 
 def json_loader(filename):

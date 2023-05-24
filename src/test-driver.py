@@ -189,9 +189,8 @@ def interactive_single_agent_test(screen, sensing_agent, environment):
 
                     pygame.display.update()
 
-
 def init_sensing_agent(
-    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 400)
+    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 500)
 ):
     ox, oy = origin
     scale = 2
@@ -213,7 +212,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 2 * np.pi / 5
+    sensor.fov_width = 3 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
@@ -229,7 +228,6 @@ def init_sensing_agent(
     sensing_agent._id = _id
     rotation = sensing_agent.rotate_agent(orientation)
     return sensing_agent
-
 
 def circular_test(screen, sensing_agent, environment):
     target_angles = [
@@ -301,9 +299,9 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
-    # circular_test(screen, sensing_agent, environment)
+    circular_test(screen, sensing_agent, environment)
     # interactive_single_agent_test(screen, sensing_agent, environment)
-    single_agent_mouse_test(screen, sensing_agent, environment)
+    # single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
 
 
