@@ -1,5 +1,6 @@
 from SensingAgent import SensingAgent
 
+
 def init_sensing_agent(
     sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 500)
 ):

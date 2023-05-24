@@ -214,7 +214,10 @@ class SensingAgent:
         e = self.obj_tracker.export_loco_fmt()
         print(f"exporting states of {self}")
         e["states"] = [s.to_json() for s in self.exoskeleton.states]
-        e["sensor_params"] = {"fov_radius": self.get_fov_radius(), "fov_width": self.get_fov_width()}
+        e["sensor_params"] = {
+            "fov_radius": self.get_fov_radius(),
+            "fov_width": self.get_fov_width(),
+        }
         return e
 
     def new_detection_layer(self, frame_id, detection_list):

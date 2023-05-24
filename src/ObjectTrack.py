@@ -43,8 +43,7 @@ class ObjectTrack:
 
         if len(self.v) > 1 and distance != 0:
             self.delta_v.append(min(1.1, distance / self.v[-1]))
-        
-        
+
         self.v.append(distance)
 
         self.r = distance
@@ -73,7 +72,6 @@ class ObjectTrack:
             distance = last_distance * last_change_in_distance
         else:
             distance = last_distance
-        
 
         #   r = r * abs(self.delta_v[-1])
 

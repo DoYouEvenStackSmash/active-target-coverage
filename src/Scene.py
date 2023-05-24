@@ -7,6 +7,7 @@ from render_support import PygameArtFxns as pafn
 
 from PIL import Image, ImageDraw
 import collections
+
 # from aux_functions import *
 
 # from Dataloader import Dataloader
@@ -44,6 +45,7 @@ def adjust_angle(theta):
 
     return theta
 
+
 def import_agent_record(screen, agent_record):
     """
     Imports a LOCO formatted json
@@ -51,36 +53,34 @@ def import_agent_record(screen, agent_record):
     Returns a json of some sort
     """
 
-    fov_width = agent_record['sensor_params']['fov_width']
-    fov_radius = agent_record['sensor_params']['fov_radius']
+    fov_width = agent_record["sensor_params"]["fov_width"]
+    fov_radius = agent_record["sensor_params"]["fov_radius"]
 
-    trackmap = agent_record['trackmap']
-    lt = agent_record['linked_tracks']
+    trackmap = agent_record["trackmap"]
+    lt = agent_record["linked_tracks"]
 
-    get_center = lambda state: state['position']
-    get_orientation = lambda state: state['orientation']
-    annotations = agent_record['annotations']
-    states = agent_record['states']
+    get_center = lambda state: state["position"]
+    get_orientation = lambda state: state["orientation"]
+    annotations = agent_record["annotations"]
+    states = agent_record["states"]
     # for anno in annotations:
-
 
     for track in lt:
         pts = []
         color = None
-        for step_id in track['steps']:
+        for step_id in track["steps"]:
             anno = annotations[step_id]
-            color = anno['track_color']
-            state = states[anno['state_id']]
-            x,y,w,h = anno['bbox']
+            color = anno["track_color"]
+            state = states[anno["state_id"]]
+            x, y, w, h = anno["bbox"]
             theta = (x - 50) / Sensor.WINDOW_WIDTH * fov_width
             theta = adjust_angle(get_orientation(state) + theta)
             r = y
             pt = mfn.pol2car(get_center(state), r, theta)
             pts.append[pt]
-        
+
         render_path(screen, pts, color)
     pygame.display.update()
-    
 
 
 def json_loader(filename):

@@ -605,9 +605,9 @@ def main():
     environment.add_target(target)
     sensing_agent = Agents[2]
     # sensing_agent._id = -1
-    repeatable_sensing_agent(screen, sensing_agent)
+    # repeatable_sensing_agent(screen, sensing_agent)
     # repeatable_environment_test(screen, sensing_agent, environment)
-    # repeatable_multiagent_test(screen, environment)
+    repeatable_multiagent_test(screen, environment)
     # repeatable_step_test(screen, sensing_agent, environment)
 
 

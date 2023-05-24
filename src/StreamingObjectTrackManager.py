@@ -39,7 +39,7 @@ class ObjectTrackManager:
         "avg_tolerance": 10,
         "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 50,
+        "radial_exclusion": 100,
     }
     display_constants = {"trail_len": 0}
 
@@ -104,12 +104,12 @@ class ObjectTrackManager:
 
             ratio = angle / self.parent_agent.get_fov_width()
             disp = ratio * 100
-            
+
             # off_t = np.pi / 2 + angle
             # off_t = disp / 100 * self.parent_agent.get_fov_width()
-            
+
             orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
-            
+
             new_angle = 0
             # # angle = 0
             if disp < 0:
@@ -119,7 +119,9 @@ class ObjectTrackManager:
                     new_angle = adjust_angle(trk.theta[-1] - angle + off_t)
                 else:
                     new_angle = adjust_angle(trk.theta[-1] + angle - off_t)
-            print(f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n")
+            print(
+                f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n"
+            )
             # print(f"trk.theta: {trk.theta[-1]}\tnew_angle: {new_angle}")
             trk.theta[-1] = new_angle
             x, y = last_d
