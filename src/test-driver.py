@@ -42,7 +42,8 @@ def agent_update(sensing_agent):
             print("rotation OOB")
         rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
         direction = 1 if est_rotation > 0 else -1
-        print(f"sensing_agent theta: {sensing_agent.exoskeleton.rel_theta}")
+        print(f"original sensing_agent theta: {sensing_agent.exoskeleton.rel_theta}")
+        
         sensing_agent.exoskeleton.rel_theta += rotation
         if sensing_agent.exoskeleton.rel_theta < -np.pi:
             sensing_agent.exoskeleton.rel_theta = (
@@ -52,6 +53,7 @@ def agent_update(sensing_agent):
             sensing_agent.exoskeleton.rel_theta = (
                 -2 * np.pi + sensing_agent.exoskeleton.rel_theta
             )
+        
         sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation, direction)
     if est_translation != None:
         translation = sensing_agent.apply_translation_to_agent(est_translation)
@@ -156,6 +158,7 @@ def interactive_single_agent_test(screen, sensing_agent, environment):
                         )
                     pygame.display.update()
                     continue
+                
                 else:
                     while pygame.MOUSEBUTTONUP not in [
                         event.type for event in pygame.event.get()
@@ -190,7 +193,7 @@ def interactive_single_agent_test(screen, sensing_agent, environment):
                     pygame.display.update()
 
 def init_sensing_agent(
-    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 500)
+    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 400)
 ):
     ox, oy = origin
     scale = 2
@@ -212,7 +215,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 3 * np.pi / 5
+    sensor.fov_width =  3 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
@@ -249,7 +252,7 @@ def circular_test(screen, sensing_agent, environment):
         0.5235987755982988,
         0,
     ]
-    target_angles.reverse()
+    # target_angles.reverse()
     target_points = [mfn.pol2car((400, 400), 100, i) for i in target_angles]
     last_pt = None
     for pt in target_points:

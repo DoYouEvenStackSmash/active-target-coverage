@@ -44,7 +44,6 @@ class ObjectTrack:
         if len(self.v) > 1 and distance != 0:
             self.delta_v.append(min(1.1, distance / self.v[-1]))
         
-
         
         self.v.append(distance)
 
@@ -69,7 +68,7 @@ class ObjectTrack:
         # consider acceleration in estimate
 
         last_change_in_distance = self.delta_v[-1]
-        print(last_change_in_distance)
+        # print(last_change_in_distance)
         if last_change_in_distance != 0:
             distance = last_distance * last_change_in_distance
         else:

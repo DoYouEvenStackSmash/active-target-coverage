@@ -37,9 +37,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 5,
+        "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 35,
+        "radial_exclusion": 50,
     }
     display_constants = {"trail_len": 0}
 
@@ -96,24 +96,36 @@ class ObjectTrackManager:
         """
         if not self.has_active_tracks():
             return
+        off_t = self.parent_agent.get_fov_width() / 2
 
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
             last_d, last_v, delta_v, theta = trk.get_track_heading()
 
-            disp = angle / self.parent_agent.get_fov_width() * 100
-
+            ratio = angle / self.parent_agent.get_fov_width()
+            disp = ratio * 100
+            
+            # off_t = np.pi / 2 + angle
+            # off_t = disp / 100 * self.parent_agent.get_fov_width()
+            
+            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
+            
+            new_angle = 0
+            # # angle = 0
             if disp < 0:
-                trk.theta[-1] = adjust_angle(trk.theta[-1] + angle + np.pi / 2)
+                new_angle = adjust_angle(trk.theta[-1] + angle + off_t)
             if disp > 0:
                 if trk.theta[-1] < -np.pi / 2:
-                    trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)
+                    new_angle = adjust_angle(trk.theta[-1] - angle + off_t)
                 else:
-                    trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)
-
+                    new_angle = adjust_angle(trk.theta[-1] + angle - off_t)
+            print(f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n")
+            # print(f"trk.theta: {trk.theta[-1]}\tnew_angle: {new_angle}")
+            trk.theta[-1] = new_angle
             x, y = last_d
+            print(x)
             nx, ny = [last_d[0] + disp, last_d[1]]
-
+            # print(nx)
             trk.path[-1].bbox = [nx, ny, 1, 1]
 
     def add_linear_displacement(self, distance, angle):
