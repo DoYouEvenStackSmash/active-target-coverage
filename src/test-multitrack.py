@@ -29,7 +29,7 @@ def agent_update(sensing_agent):
     """
     est_rotation, est_translation = sensing_agent.estimate_pose_update()
 
-    if est_rotation != None:
+    if est_rotation != None and sensing_agent.ALLOW_ROTATION:
         # if est_rotation > np.pi or est_rotation < -np.pi:
         #     print("rotation OOB")
         rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
@@ -45,7 +45,7 @@ def agent_update(sensing_agent):
                 -2 * np.pi + sensing_agent.exoskeleton.rel_theta
             )
         sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation, direction)
-    if est_translation != None:
+    if est_translation != None and sensing_agent.ALLOW_TRANSLATION:
         translation = sensing_agent.apply_translation_to_agent(est_translation)
         sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
 
@@ -121,17 +121,17 @@ def multitrack(screen, environment, paths,colors, n = 10):
       sensing_agent = environment.agents[k]
       agent_update(sensing_agent)
       draw_sensing_agent(screen, environment.agents[k])
-      # if sensing_agent.obj_tracker.active_tracks == None:
-        # continue
-      # for t in range(len(sensing_agent.obj_tracker.active_tracks)):
-      curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-      if len(pred_pt):
-          # print((curr_pt,pred_pt))
-          pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-          pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-          pafn.frame_draw_line(
-              screen, (curr_pt, pred_pt), pafn.colors["white"]
-          )
+      if sensing_agent.obj_tracker.active_tracks == None:
+        continue
+      for t in range(len(sensing_agent.obj_tracker.active_tracks)):
+        curr_pt, pred_pt = sensing_agent.estimate_next_detection(t)
+        if len(pred_pt):
+            # print((curr_pt,pred_pt))
+            pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+            pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+            pafn.frame_draw_line(
+                screen, (curr_pt, pred_pt), pafn.colors["white"]
+            )
     for j,t in enumerate(environment.targets):
       t.origin = paths[j][i]
       pafn.frame_draw_dot(screen, paths[j][i], colors[j])
@@ -159,14 +159,14 @@ def path_handler(screen):
   min_x, min_y = 50,50
   max_x, max_y = 700,700
   # origins = [(100,50)]#, (50,50)]#, (50,100)]
-  origins = [(100,50)]#, (50,100)]
-  # origins.reverse()
+  origins = [(100,50), (50,100)]
+  origins.reverse()
   destinations = [(450,700), (700, 450), (700,700), (700,450)]
   vertices = []
   vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0],-1, 35))
   # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
   # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-  # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1],1,35))
+  vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1],1,35))
   n = 30
   paths = []
   for i in range(len(origins)):
@@ -181,18 +181,23 @@ def path_handler(screen):
   # paths[1].reverse()
   colors = [pafn.colors["green"], pafn.colors["red"], pafn.colors["cyan"]]
   environment = Environment()
-  sensing_agent = init_sensing_agent()
-  # sensing_agent.ALLOW_TRANSLATION = False
-  # sensing_agent.ALLOW_ROTATION = False
+  sensing_agent = init_sensing_agent(SensingAgent())
+  sensing_agent_2 = init_sensing_agent(SensingAgent(),origin=(400,50),_id=1)
+  sensing_agent_2.centered_sensor.fov_width = np.pi / 4
+  sensing_agent_2.centered_sensor.fov_radius = 400
+  sensing_agent_2.ALLOW_TRANSLATION = False
+  sensing_agent.ALLOW_ROTATION = False
   # theta, r = mfn.car2pol(origins[1], destinations[1])
-  sensing_agent.centered_sensor.fov_radius = 300
-  sensing_agent.centered_sensor.fov_width = np.pi / 4
+  sensing_agent.centered_sensor.fov_radius = 500
+  sensing_agent.centered_sensor.fov_width = np.pi / 3
   # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
   for i in range(len(origins)):
     environment.add_target(Target(origins[i], _id=i))
   
   environment.agents[0] = sensing_agent
+  environment.agents[1] = sensing_agent_2
+  
 
   for i,path in enumerate(paths):
     render_path(screen, path, colors[i])
@@ -204,7 +209,7 @@ def path_handler(screen):
   sys.exit()
 
 def init_sensing_agent(
-    sensing_agent=SensingAgent(), origin=(0, 0), _id=0, orientation=(500, 500)
+    sensing_agent=SensingAgent(), origin=(50, 400), _id=0, orientation=(200, 200)
 ):
     ox, oy = origin
     scale = 2
