@@ -216,13 +216,17 @@ class SensingAgent:
         e["states"] = [s.to_json() for s in self.exoskeleton.states]
         return e
 
-    def new_detection_layer(self, frame_id, add_list):
+    def new_detection_layer(self, frame_id, detection_list):
         """
-        Ingest for a new layer of detections from the outside world
+        Ingest for a new layer of detections from the outside world.
+
+        Creates a new list of yoloboxes associated with current state.
+        Adds layer of yoloboxes to tracker and processes layer.
+        Does not return
         """
         detections = []
         curr_state = self.exoskeleton.get_age()
-        for a in add_list:
+        for a in detection_list:
             dc = self.transform_to_local_bbox(a.get_origin())
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
             detections.append(yb)

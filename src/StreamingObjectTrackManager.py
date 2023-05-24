@@ -5,6 +5,7 @@ sys.path.append("..")
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+from render_support import TransformFxns as tfn
 from aux_functions import *
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
@@ -89,7 +90,7 @@ class ObjectTrackManager:
             estimates.append(trk.predict_next_box())
         return estimates
 
-    def add_angular_displacement(self, distance, angle):
+    def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
@@ -102,10 +103,18 @@ class ObjectTrackManager:
 
             disp = angle / self.parent_agent.get_fov_width() * 100
 
-            new_posn = [last_d[0] + disp, last_d[1]]
-            trk.theta = adjust_angle(trk.theta - angle)
+            if disp < 0:
+                trk.theta[-1] = adjust_angle(trk.theta[-1] + angle + np.pi / 2)
+            if disp > 0:
+                if trk.theta[-1] < -np.pi / 2:
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] - angle + np.pi / 2)
+                else:
+                    trk.theta[-1] = adjust_angle(trk.theta[-1] + angle - np.pi / 2)
 
-            trk.path[-1].bbox = [new_posn[0], new_posn[1], 1, 1]
+            x, y = last_d
+            nx, ny = [last_d[0] + disp, last_d[1]]
+
+            trk.path[-1].bbox = [nx, ny, 1, 1]
 
     def add_linear_displacement(self, distance, angle):
         """
@@ -327,8 +336,8 @@ class ObjectTrackManager:
         steps = self.export_linked_loco_tracks(fdict)
 
         """
-    Generate new images with which to populate a LOCO of the REFLECTED images
-    """
+        Generate new images with which to populate a LOCO of the REFLECTED images
+        """
 
         # construct "linked_tracks" : []
         linked_tracks = [

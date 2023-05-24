@@ -75,9 +75,13 @@ def draw_coordinate_frame(screen, sensor):
                 screen, (sensor.get_origin(), endpoint), pafn.colors["dimgray"]
             )
 
-    for endpoint in detect_frame[-1]:
+    for endpoint in detect_frame[-1][:2]:
         pafn.frame_draw_line(
             screen, (sensor.get_origin(), endpoint), pafn.colors["tangerine"]
+        )
+    for endpoint in detect_frame[-1][2:]:
+        pafn.frame_draw_line(
+            screen, (sensor.get_origin(), endpoint), pafn.colors["cyan"]
         )
 
 

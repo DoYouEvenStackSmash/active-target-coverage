@@ -9,7 +9,7 @@ from render_support import PygameArtFxns as pafn
 class ObjectTrack:
     def __init__(self, track_id, class_id):
         self.r = 0  # distance between two most recent elements in the track
-        self.theta = 0  # angle between two most recent elements in the track
+        self.theta = [0]  # angle between two most recent elements in the track
         self.delta_theta = [0]  # change in angle after adding element to the track
         self.delta_v = [
             0
@@ -39,13 +39,16 @@ class ObjectTrack:
         Assumes path is not empty
         """
         center = self.path[-1].get_center_coord()
-        theta, r = mfn.car2pol(center, pt)
-        self.v.append(r)
-        self.delta_v.append(r / self.r)
+        theta, distance = mfn.car2pol(center, pt)
 
-        self.r = r
+        if len(self.v) > 1 and distance != 0:
+            self.delta_v.append(min(1.1, distance / self.v[-1]))
 
-        self.theta = theta
+        self.v.append(distance)
+
+        self.r = distance
+
+        self.theta.append(theta)
 
         # add recent velocity to delta_v
 
@@ -57,10 +60,21 @@ class ObjectTrack:
         if len(self.path) == 1:
             return (lx, ly)
 
-        if posn:
-            lx, ly = posn
+        # if posn:
+        #     lx, ly = pos
+        last_distance = self.v[-1]
+        distance = 0
+        # consider acceleration in estimate
 
-        new_posn = mfn.pol2car((lx, ly), self.v[-1], self.theta)
+        last_change_in_distance = self.delta_v[-1]
+        print(last_change_in_distance)
+        if last_change_in_distance != 0:
+            distance = last_distance * last_change_in_distance
+        else:
+            distance = last_distance
+        #   r = r * abs(self.delta_v[-1])
+
+        new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
 
         return new_posn
 
@@ -69,7 +83,7 @@ class ObjectTrack:
         Accessor for track trajectory information
         Returns the track heading
         """
-        return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta)
+        return (self.get_last_detection(), self.r, self.delta_v[-1], self.theta[-1])
 
     def is_alive(self, fc, expiration):
         """
