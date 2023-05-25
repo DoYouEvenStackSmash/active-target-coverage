@@ -190,9 +190,9 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(50, 100)]#, (300, 600)]  # , 100), (50, 100)]
+    origins = [(50, 100)]  # , (300, 600)]  # , 100), (50, 100)]
     # origins.reverse()
-    destinations = [(600, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
+    destinations = [(450, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []
     vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], -1, 45))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
@@ -211,11 +211,11 @@ def path_handler(screen):
         pts.append(l2[-1])
         paths.append(pts)
     path_1 = []
-    # for p in paths:
-    #     for pt in p:
-    #         path_1.append(pt)
-    # paths = [path_1]
-    # paths[0] = get_lerp(origins[0], destinations[0])
+    for p in paths:
+        for pt in p:
+            path_1.append(pt)
+    paths = [path_1]
+    paths[0] = get_lerp(origins[0], destinations[0])
     print(paths)
 
     # paths[1].reverse()
@@ -228,7 +228,7 @@ def path_handler(screen):
     sensing_agent.ALLOW_TRANSLATION = True
     sensing_agent.ALLOW_ROTATION = True
     # theta, r = mfn.car2pol(origins[1], destinations[1])
-    sensing_agent.centered_sensor.fov_radius = 1100
+    sensing_agent.centered_sensor.fov_radius = 400
     sensing_agent.centered_sensor.fov_width = 3 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
@@ -242,7 +242,7 @@ def path_handler(screen):
         render_path(screen, path, colors[i])
     pygame.display.update()
 
-    multitrack(screen, environment, paths, colors, 35)
+    multitrack(screen, environment, paths, colors, 180)
 
     time.sleep(10)
     sys.exit()

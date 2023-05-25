@@ -39,7 +39,7 @@ class ObjectTrackManager:
         "avg_tolerance": 10,
         "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 150,
+        "radial_exclusion": 60,
     }
     display_constants = {"trail_len": 0}
 
@@ -226,7 +226,7 @@ class ObjectTrackManager:
         while len(self.active_tracks) > 0:
             self.inactive_tracks.append(self.active_tracks.pop())
 
-    def link_all_tracks(self, min_len=0):
+    def link_all_tracks(self, min_len=2):
         """
         Resolve linked lists to make tracks externally traversible
         """

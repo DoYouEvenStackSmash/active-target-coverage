@@ -3,7 +3,7 @@ import flatbuffers
 import matplotlib.pyplot as plt
 from LOCO.TopLoco import *
 
-buf = open("out.bin", "rb").read()
+buf = open("0_out.bin", "rb").read()
 buf = bytearray(buf)
 b = TopLoco.GetRootAsTopLoco(buf, 0)
 top_loco_t = TopLocoT.InitFromObj(b)
@@ -16,7 +16,7 @@ for lt in linked_tracks:
     for st in steps:
         err.append(annos[st].error)
     errors.append(err)
-plt.plot(errors[0])
+plt.plot(errors[1])
 plt.show()
 
 # print(c)
