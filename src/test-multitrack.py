@@ -116,15 +116,15 @@ def multitrack(screen, environment, paths, colors, n=10):
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
     for i in range(n):
-        pafn.clear_frame(screen)
+        # pafn.clear_frame(screen)
 
         for p in range(len(paths)):
             render_path(screen, paths[p], colors[p])
 
         for k in environment.agents:
             sensing_agent = environment.agents[k]
-            agent_update(sensing_agent)
-            draw_sensing_agent(screen, environment.agents[k])
+            # agent_update(sensing_agent)
+            # draw_sensing_agent(screen, environment.agents[k])
             if sensing_agent.obj_tracker.active_tracks == None:
                 continue
             for t in range(len(sensing_agent.obj_tracker.active_tracks)):
@@ -137,8 +137,9 @@ def multitrack(screen, environment, paths, colors, n=10):
                         screen, (curr_pt, pred_pt), pafn.colors["white"]
                     )
         for j, t in enumerate(environment.targets):
+            print(i)
             t.origin = paths[j][i]
-            pafn.frame_draw_dot(screen, paths[j][i], colors[j])
+            # pafn.frame_draw_dot(screen, paths[j][i-1], colors[j])
         environment.visible_targets()
         pygame.display.update()
         time.sleep(0.2)
@@ -163,16 +164,16 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(100, 50), (600, 100), (50, 100)]
+    origins = [(50, 100), (300,600)]#, 100), (50, 100)]
     # origins.reverse()
-    destinations = [(450, 700), (700, 450), (100, 600), (700, 700), (700, 450)]
+    destinations = [(400, 600), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []
     vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], -1, 45))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-    # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1],1,35))
-    vertices.append(gfn.get_midpoint(origins[1], destinations[2]))
-    n = 30
+    vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1],-1,-35))
+    # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
+    n = 15
     paths = []
     for i in range(len(vertices)):
         l1 = gfn.lerp_list(origins[i], vertices[i], n)
@@ -183,6 +184,13 @@ def path_handler(screen):
             pts.append(gfn.lerp(l1[j], l2[j], step * j))
         pts.append(l2[-1])
         paths.append(pts)
+    # path_1 = []
+    # for p in paths:
+    #     for pt in p:
+    #         path_1.append(pt)
+    # paths = [path_1]
+    print(paths)
+    
     # paths[1].reverse()
     colors = [pafn.colors["green"], pafn.colors["red"], pafn.colors["cyan"]]
     environment = Environment()
@@ -190,14 +198,14 @@ def path_handler(screen):
     sensing_agent_2 = init_sensing_agent(SensingAgent(), origin=(400, 50), _id=1)
     sensing_agent_2.centered_sensor.fov_width = np.pi / 4
     sensing_agent_2.centered_sensor.fov_radius = 500
-    # sensing_agent_2.ALLOW_TRANSLATION = False
-    # sensing_agent.ALLOW_ROTATION = False
+    sensing_agent.ALLOW_TRANSLATION = False
+    sensing_agent.ALLOW_ROTATION = False
     # theta, r = mfn.car2pol(origins[1], destinations[1])
-    sensing_agent.centered_sensor.fov_radius = 400
+    sensing_agent.centered_sensor.fov_radius = 1100
     sensing_agent.centered_sensor.fov_width = np.pi / 2
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
-    for i in range(len(vertices)):
+    for i in range(1):
         environment.add_target(Target(origins[i], _id=i))
 
     environment.agents[0] = sensing_agent
@@ -207,7 +215,7 @@ def path_handler(screen):
         render_path(screen, path, colors[i])
     pygame.display.update()
 
-    multitrack(screen, environment, paths, colors, n)
+    multitrack(screen, environment, paths, colors, 30)
 
     time.sleep(10)
     sys.exit()
