@@ -25,7 +25,6 @@ def adjust_angle(theta):
     return theta
 
 
-
 def import_agent_record(screen, agent_record):
     """
     Imports a LOCO formatted json
@@ -89,28 +88,40 @@ def render_path(screen, path, color):
 def multitrack(screen, environment, paths, colors, n=10):
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
+    curr_pts = []
+    pred_pts = []
     for i in range(n):
-        # pafn.clear_frame(screen)
+        pafn.clear_frame(screen)
 
         for p in range(len(paths)):
             render_path(screen, paths[p], colors[p])
 
         for k in environment.agents:
             sensing_agent = environment.agents[k]
+            r, t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, t)
             # agent_update(sensing_agent)
-            # draw_sensing_agent(screen, environment.agents[k])
-            if sensing_agent.obj_tracker.active_tracks == None or len(sensing_agent.obj_tracker.active_tracks) == 0:
+            draw_sensing_agent(screen, environment.agents[k])
+            if (
+                sensing_agent.obj_tracker.active_tracks == None
+                or len(sensing_agent.obj_tracker.active_tracks) == 0
+            ):
                 print("no active tracks")
                 continue
             for t in range(len(sensing_agent.obj_tracker.active_tracks)):
                 curr_pt, pred_pt = sensing_agent.estimate_next_detection(t)
                 if len(pred_pt):
-                    # print((curr_pt,pred_pt))
-                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-                    pafn.frame_draw_line(
-                        screen, (curr_pt, pred_pt), pafn.colors["white"]
-                    )
+                    curr_pts.append(curr_pt)
+                    pred_pts.append(pred_pt)
+                    print((curr_pt, pred_pt))
+                    for i in range(len(curr_pts)):
+                        pred_pt = pred_pts[i]
+                        curr_pt = curr_pts[i]
+                        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+                        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                        pafn.frame_draw_line(
+                            screen, (curr_pt, pred_pt), pafn.colors["white"]
+                        )
         for j, t in enumerate(environment.targets):
             t.origin = paths[j][i]
             pafn.frame_draw_dot(screen, paths[j][i], colors[j])
@@ -172,11 +183,11 @@ def path_handler(screen):
     sensing_agent_2 = init_sensing_agent(SensingAgent(), origin=(400, 50), _id=1)
     sensing_agent_2.centered_sensor.fov_width = np.pi / 4
     sensing_agent_2.centered_sensor.fov_radius = 500
-    sensing_agent.ALLOW_TRANSLATION = False
-    sensing_agent.ALLOW_ROTATION = False
+    sensing_agent.ALLOW_TRANSLATION = True
+    sensing_agent.ALLOW_ROTATION = True
     # theta, r = mfn.car2pol(origins[1], destinations[1])
-    sensing_agent.centered_sensor.fov_radius = 1100
-    sensing_agent.centered_sensor.fov_width = np.pi / 2
+    sensing_agent.centered_sensor.fov_radius = 400
+    sensing_agent.centered_sensor.fov_width = 2 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
     for i in range(1):

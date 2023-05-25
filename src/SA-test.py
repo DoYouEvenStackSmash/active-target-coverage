@@ -462,9 +462,8 @@ def repeatable_multiagent_test(screen, environment):
             for _id in environment.agents:
                 agent = environment.agents[_id]
                 pred_rotation = agent.exoskeleton.get_relative_rotation(pt)
-                r,t = agent.tracker_query()
-                agent.reposition(r,t)
-
+                r, t = agent.tracker_query()
+                agent.reposition(r, t)
 
                 curr_pt, pred_pt = agent.estimate_next_detection()
                 # # environment.agents[_id] = sensing_agent

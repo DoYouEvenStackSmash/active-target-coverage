@@ -31,7 +31,6 @@ from drawing_functions import *
 LCTRL = 64
 
 
-
 def circular_test(screen, sensing_agent, environment):
     target_angles = [
         0,
@@ -50,7 +49,7 @@ def circular_test(screen, sensing_agent, environment):
         1.0471975511965976,
         0.7853981633974483,
         0.5235987755982988,
-        0
+        0,
     ]
     # target_angles = [
     #     0,

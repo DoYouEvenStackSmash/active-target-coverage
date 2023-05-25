@@ -37,9 +37,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 1,
+        "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 70,
+        "radial_exclusion": 100,
     }
     display_constants = {"trail_len": 0}
 
@@ -261,16 +261,16 @@ class ObjectTrackManager:
             return
 
         curr_layer = self.layers[layer_idx]
-        
+
         # reinitialize active tracks if there are none currently active
         if not self.has_active_tracks():
             if len(curr_layer):
                 self.initialize_tracks(layer_idx)
             return
-        
+
         fc = layer_idx
         pred, pairs = [], []
-        
+
         # gather predictions from track heads
         for t in self.active_tracks:
             pred.append((t.track_id, t.predict_next_box()))
@@ -284,14 +284,14 @@ class ObjectTrackManager:
         # sort the list of pairs by euclidean distance
         sortkey = lambda s: s[2]
         pairs = sorted(pairs, key=sortkey)
-        
+
         # number of pairs visited
         pc = 0
         # number of active tracks
         tc = len(self.active_tracks)
         # number of detections in layer
         lc = len(curr_layer)
-        
+
         # update existing tracks with new entities
         while tc > 0 and lc > 0 and pc < len(pairs):
             elem = pairs[pc]
@@ -303,8 +303,10 @@ class ObjectTrackManager:
             # do not increment pair count for radial exclusion in case this is a new track
             if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
                 tc -= 1
+                # pc += 1
                 break
-            
+                # continue
+
             # add entity to nearest track
             T = self.global_track_store[elem[0]]
             T.add_new_step(curr_layer[elem[1]], fc)
@@ -313,12 +315,12 @@ class ObjectTrackManager:
             tc -= 1
             lc -= 1
             pc += 1
-        
+
         # create new tracks from unmatched entities
         if lc > 0:
             while lc > 0 and pc < len(pairs):
                 elem = pairs[pc]
-                if curr_layer[elem[1]].parent_track != None: 
+                if curr_layer[elem[1]].parent_track != None:
                     pc += 1
                     continue
 
@@ -341,7 +343,7 @@ class ObjectTrackManager:
                 else:
                     # reap tracks which are no longer active
                     self.inactive_tracks.append(self.active_tracks.pop())
-        
+
     def export_loco_fmt(self):
         """
         Export active tracks and associated metadata to loco format
@@ -399,8 +401,8 @@ class ObjectTrackManager:
 
         track_steps = []
         for i in self.linked_tracks:
-            # steps = []
             self.get_track(i).get_loco_track(fdict=None, steps=track_steps)
+
         for st in range(len(track_steps)):
             bbox = track_steps[st]["bbox"]
             x, y, w, h = bbox
