@@ -275,7 +275,7 @@ class ObjectTrackManager:
         for t in self.active_tracks:
             pred.append((t.track_id, t.predict_next_box()))
 
-        # create list of all pairs between track heads and detections in curr layer
+        # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
                 d = MathFxns.euclidean_dist(p[1], curr_layer[c].get_center_coord())
@@ -303,9 +303,7 @@ class ObjectTrackManager:
             # do not increment pair count for radial exclusion in case this is a new track
             if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
                 tc -= 1
-                # pc += 1
                 break
-                # continue
 
             # add entity to nearest track
             T = self.global_track_store[elem[0]]
