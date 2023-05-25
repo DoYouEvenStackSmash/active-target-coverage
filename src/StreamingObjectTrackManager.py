@@ -96,7 +96,7 @@ class ObjectTrackManager:
         """
         if not self.has_active_tracks():
             return
-        off_t = self.parent_agent.get_fov_width() / 2
+        off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
 
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]

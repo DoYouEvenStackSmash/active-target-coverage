@@ -164,14 +164,14 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(50, 100), (300,600)]#, 100), (50, 100)]
+    origins = [(50, 100), (300, 600)]  # , 100), (50, 100)]
     # origins.reverse()
     destinations = [(400, 600), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []
     vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], -1, 45))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-    vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1],-1,-35))
+    vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1], -1, -35))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
     n = 15
     paths = []
@@ -190,7 +190,7 @@ def path_handler(screen):
     #         path_1.append(pt)
     # paths = [path_1]
     print(paths)
-    
+
     # paths[1].reverse()
     colors = [pafn.colors["green"], pafn.colors["red"], pafn.colors["cyan"]]
     environment = Environment()

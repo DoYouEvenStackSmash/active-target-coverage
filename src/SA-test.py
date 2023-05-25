@@ -452,6 +452,9 @@ def repeatable_multiagent_test(screen, environment):
         for i in range(1, len(translation_path)):
             pt = translation_path[i]
             pafn.clear_frame(screen)
+            for p in translation_path[:i]:
+                pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
+            # pafn.clear_frame(screen)
 
             # pygame.display.update()
             # print(pt)
@@ -459,20 +462,9 @@ def repeatable_multiagent_test(screen, environment):
             for _id in environment.agents:
                 agent = environment.agents[_id]
                 pred_rotation = agent.exoskeleton.get_relative_rotation(pt)
-                agent_update(agent)
-                # est_rotation, est_translation = None, None
-                # est_rotation, est_translation = agent.estimate_pose_update()
+                r,t = agent.tracker_query()
+                agent.reposition(r,t)
 
-                # if est_rotation != None and agent.ALLOW_ROTATION:
-                #     rotation = 0
-                #     rotation = agent.apply_rotation_to_agent(est_rotation)
-                #     agent.obj_tracker.add_angular_displacement(0, -est_rotation)
-                #     agent.exoskeleton.rel_theta += rotation
-
-                # if est_translation != None and agent.ALLOW_TRANSLATION:
-                #     translation = 0
-                #     translation = agent.apply_translation_to_agent(est_translation)
-                #     agent.obj_tracker.add_linear_displacement(-translation, 0)
 
                 curr_pt, pred_pt = agent.estimate_next_detection()
                 # # environment.agents[_id] = sensing_agent
