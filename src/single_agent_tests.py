@@ -127,7 +127,8 @@ def single_agent_mouse_test(screen, sensing_agent, environment):
             pafn.clear_frame(screen)
 
             # agent_update(sensing_agent)
-            sensing_agent.pose_update()
+            r, t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, t)
 
             curr_pt, pred_pt = sensing_agent.estimate_next_detection()
 

@@ -1,3 +1,5 @@
+namespace LOCO;
+
 table Category {
   id:int;
   name:string;
@@ -37,6 +39,7 @@ table Annotation {
   vid_id:int;
   track_color:[int];
   displaced:bool;
+  error:float;
   state_id:int;
 }
 
@@ -44,6 +47,11 @@ table State {
   position:[float];
   orientation:float;
   time_stamp:int;
+}
+
+table SensorParameters {
+  fov_radius:int;
+  fov_width:float;
 }
 
 table TopLoco {
@@ -54,5 +62,6 @@ table TopLoco {
   images:[Image];
   annotations:[Annotation];
   states:[State];
+  sensor_params:SensorParameters;
 }
 root_type TopLoco;

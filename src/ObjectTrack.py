@@ -20,14 +20,17 @@ class ObjectTrack:
         self.color = rand_color()
         self.last_frame = -1
         self.class_id = class_id  # track classification for use with an Object Detector
+        self.error_over_time = []
 
-    def add_new_step(self, yb, frame_id):
+    def add_new_step(self, yb, frame_id, error=-1):
         """
         Add a new bounding box to the object track
         """
         # update velocity
         if len(self.path) > 0:
             self.update_track_vector(yb.get_center_coord())
+
+        self.error_over_time.append(error)
 
         self.last_frame = frame_id
         yb.parent_track = self.track_id
@@ -175,7 +178,7 @@ class ObjectTrack:
                     "vid_id":0
                     }
         """
-        for yb in self.path:
+        for i, yb in enumerate(self.path):
             fid = None
             # if fdict != None:
             #   fid = fdict[f'{yb.img_filename[:-3]}png']
@@ -194,6 +197,7 @@ class ObjectTrack:
                     "vid_id": 0,
                     "track_color": self.color,
                     "displaced": yb.displaced,
+                    "error": self.error_over_time[i],
                     "state_id": fid,
                 }
             )
