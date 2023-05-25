@@ -54,7 +54,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 4 * np.pi / 5
+    sensor.fov_width = 3 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []

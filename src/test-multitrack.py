@@ -25,32 +25,6 @@ def adjust_angle(theta):
     return theta
 
 
-def agent_update(sensing_agent):
-    """
-    Updates the pose of a single agent
-    """
-    est_rotation, est_translation = sensing_agent.estimate_pose_update()
-
-    if est_rotation != None and sensing_agent.ALLOW_ROTATION:
-        # if est_rotation > np.pi or est_rotation < -np.pi:
-        #     print("rotation OOB")
-        rotation = sensing_agent.apply_rotation_to_agent(est_rotation)
-        direction = 1 if est_rotation > 0 else -1
-        # print(f"sensing_agent theta: {sensing_agent.exoskeleton.rel_theta}")
-        sensing_agent.exoskeleton.rel_theta += rotation
-        if sensing_agent.exoskeleton.rel_theta < -np.pi:
-            sensing_agent.exoskeleton.rel_theta = (
-                2 * np.pi + sensing_agent.exoskeleton.rel_theta
-            )
-        if sensing_agent.exoskeleton.rel_theta > np.pi:
-            sensing_agent.exoskeleton.rel_theta = (
-                -2 * np.pi + sensing_agent.exoskeleton.rel_theta
-            )
-        sensing_agent.obj_tracker.add_angular_displacement(0, -est_rotation, direction)
-    if est_translation != None and sensing_agent.ALLOW_TRANSLATION:
-        translation = sensing_agent.apply_translation_to_agent(est_translation)
-        sensing_agent.obj_tracker.add_linear_displacement(-translation, 0)
-
 
 def import_agent_record(screen, agent_record):
     """
@@ -125,7 +99,8 @@ def multitrack(screen, environment, paths, colors, n=10):
             sensing_agent = environment.agents[k]
             # agent_update(sensing_agent)
             # draw_sensing_agent(screen, environment.agents[k])
-            if sensing_agent.obj_tracker.active_tracks == None:
+            if sensing_agent.obj_tracker.active_tracks == None or len(sensing_agent.obj_tracker.active_tracks) == 0:
+                print("no active tracks")
                 continue
             for t in range(len(sensing_agent.obj_tracker.active_tracks)):
                 curr_pt, pred_pt = sensing_agent.estimate_next_detection(t)
@@ -137,9 +112,8 @@ def multitrack(screen, environment, paths, colors, n=10):
                         screen, (curr_pt, pred_pt), pafn.colors["white"]
                     )
         for j, t in enumerate(environment.targets):
-            print(i)
             t.origin = paths[j][i]
-            # pafn.frame_draw_dot(screen, paths[j][i-1], colors[j])
+            pafn.frame_draw_dot(screen, paths[j][i], colors[j])
         environment.visible_targets()
         pygame.display.update()
         time.sleep(0.2)
@@ -184,11 +158,11 @@ def path_handler(screen):
             pts.append(gfn.lerp(l1[j], l2[j], step * j))
         pts.append(l2[-1])
         paths.append(pts)
-    # path_1 = []
-    # for p in paths:
-    #     for pt in p:
-    #         path_1.append(pt)
-    # paths = [path_1]
+    path_1 = []
+    for p in paths:
+        for pt in p:
+            path_1.append(pt)
+    paths = [path_1]
     print(paths)
 
     # paths[1].reverse()
@@ -215,7 +189,7 @@ def path_handler(screen):
         render_path(screen, path, colors[i])
     pygame.display.update()
 
-    multitrack(screen, environment, paths, colors, 30)
+    multitrack(screen, environment, paths, colors, 29)
 
     time.sleep(10)
     sys.exit()
@@ -244,7 +218,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 1 * np.pi / 5
+    sensor.fov_width = 5 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
