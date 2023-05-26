@@ -186,9 +186,10 @@ class ObjectTrack:
         estimated_detection = self.estimate_next_position()
         # self.add_new_prediction()
         predicted_posn = self.predict_next_position()
-        # predicted_posn = None
+        predicted_posn = None
         if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
             return predicted_posn
+        
         if predicted_posn != None:
             # estimated_detection = predicted_posn
             ed2 = gfn.get_midpoint(estimated_detection, predicted_posn)

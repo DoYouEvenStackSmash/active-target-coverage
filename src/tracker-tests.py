@@ -124,13 +124,15 @@ def constant_angular_test(screen, path, environment):
             sensing_agent = environment.agents[k]
             # est = sensing_agent.add_predictions()
             
-            est = sensing_agent.obj_tracker.add_predictions()
-            r, tr = sensing_agent.tracker_query()
-            sensing_agent.reposition(r, tr)
             
-            for L in range(0):
+
+            
+            for L in range(2):
                 if i % 2:
                     break
+                r, tr = sensing_agent.tracker_query()
+                sensing_agent.reposition(r, tr)
+                continue
                 
                 
                 print(est)
@@ -154,7 +156,7 @@ def constant_angular_test(screen, path, environment):
 
             # pygame.display.update()
                   # time.sleep(0.06)
-
+            # est = sensing_agent.obj_tracker.add_predictions()
             draw_sensing_agent(screen, sensing_agent)
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
@@ -164,7 +166,7 @@ def constant_angular_test(screen, path, environment):
         pygame.display.update()
         if i < 5 or not i % 4:
           environment.visible_targets()
-        time.sleep(0.101)
+        time.sleep(0.01)
 
     while 1:
         for event in pygame.event.get():
