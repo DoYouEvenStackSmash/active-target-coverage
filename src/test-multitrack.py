@@ -127,7 +127,7 @@ def get_lerp(origin, p):
 
 
 def multitrack(screen, environment, paths, colors, n=10):
-    n = len(paths[0]) + len(paths[1])
+    n = min(len(paths[0]),len(paths[1]))
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
     # curr_pts = []

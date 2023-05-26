@@ -6,14 +6,24 @@ class Polygon:
     """
     2D Polygon object, made up by an ordered list of points
     Internally represented as a doubly connected edge list
+
+    Args:
+        _id (Any): Unique identifier of the polygon
+        data_structure (Doubly Connected edge list): Implementation representation
+        of the polygon attributes
+
+        color: color of the polygon for rendering
+        v_color: vertex color of the polygon for rendering
+        e_color: edge color of the polygon for rendering
     """
 
-    def __init__(self, point_list=[]):
+    def __init__(self, point_list=None):
         """
         Initialize polygon object from a set of points
         """
         self._id = None
         self.data_structure = DoublyConnectedEdgeList()
+        point_list = point_list if point_list != None else []
         self.init_face(point_list)
         self.color = None
         self.v_color = None
