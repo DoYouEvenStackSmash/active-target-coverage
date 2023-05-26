@@ -127,7 +127,7 @@ def get_lerp(origin, p):
 
 
 def multitrack(screen, environment, paths, colors, n=10):
-    n = min(len(paths[0]),len(paths[1]))
+    n = min(len(paths[0]), len(paths[1]))
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
     # curr_pts = []
@@ -143,7 +143,7 @@ def multitrack(screen, environment, paths, colors, n=10):
             sensing_agent = environment.agents[k]
 
             # # agent_update(sensing_agent)
-            
+
             if (
                 sensing_agent.obj_tracker.active_tracks == None
                 or len(sensing_agent.obj_tracker.active_tracks) == 0
@@ -160,11 +160,11 @@ def multitrack(screen, environment, paths, colors, n=10):
                     # print(yb.bbox)
                     x, y, w, h = yb.bbox
                     pred_pt = (x, y)
-                    
+
                     curr_pt = pred_pt
-                    
+
                     pred_pt = sensing_agent.transform_from_local_coord(x, y)
-                    
+
                     est_pts.append(pred_pt)
 
                     pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
@@ -172,7 +172,7 @@ def multitrack(screen, environment, paths, colors, n=10):
                     pafn.frame_draw_line(
                         screen, (curr_pt, pred_pt), pafn.colors["white"]
                     )
-                    
+
                     pygame.display.update()
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
@@ -210,7 +210,7 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(70, 100), (150,150)]  # , (300, 600)]  # , 100), (50, 100)]
+    origins = [(70, 100), (150, 150)]  # , (300, 600)]  # , 100), (50, 100)]
     # origins.reverse()
     destinations = [(850, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []

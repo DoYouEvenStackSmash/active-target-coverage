@@ -1,5 +1,5 @@
 class Target:
-    """ A class which models a Target which may or may not be covered
+    """A class which models a Target which may or may not be covered
 
     Attributes:
         origin (List[float]): global origin of the target with respect to world frame
@@ -7,11 +7,12 @@ class Target:
         _id (Any): unique identifier for the target
 
     """
+
     def __init__(
         self,
-        origin, 
-        color=None,  
-        _id=0,  
+        origin,
+        color=None,
+        _id=0,
     ):
         self.origin = origin
         self.color = color

@@ -58,15 +58,15 @@ def draw_coordinate_frame(screen, sensor, levels=5):
     """
     coord_frame = sensor.get_visible_fov(levels)
     detect_frame = sensor.get_detectable_bounds(levels)
-    
-    if OUTLINE: # draw skeletal outline only
+
+    if OUTLINE:  # draw skeletal outline only
         for i in range(1, len(coord_frame[-1])):
             pafn.frame_draw_line(
                 screen,
                 (coord_frame[-1][i - 1], coord_frame[-1][i]),
                 pafn.colors["black"],
             )
-    else: # draw full sensor field of view
+    else:  # draw full sensor field of view
         for c in range(levels):
             for i in range(1, len(coord_frame[c])):
                 pafn.frame_draw_line(
@@ -78,7 +78,7 @@ def draw_coordinate_frame(screen, sensor, levels=5):
             pafn.frame_draw_line(
                 screen, (sensor.get_origin(), endpoint), pafn.colors["dimgray"]
             )
-    
+
     # draw threshold regions
     for endpoint in detect_frame[-1][:2]:
         pafn.frame_draw_line(
@@ -120,7 +120,7 @@ def draw_all_links(screen, link, color=None):
     points = link.get_points()
     pafn.frame_draw_filled_polygon(screen, points, color)
     pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
-    pafn.frame_draw_dot(screen, link.get_center(), pafn.colors['white'])
+    pafn.frame_draw_dot(screen, link.get_center(), pafn.colors["white"])
 
 
 def draw_rigid_body(screen, rigid_body):

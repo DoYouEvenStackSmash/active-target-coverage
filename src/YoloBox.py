@@ -8,7 +8,7 @@ import numpy as np
 
 
 class YoloBox:
-    """ A class representing a single detection in Yolo format
+    """A class representing a single detection in Yolo format
     Attributes:
         class_id(int)  : index of class in obj.data
         bbox  (List[float]): bounding box [centerx, centery, width, height]. assumes uniform dataset

@@ -30,9 +30,10 @@ class Sensor:
         sensor_width (float): horizontal field of view of the sensor
         _id (Any): unique identifier for the sensor
     """
+
     def __init__(
         self,
-        parent_agent,  
+        parent_agent,
         sensor_radius=300,
         sensor_width=np.pi / 4,
         _id=None,

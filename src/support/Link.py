@@ -23,13 +23,14 @@ class Link:
         rigid_body (Polygon): Abstraction containing geometric representation 
         of a link
     """
+
     def __init__(
         self,
         point_set=None,
-        endpoint=(0, 0),  # 
-        _prev=None,  # 
-        _next=None,  # 
-        theta=0,  # 
+        endpoint=(0, 0),  #
+        _prev=None,  #
+        _next=None,  #
+        theta=0,  #
         rigid_body=None,  # rigid body of the link
     ):
         self.point_set = point_set if point_set != None else []

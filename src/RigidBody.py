@@ -67,7 +67,6 @@ class RigidBody:
         self.time_stamp = time_stamp
         self.states = states if states is not None else []
 
-
     def heartbeat(self):
         """
         Internal heartbeat. Records a new state.
