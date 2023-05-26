@@ -85,12 +85,53 @@ def render_path(screen, path, color):
         pafn.frame_draw_bold_line(screen, (path[i - 1], path[i]), color)
 
 
+def get_lerp(origin, p):
+    segment = 8
+    pts = []
+    if segment > 0:
+        spts = []
+        pts = []
+        ev = []
+        l1_pts = []
+        l2_pts = []
+
+        seg_step = 1 / segment
+        # break origin-target segment into regions
+        for i in range(segment):
+            spts.append(gfn.lerp(origin, p, i * seg_step))
+        spts.append(p)
+
+        # get equilateral vertex of each segment
+        sign = 1
+        for i in range(len(spts) - 1):
+            ev.append(gfn.get_equilateral_vertex(spts[i], spts[i + 1], sign))
+            sign = sign * -1
+
+        # calculate lerp points
+        n = 20
+        step = 1 / n
+        print(len(spts))
+        for sp in range(len(spts) - 1):
+            for i in range(n):
+                # lerp between origin and equilateral vertex
+                l1 = gfn.lerp(spts[sp], ev[sp], step * i)
+                # lerp between equilateral vertex and target
+                l2 = gfn.lerp(ev[sp], spts[sp + 1], step * i)
+                # lerp between lerps
+                m1 = gfn.lerp(l1, l2, step * i)
+
+                l1_pts.append(l1)
+                l2_pts.append(l2)
+                pts.append(m1)
+    return pts
+
+
 def multitrack(screen, environment, paths, colors, n=10):
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
     curr_pts = []
     pred_pts = []
-    for i in range(n):
+    for i in range(2, n):
         pafn.clear_frame(screen)
 
         for p in range(len(paths)):
@@ -127,7 +168,7 @@ def multitrack(screen, environment, paths, colors, n=10):
             pafn.frame_draw_dot(screen, paths[j][i], colors[j])
         environment.visible_targets()
         pygame.display.update()
-        time.sleep(0.2)
+        time.sleep(0.01)
     pafn.clear_frame(screen)
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
@@ -149,16 +190,16 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(50, 100), (300, 600)]  # , 100), (50, 100)]
+    origins = [(50, 100)]  # , (300, 600)]  # , 100), (50, 100)]
     # origins.reverse()
-    destinations = [(400, 600), (950, 450), (100, 600), (700, 700), (700, 450)]
+    destinations = [(450, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []
     vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], -1, 45))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-    vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1], -1, -35))
+    # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1], -1, -65))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-    n = 15
+    n = 35
     paths = []
     for i in range(len(vertices)):
         l1 = gfn.lerp_list(origins[i], vertices[i], n)
@@ -174,6 +215,7 @@ def path_handler(screen):
         for pt in p:
             path_1.append(pt)
     paths = [path_1]
+    paths[0] = get_lerp(origins[0], destinations[0])
     print(paths)
 
     # paths[1].reverse()
@@ -187,7 +229,7 @@ def path_handler(screen):
     sensing_agent.ALLOW_ROTATION = True
     # theta, r = mfn.car2pol(origins[1], destinations[1])
     sensing_agent.centered_sensor.fov_radius = 400
-    sensing_agent.centered_sensor.fov_width = 2 * np.pi / 5
+    sensing_agent.centered_sensor.fov_width = 3 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
     for i in range(1):
@@ -200,7 +242,7 @@ def path_handler(screen):
         render_path(screen, path, colors[i])
     pygame.display.update()
 
-    multitrack(screen, environment, paths, colors, 29)
+    multitrack(screen, environment, paths, colors, 180)
 
     time.sleep(10)
     sys.exit()
