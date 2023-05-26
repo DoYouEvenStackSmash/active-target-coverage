@@ -67,11 +67,12 @@ class ObjectTrack:
         # consider acceleration in estimate
 
         last_change_in_distance = self.delta_v[-1]
-        print(last_change_in_distance)
+        # print(last_change_in_distance)
         if last_change_in_distance != 0:
             distance = last_distance * last_change_in_distance
         else:
             distance = last_distance
+
         #   r = r * abs(self.delta_v[-1])
 
         new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])

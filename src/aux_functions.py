@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import cv2
 import numpy as np
+
 # import magic
 import re
 

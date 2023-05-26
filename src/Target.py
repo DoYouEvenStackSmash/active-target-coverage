@@ -8,6 +8,7 @@ class Target:
         self.origin = origin
         self.color = color
         self._id = _id
+        # self.path = []
 
     def reposition(self, destination):
         """
