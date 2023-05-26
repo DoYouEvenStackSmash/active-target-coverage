@@ -39,7 +39,7 @@ class ObjectTrackManager:
         "avg_tolerance": 10,
         "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 80,
+        "radial_exclusion": 100,
     }
     display_constants = {"trail_len": 0}
 
@@ -96,7 +96,7 @@ class ObjectTrackManager:
         """
         if not self.has_active_tracks():
             return
-        off_t = self.parent_agent.get_fov_width() / 2
+        off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
 
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
@@ -104,9 +104,6 @@ class ObjectTrackManager:
 
             ratio = angle / self.parent_agent.get_fov_width()
             disp = ratio * 100
-
-            # off_t = np.pi / 2 + angle
-            # off_t = disp / 100 * self.parent_agent.get_fov_width()
 
             orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
 
@@ -264,6 +261,7 @@ class ObjectTrackManager:
             return
 
         curr_layer = self.layers[layer_idx]
+
         # reinitialize active tracks if there are none currently active
         if not self.has_active_tracks():
             if len(curr_layer):
@@ -277,7 +275,7 @@ class ObjectTrackManager:
         for t in self.active_tracks:
             pred.append((t.track_id, t.predict_next_box()))
 
-        # create list of all pairs between track heads and detections in curr layer
+        # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
                 d = MathFxns.euclidean_dist(p[1], curr_layer[c].get_center_coord())
@@ -286,7 +284,13 @@ class ObjectTrackManager:
         # sort the list of pairs by euclidean distance
         sortkey = lambda s: s[2]
         pairs = sorted(pairs, key=sortkey)
-        pc, tc, lc = 0, len(self.active_tracks), len(curr_layer)
+
+        # number of pairs visited
+        pc = 0
+        # number of active tracks
+        tc = len(self.active_tracks)
+        # number of detections in layer
+        lc = len(curr_layer)
 
         # update existing tracks with new entities
         while tc > 0 and lc > 0 and pc < len(pairs):
@@ -296,10 +300,10 @@ class ObjectTrackManager:
                 continue
 
             # Gate check for global nearest neighbors
+            # do not increment pair count for radial exclusion in case this is a new track
             if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
                 tc -= 1
-                pc += 1
-                continue
+                break
 
             # add entity to nearest track
             T = self.global_track_store[elem[0]]
@@ -395,8 +399,8 @@ class ObjectTrackManager:
 
         track_steps = []
         for i in self.linked_tracks:
-            # steps = []
             self.get_track(i).get_loco_track(fdict=None, steps=track_steps)
+
         for st in range(len(track_steps)):
             bbox = track_steps[st]["bbox"]
             x, y, w, h = bbox

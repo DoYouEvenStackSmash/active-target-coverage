@@ -66,6 +66,46 @@ class SensingAgent:
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
 
+    def tracker_query(self):
+        """
+        Wrapper function for querying the tracker
+        Returns a tuple of the estimated rotation and translation to track target
+        """
+        est_rotation, est_translation = self.estimate_pose_update()
+        return (est_rotation, est_translation)
+
+    def reposition(self, est_rotation=None, est_translation=None):
+        """
+        Wrapper function to trigger a pose update for target coverage
+        Returns a tuple of the expected rotation and translation
+        """
+        rotation, translation = 0, 0
+
+        # perform rotation
+        if est_rotation != None:
+            rotation = self.apply_rotation_to_agent(est_rotation)
+
+        # perform translation
+        if est_translation != None:
+            translation = self.apply_translation_to_agent(est_translation)
+
+        # update tracker
+        self.tracker_update(rotation, translation)
+
+        return (rotation, translation)
+
+    def tracker_update(self, body_rotation=0, body_translation=0):
+        """
+        Wrapper function for triggering an update to the active tracks
+        Does not return
+        """
+        if body_rotation != 0:
+            direction = 1 if body_rotation > 0 else -1
+            self.obj_tracker.add_angular_displacement(0, -body_rotation, direction)
+
+        if body_translation != 0:
+            self.obj_tracker.add_linear_displacement(-body_translation, 0)
+
     def heartbeat(self):
         """
         Exoskeleton heartbeat
@@ -166,7 +206,12 @@ class SensingAgent:
             return 0
 
         rotation = self.exoskeleton.apply_rotation_to_body(rotation)
-        # self.exoskeleton.rel_theta += rotation
+        # update rotation of agent
+        self.exoskeleton.rel_theta += rotation
+        if self.exoskeleton.rel_theta < -np.pi:
+            self.exoskeleton.rel_theta = 2 * np.pi + self.exoskeleton.rel_theta
+        if self.exoskeleton.rel_theta > np.pi:
+            self.exoskeleton.rel_theta = -2 * np.pi + self.exoskeleton.rel_theta
         return rotation
 
     def apply_translation_to_agent(self, translation_dist):
