@@ -127,11 +127,12 @@ def get_lerp(origin, p):
 
 
 def multitrack(screen, environment, paths, colors, n=10):
+    n = len(paths[0])
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
-    curr_pts = []
+    # curr_pts = []
     pred_pts = []
-    for i in range(2, n):
+    for i in range(0,n):
         pafn.clear_frame(screen)
 
         for p in range(len(paths)):
@@ -139,36 +140,60 @@ def multitrack(screen, environment, paths, colors, n=10):
 
         for k in environment.agents:
             sensing_agent = environment.agents[k]
-            r, t = sensing_agent.tracker_query()
-            sensing_agent.reposition(r, t)
-            # agent_update(sensing_agent)
-            draw_sensing_agent(screen, environment.agents[k])
+
+            # # agent_update(sensing_agent)
+            # draw_sensing_agent(screen, environment.agents[k])
             if (
                 sensing_agent.obj_tracker.active_tracks == None
                 or len(sensing_agent.obj_tracker.active_tracks) == 0
             ):
                 print("no active tracks")
                 continue
-            for t in range(len(sensing_agent.obj_tracker.active_tracks)):
-                curr_pt, pred_pt = sensing_agent.estimate_next_detection(t)
-                if len(pred_pt):
-                    curr_pts.append(curr_pt)
-                    pred_pts.append(pred_pt)
-                    print((curr_pt, pred_pt))
-                    for i in range(len(curr_pts)):
-                        pred_pt = pred_pts[i]
-                        curr_pt = curr_pts[i]
-                        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-                        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-                        pafn.frame_draw_line(
-                            screen, (curr_pt, pred_pt), pafn.colors["white"]
-                        )
-        for j, t in enumerate(environment.targets):
-            t.origin = paths[j][i]
-            pafn.frame_draw_dot(screen, paths[j][i], colors[j])
-        environment.visible_targets()
+            for L in range(1):
+                # if i % 2:
+                #     break
+                est = sensing_agent.obj_tracker.add_predictions()
+                # print(est)
+                for yb in est:
+                    # print(yb.bbox)
+                    x, y, w, h = yb.bbox
+                    pred_pt = (x, y)
+                    # curr_pt, pred_pt = sensing_agent.estimate_next_detection(t)
+                    # pred_pt = sensing_agent.obj_tracker.active_tracks[t].add_new_prediction()
+
+                    curr_pt = pred_pt
+                    # if pred_pt != None and len(pred_pt):
+                    pred_pt = sensing_agent.transform_from_local_coord(
+                        x, y
+                    )
+                    #     curr_pts.append(curr_pt)
+                    #     pred_pts.append(pred_pt)
+                    # # print((curr_pt, pred_pt))
+                    # for K in range(len(pred_pts)):
+                    # pred_pt = pred_pts[K]
+                    # curr_pt = curr_pts[K]
+                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                    pafn.frame_draw_line(
+                        screen, (curr_pt, pred_pt), pafn.colors["white"]
+                    )
+                    # r, t = sensing_agent.tracker_query()
+                    # sensing_agent.reposition(r, t)
+                    pygame.display.update()
+            r, tr = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, tr)
+            draw_sensing_agent(screen, environment.agents[k])
+        for prpt in pred_pts:
+            pafn.frame_draw_dot(screen, prpt, pafn.colors["cyan"])
+            
+        if True or i < 4 or not i % 7:
+            for j, t in enumerate(environment.targets):
+                t.origin = paths[j][i]
+                pred_pts.append(paths[j][i])        
+            environment.visible_targets()
         pygame.display.update()
-        time.sleep(0.01)
+        time.sleep(0.05)
+
     pafn.clear_frame(screen)
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
@@ -190,16 +215,16 @@ def path_handler(screen):
     min_x, min_y = 50, 50
     max_x, max_y = 700, 700
     # origins = [(100,50)]#, (50,50)]#, (50,100)]
-    origins = [(50, 100)]  # , (300, 600)]  # , 100), (50, 100)]
+    origins = [(70, 100)]  # (100,100)]  # , (300, 600)]  # , 100), (50, 100)]
     # origins.reverse()
-    destinations = [(450, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
+    destinations = [(850, 700), (950, 450), (100, 600), (700, 700), (700, 450)]
     vertices = []
-    vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], -1, 45))
+    vertices.append(gfn.get_isosceles_vertex(origins[0], destinations[0], 1, 35))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1], -1, -65))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
-    n = 35
+    n = 170
     paths = []
     for i in range(len(vertices)):
         l1 = gfn.lerp_list(origins[i], vertices[i], n)
@@ -215,8 +240,10 @@ def path_handler(screen):
         for pt in p:
             path_1.append(pt)
     paths = [path_1]
-    paths[0] = get_lerp(origins[0], destinations[0])
-    print(paths)
+    # paths = []
+    # paths.append(get_lerp(origins[0], destinations[0]))
+    # print(paths)
+    # paths = [paths[0]]
 
     # paths[1].reverse()
     colors = [pafn.colors["green"], pafn.colors["red"], pafn.colors["cyan"]]
@@ -228,7 +255,7 @@ def path_handler(screen):
     sensing_agent.ALLOW_TRANSLATION = True
     sensing_agent.ALLOW_ROTATION = True
     # theta, r = mfn.car2pol(origins[1], destinations[1])
-    sensing_agent.centered_sensor.fov_radius = 400
+    sensing_agent.centered_sensor.fov_radius = 300
     sensing_agent.centered_sensor.fov_width = 3 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 

@@ -4,6 +4,17 @@ from aux_functions import *
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+import sys
+
+
+def adjust_angle(theta):
+    """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
+    if theta > np.pi:
+        theta = theta + -2 * np.pi
+    elif theta < -np.pi:
+        theta = theta + 2 * np.pi
+
+    return theta
 
 
 class ObjectTrack:
@@ -16,25 +27,68 @@ class ObjectTrack:
         ]  # change in velocity (acceleration) after adding element to the track
         self.v = [0]  # velocity between every adjacent pair of elements in the track
         self.path = []  # list of all detections in the track
+
+        self.predictions = [[]]
+        self.prediction_count = 0
+
         self.track_id = track_id  # unique identifier for the track
         self.color = rand_color()
         self.last_frame = -1
         self.class_id = class_id  # track classification for use with an Object Detector
         self.error_over_time = []
 
-    def add_new_step(self, yb, frame_id, error=-1):
+        self.detection_idx = []
+
+        self.detection_time = 1
+        self.avg_detection_time = 1
+
+        self.clock = 0
+        # self.last_update_to_delta_v = None
+        # self.last_update_to_theta = 0
+        # self.last_update_to_v = 0
+
+    def heartbeat(self):
+        """
+        Heartbeat function
+        """
+        self.clock += 1
+
+    def add_new_detection(self, yb, frame_id, error=-1):
         """
         Add a new bounding box to the object track
         """
         # update velocity
-        if len(self.path) > 0:
-            self.update_track_vector(yb.get_center_coord())
+        self.heartbeat()
 
+        self.detection_idx.append(self.clock)
+        if len(self.path) > 0:
+            self.detection_time = (
+                self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
+            )
+            self.avg_detection_time = self.detection_time / len(self.detection_idx)
+
+            # self.last_update_to_v = len(self.v)
+            # self.last_update_to_theta = len(self.theta)
+            self.update_track_vector(yb.get_center_coord())
+            # if len(self.delta_v):
+            #     self.last_update_to_delta_v = len(self.delta_v) - 1
+        # print(self.avg_detection_time)
         self.error_over_time.append(error)
 
         self.last_frame = frame_id
         yb.parent_track = self.track_id
+
         self.path.append(yb)
+        self.predictions.append([])
+
+    def add_new_prediction(self, pred):
+        """
+        Wrapper for object track adding its own prediction
+        """
+        if pred != None:
+            self.predictions[-1].append(pred)
+        self.heartbeat()
+        return pred
 
     def update_track_vector(self, pt, displacement=None):
         """
@@ -55,10 +109,11 @@ class ObjectTrack:
 
         # add recent velocity to delta_v
 
-    def predict_next_box(self, posn=None):
+    def estimate_next_position(self):
         """
         Predict next bounding box center
         """
+        # last_detection = self.detection_idx[-1]
         lx, ly = self.path[-1].get_center_coord()
         if len(self.path) == 1:
             return (lx, ly)
@@ -68,19 +123,109 @@ class ObjectTrack:
         last_distance = self.v[-1]
         distance = 0
         # consider acceleration in estimate
-
         last_change_in_distance = self.delta_v[-1]
-        # print(last_change_in_distance)
+
         if last_change_in_distance != 0:
             distance = last_distance * last_change_in_distance
         else:
             distance = last_distance
 
-        #   r = r * abs(self.delta_v[-1])
-
         new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
 
         return new_posn
+
+    def predict_next_position(self):
+        """
+        Prediction for the next position by scaled theta and velocity, constant acceleration
+        """
+        # Need at least two detections to make a prediction
+        if len(self.detection_idx) < 2:
+            return None
+
+        time_since_detection = max(1, self.clock - self.detection_idx[-1])
+        scaling_factor = min(1, time_since_detection / self.avg_detection_time)
+        print(f"time: {time_since_detection}\tavg: {self.avg_detection_time}")
+
+        lx, ly = self.path[-1].get_center_coord()
+
+        if len(self.predictions[-1]) != 0:
+            lx, ly, w, h = self.predictions[-1][-1].bbox
+
+            time_since_detection = 1
+        # else:
+        # return None
+
+        # if posn:
+        #     lx, ly = pos
+        scaled_last_distance = self.v[-1] * scaling_factor
+        distance = 0
+        # consider acceleration in estimate
+        last_change_in_distance = self.delta_v[-1]
+        if last_change_in_distance > 1:
+            last_change_in_distance = 1
+        if last_change_in_distance != 0:
+            distance = scaled_last_distance * last_change_in_distance
+        else:
+            distance = scaled_last_distance
+        # distance = distance * scaling_factor
+        # print(self.predictions)
+        # print(self.detection_idx)
+
+        # sys.exit()
+        # scaled_last_theta, r = mfn.car2pol(self.path[-1].get_center_coord(), (lx,ly))
+        scaled_last_theta = self.theta[
+            -1
+        ]  # adjust_angle((self.theta[-1]/self.avg_detection_time) + self.theta[-1])#adjust_angle(self.theta[-1] * scaling_factor)
+
+        predicted_posn = mfn.pol2car((lx, ly), distance, scaled_last_theta)
+        return predicted_posn
+
+    def predict_next_detection(self):
+        print(self.clock)
+        """
+        wrapper for estimating next bounding box center
+        """
+        estimated_detection = self.estimate_next_position()
+        # self.add_new_prediction()
+        predicted_posn = self.predict_next_position()
+        predicted_posn = None
+        if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
+            return predicted_posn
+        if predicted_posn != None:
+            # estimated_detection = predicted_posn
+            ed2 = gfn.get_midpoint(estimated_detection, predicted_posn)
+            estimated_detection = gfn.get_midpoint(estimated_detection, ed2)
+
+        return estimated_detection
+
+    # def predict_next_detection(self, posn=None):
+    #     """
+    #     Predict next bounding box center
+    #     """
+    #     # last_detection = self.detection_idx[-1]
+    #     lx, ly = self.path[-1].get_center_coord()
+    #     if len(self.path) == 1:
+    #         return (lx, ly)
+
+    #     # if posn:
+    #     #     lx, ly = pos
+    #     last_distance = self.v[-1]
+    #     distance = 0
+    #     # consider acceleration in estimate
+    #     last_change_in_distance = 0
+    #     if self.last_update_to_delta_v != None:
+    #         last_change_in_distance = self.delta_v[-1]
+
+    #     if last_change_in_distance != 0:
+    #         distance = last_distance * last_change_in_distance
+    #     else:
+    #         distance = last_distance
+
+    #     #   r = r * abs(self.delta_v[-1])
+
+    #     new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
+
+    #     return new_posn
 
     def get_track_heading(self):
         """

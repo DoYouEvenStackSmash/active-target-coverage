@@ -16,7 +16,7 @@ for lt in linked_tracks:
     for st in steps:
         err.append(annos[st].error)
     errors.append(err)
-plt.plot(errors[1])
+plt.plot(errors[0])
 plt.show()
 
 # print(c)

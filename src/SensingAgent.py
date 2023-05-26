@@ -372,7 +372,7 @@ class SensingAgent:
             trk = self.obj_tracker.active_tracks[idx]
             trk_h = trk.get_track_heading()
             last_pt = trk.get_last_detection()
-            pred_pt = trk.predict_next_box()
+            pred_pt = trk.predict_next_detection()
 
         nd = (last_pt, pred_pt)
 

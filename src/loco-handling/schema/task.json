@@ -1,0 +1,70 @@
+{
+  "time_stamp": 1622014927,
+  "global_task_list": [
+    {
+      "agent_id": 1,
+      "tasks": [
+        {
+          "task_type": "echo",
+          "target_coverage": [
+            {
+              "class_id": 1,
+              "priority": 2
+            },
+            {
+              "class_id": 2,
+              "priority": 1
+            }
+          ],
+          "navigation_goal": [
+            {
+              "coordinate": {
+                "x": 10,
+                "y": 20,
+                "z": 5
+              },
+              "priority": 1
+            },
+            {
+              "coordinate": {
+                "x": 30,
+                "y": 40,
+                "z": 15
+              },
+              "priority": 2
+            }
+          ]
+        },
+        {
+          "task_type": "Target",
+          "target_coverage": [
+            {
+              "class_id": 3,
+              "priority": 3
+            }
+          ],
+          "navigation_goal": []
+        }
+      ]
+    },
+    {
+      "agent_id": 2,
+      "tasks": [
+        {
+          "task_type": "Nav",
+          "target_coverage": [],
+          "navigation_goal": [
+            {
+              "coordinate": {
+                "x": 50,
+                "y": 60,
+                "z": 25
+              },
+              "priority": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
