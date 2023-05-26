@@ -28,20 +28,25 @@ import time
 
 
 class Environment:
-    """
+    """ A class for simulating the environment in which the agents operate
+    Attributes:
+        Agent (Agent): legacy Agent attribute
+        Agents (List[Agent]): list of all agents present in the environment
+        Targets (List[Target]): list of all targets present in the environment
+
     Mock environment for simulating the world
     """
 
     def __init__(
         self,
         agent=None,  # single agent for backwards compatibility
-        agents={},  # dictionary of agents, accessible by their unique identifiers
-        targets=[],  # list of targets in the world
+        agents=None,  # dictionary of agents, accessible by their unique identifiers
+        targets=None,  # list of targets in the world
         counter=0,  # global counter for synchronizing "time"
     ):
         self._agent = agent
-        self.agents = agents
-        self.targets = targets
+        self.agents = agents if agents != None else {}
+        self.targets = targets if targets != None else []
         self.counter = counter
 
     def visible_targets(self):
@@ -86,6 +91,11 @@ class Environment:
         """
         Transforms a bbox from Sensor local coordinates to world coordinates
         returns a Point
+        Args:
+            x(float) : x coordinate
+            y(float) : y coordinate
+            w(float) : width of the bounding box
+            h(float) : height of the bounding box
         """
         org_theta = mfn.correct_angle(self.agent.fov_theta)
 

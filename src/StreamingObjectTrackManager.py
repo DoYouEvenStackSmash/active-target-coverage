@@ -46,38 +46,39 @@ class ObjectTrackManager:
 
     def __init__(
         self,
-        global_track_store={},  # Centralized storage for all tracks
-        inactive_tracks=[],  # list of inactive tracks
-        active_tracks=None,  # placeholder for deque of active tracks
-        img_filenames=[],  # DATA AUGMENTATION: image filenames for associating detections with images
-        annotation_list_fname="",  # input list of annotations
-        filenames=[],  # DATA AUGMENTATION: filenames for loaded detections
-        sys_paths=[],  # DATA AUGMENTATION: paths to filenames for loaded detections
-        frame_counter=0,  # PROCESSING: clock counter for tracking track lifespan
-        layers=[],  # PROCESSING: accumulator for detections by frame
-        linked_tracks=[],  # EXPORT: list of linked tracks for export
-        trackmap=[],  # EXPORT: list of identifiers for linked tracks
-        fdict={},  # EXPORT: List of filenames for associating with tracks and their detections
-        categories=CATEGORIES,  # class list for tracks and their identifiers
-        img_centers=[],  #
-        imported=False,  # flag denoting whether this is a live tracker or loading track history
-        parent_agent=None,  # placeholder for parent agent
+        global_track_store=None,  # Centralized storage for all tracks
+        inactive_tracks=None,  # List of inactive tracks
+        active_tracks=None,  # Placeholder for deque of active tracks
+        img_filenames=None,  # DATA AUGMENTATION: Image filenames for associating detections with images
+        annotation_list_fname="",  # Input list of annotations
+        filenames=None,  # DATA AUGMENTATION: Filenames for loaded detections
+        sys_paths=None,  # DATA AUGMENTATION: Paths to filenames for loaded detections
+        frame_counter=0,  # PROCESSING: Clock counter for tracking track lifespan
+        layers=None,  # PROCESSING: Accumulator for detections by frame
+        linked_tracks=None,  # EXPORT: List of linked tracks for export
+        trackmap=None,  # EXPORT: List of identifiers for linked tracks
+        fdict=None,  # EXPORT: List of filenames for associating with tracks and their detections
+        categories=None,  # Class list for tracks and their identifiers
+        img_centers=None,  #
+        imported=False,  # Flag denoting whether this is a live tracker or loading track history
+        parent_agent=None,  # Placeholder for parent agent
     ):
-        self.global_track_store = global_track_store
-        self.inactive_tracks = inactive_tracks
+        self.global_track_store = global_track_store if global_track_store is not None else {}
+        self.inactive_tracks = inactive_tracks if inactive_tracks is not None else []
         self.active_tracks = active_tracks
-        self.img_filenames = img_filenames
+        self.img_filenames = img_filenames if img_filenames is not None else []
         self.annotation_list_fname = annotation_list_fname
-        self.filenames = filenames
-        self.sys_paths = sys_paths
+        self.filenames = filenames if filenames is not None else []
+        self.sys_paths = sys_paths if sys_paths is not None else []
         self.frame_counter = frame_counter
-        self.layers = layers
-        self.linked_tracks = linked_tracks
-        self.fdict = fdict
-        self.categories = categories
-        self.img_centers = img_centers
+        self.layers = layers if layers is not None else []
+        self.linked_tracks = linked_tracks if linked_tracks is not None else []
+        self.fdict = fdict if fdict is not None else {}
+        self.categories = categories if categories is not None else CATEGORIES
+        self.img_centers = img_centers if img_centers is not None else []
         self.imported = imported
         self.parent_agent = parent_agent
+
 
     def add_predictions(self):
         """

@@ -8,11 +8,12 @@ import numpy as np
 
 
 class YoloBox:
-    """
-    class_id  : index of class in obj.data
-        bbox  : bounding box [centerx, centery, width, height]. assumes uniform dataset
-    img_file  : identifier for mapping bounding box to source image
-    confidence: optional confidence value from inference
+    """ A class representing a single detection in Yolo format
+    Attributes:
+        class_id(int)  : index of class in obj.data
+        bbox  (List[float]): bounding box [centerx, centery, width, height]. assumes uniform dataset
+        img_file (string) : identifier for mapping bounding box to source image
+        confidence (float): optional confidence value from inference
     """
 
     def __init__(

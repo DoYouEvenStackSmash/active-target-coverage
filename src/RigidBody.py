@@ -11,37 +11,62 @@ from State import State
 
 
 class RigidBody:
+    """A class representing a rigid body.
+
+    Attributes:
+        LINE_LEN (int): Length constant for the rigid body.
+        parent_agent: Placeholder for the parent agent of the rigid body.
+        rigid_link: Underlying Link object and implementation for transformations.
+        ref_origin (Tuple[float, float]): Global origin of the rigid body in the agent's world frame.
+        endpoint (Tuple[float, float, float]): Global coordinate of the end point in the agent's world frame.
+        ref_center (Tuple[float, float, float]): Global coordinate of the center point (central sensor) in the agent's world frame.
+        point_set (List[Any]): Placeholder for the points in the rigid body. Superseded by rigid_link.
+        rel_theta (float): Global angle theta describing where the agent is oriented in the agent's world frame.
+        color: Color for rendering agent details.
+        time_stamp (float): A float with significance to a reference clock.
+        states (List[Any]): List of rigid body states.
+    """
+
     LINE_LEN = 30
 
     def __init__(
         self,
-        parent_agent,  # placeholder for parent agent of rigid body
-        rigid_link=None,  # underlying Link object and implementation for transformations
-        ref_origin=(0, 0),  # global origin of the rigid body in the agent's world frame
-        endpoint=(
-            0,
-            0,
-        ),  # global coordinate of the end point in the agent's world frame
-        ref_center=(
-            0,
-            0,
-        ),  # global coordinate of the center point (central sensor) in the agent's world frame
-        point_set=[],  # placeholder for the points in the rigid body. Superceded by rigid_link
-        rel_theta=0,  # global angle theta describing where the agent is oriented in the agent's world frame
-        color=None,  # Color for rendering agent details
-        time_stamp=0,  # some float with significance to a reference clock
-        states=[],  # list of rigid body states
+        parent_agent,
+        rigid_link=None,
+        ref_origin=(0, 0),
+        endpoint=(0, 0, 0),
+        ref_center=(0, 0, 0),
+        point_set=None,
+        rel_theta=0,
+        color=None,
+        time_stamp=0,
+        states=None,
     ):
+        """Initializes a RigidBody instance.
+
+        Args:
+            parent_agent: Placeholder for the parent agent of the rigid body.
+            rigid_link: Underlying Link object and implementation for transformations.
+            ref_origin (Tuple[float, float]): Global origin of the rigid body in the agent's world frame.
+            endpoint (Tuple[float, float, float]): Global coordinate of the end point in the agent's world frame.
+            ref_center (Tuple[float, float, float]): Global coordinate of the center point (central sensor) in the agent's world frame.
+            point_set (List[Any], optional): Placeholder for the points in the rigid body. Superseded by rigid_link.
+            rel_theta (float, optional): Global angle theta describing where the agent is oriented in the agent's world frame. Defaults to 0.
+            color: Color for rendering agent details.
+            time_stamp (float, optional): A float with significance to a reference clock. Defaults to 0.
+            states (List[Any], optional): List of rigid body states.
+        """
         self.parent_agent = parent_agent
         self.origin = ref_origin
         self.endpoint = endpoint
         self.ref_center = ref_center
-        self.point_set = point_set
+        self.point_set = point_set if point_set is not None else []
         self.body = rigid_link
         self.rel_theta = rel_theta
-        self.color = rand_color()
+        self.color = color or rand_color()
         self.time_stamp = time_stamp
-        self.states = states
+        self.states = states if states is not None else []
+
 
     def heartbeat(self):
         """
