@@ -91,6 +91,6 @@ class StreamingAnnotations:
         Registers an annotation as a YoloBox
         """
         bbox = bbox if bbox != None else []
-        
+
         yb = YoloBox(class_id, bbox, valid_frame_name)
         return yb

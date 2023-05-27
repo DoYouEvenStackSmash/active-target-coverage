@@ -46,14 +46,14 @@ class ObjectTrack:
             track_id (int): Unique identifier for the track.
             class_id (int): Track classification for use with an Object Detector.
         """
-        self.r = 0  
-        self.theta = [0]  
-        self.delta_theta = [0] 
-        self.delta_v = [0]  
+        self.r = 0
+        self.theta = [0]
+        self.delta_theta = [0]
+        self.delta_v = [0]
         self.v = [0]
-        self.path = [] 
+        self.path = []
         self.predictions = [[]]
-        self.track_id = track_id 
+        self.track_id = track_id
         self.color = rand_color()
         self.last_frame = -1
         self.class_id = class_id
@@ -155,7 +155,6 @@ class ObjectTrack:
         time_since_detection = max(1, self.clock - self.detection_idx[-1])
         scaling_factor = min(1, time_since_detection / self.avg_detection_time)
 
-
         lx, ly = self.path[-1].get_center_coord()
 
         if len(self.predictions[-1]) != 0:
@@ -174,14 +173,11 @@ class ObjectTrack:
             distance = scaled_last_distance * last_change_in_distance
         else:
             distance = scaled_last_distance
-
-        scaled_last_theta = self.theta[
-            -1
-        ] 
+        # self.theta[-1] = adjust_angle(self.theta[-1])
+        scaled_last_theta = self.theta[-1]
 
         predicted_posn = mfn.pol2car((lx, ly), distance, scaled_last_theta)
         return predicted_posn
-
 
     def predict_next_detection(self):
         """
@@ -190,9 +186,10 @@ class ObjectTrack:
         estimated_detection = self.estimate_next_position()
         # self.add_new_prediction()
         predicted_posn = self.predict_next_position()
-        # predicted_posn = None
+        predicted_posn = None
         if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
             return predicted_posn
+        
         if predicted_posn != None:
             # estimated_detection = predicted_posn
             ed2 = gfn.get_midpoint(estimated_detection, predicted_posn)
@@ -300,7 +297,7 @@ class ObjectTrack:
                     }
         """
         steps = steps if steps != None else []
-        
+
         for i, yb in enumerate(self.path):
             fid = None
             # if fdict != None:

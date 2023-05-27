@@ -6,12 +6,12 @@ class State:
         orientation (List[float]): some vector with significance to a reference frame
         time_stamp (float): some float with significance to a reference frame
     """
-    
+
     def __init__(
         self,
-        position=None,  # 
-        orientation=None,  # 
-        time_stamp=0,  # 
+        position=None,  #
+        orientation=None,  #
+        time_stamp=0,  #
     ):
         self.position = position
         self.orientation = orientation

@@ -2,8 +2,8 @@
 import flatbuffers
 import matplotlib.pyplot as plt
 from LOCO.TopLoco import *
-
-buf = open("0_out.bin", "rb").read()
+import sys
+buf = open(sys.argv[1], "rb").read()
 buf = bytearray(buf)
 b = TopLoco.GetRootAsTopLoco(buf, 0)
 top_loco_t = TopLocoT.InitFromObj(b)

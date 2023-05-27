@@ -38,9 +38,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 1,
+        "track_lifespan": 3,
         "default_avg_dist": 10,
-        "radial_exclusion": 110,
+        "radial_exclusion": 200,
     }
     display_constants = {"trail_len": 0}
 
@@ -63,7 +63,9 @@ class ObjectTrackManager:
         imported=False,  # Flag denoting whether this is a live tracker or loading track history
         parent_agent=None,  # Placeholder for parent agent
     ):
-        self.global_track_store = global_track_store if global_track_store is not None else {}
+        self.global_track_store = (
+            global_track_store if global_track_store is not None else {}
+        )
         self.inactive_tracks = inactive_tracks if inactive_tracks is not None else []
         self.active_tracks = active_tracks
         self.img_filenames = img_filenames if img_filenames is not None else []
@@ -78,7 +80,6 @@ class ObjectTrackManager:
         self.img_centers = img_centers if img_centers is not None else []
         self.imported = imported
         self.parent_agent = parent_agent
-
 
     def add_predictions(self):
         """

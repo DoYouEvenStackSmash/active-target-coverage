@@ -28,7 +28,7 @@ import time
 
 
 class Environment:
-    """ A class for simulating the environment in which the agents operate
+    """A class for simulating the environment in which the agents operate
     Attributes:
         Agent (Agent): legacy Agent attribute
         Agents (List[Agent]): list of all agents present in the environment
