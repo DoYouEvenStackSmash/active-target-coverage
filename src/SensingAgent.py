@@ -40,29 +40,44 @@ def adjust_angle(theta):
 
 
 class SensingAgent:
-    exoskeleton: RigidBody
-    centered_sensor: Sensor
-    obj_tracker: ObjectTrackManager
-    _id: Any
-    sensors: List[Sensor]
-    rotation_flag: bool
-    translation_flag: bool
+    """A class representing a sensing agent.
+
+    Attributes:
+        exoskeleton (RigidBody): The rigid body of the agent.
+        centered_sensor (Sensor): The default sensor aligned with the axis of rotation for the agent.
+        obj_tracker (ObjectTrackManager): The agent's object tracker.
+        _id (Any): Unique identifier for the agent.
+        sensors (List[Sensor]): List of additional sensors riding on the agent.
+        rotation_flag (bool): Flag allowing the agent to rotate.
+        translation_flag (bool): Flag allowing the agent to translate.
+    """
 
     def __init__(
         self,
-        exoskeleton=None,  # rigid body of the agent
-        centered_sensor=None,  # default sensor, aligned with the axis of rotation for the agent
-        obj_tracker=None,  # agent's object tracker
-        _id=None,  # unique identifier for the agent
-        sensors=[],  # list of additional sensors riding on the agent
-        rotation_flag=True,  # flag allowing agent to rotate
-        translation_flag=True,  # flag allowing agent to translate
+        exoskeleton=None,
+        centered_sensor=None,
+        obj_tracker=None,
+        _id=None,
+        sensors=None,
+        rotation_flag=True,
+        translation_flag=True,
     ):
+        """Initializes a SensingAgent instance.
+
+        Args:
+            exoskeleton (RigidBody): The rigid body of the agent.
+            centered_sensor (Sensor): The default sensor aligned with the axis of rotation for the agent.
+            obj_tracker (ObjectTrackManager): The agent's object tracker.
+            _id (Any): Unique identifier for the agent.
+            sensors (List[Sensor]): List of additional sensors riding on the agent.
+            rotation_flag (bool): Flag allowing the agent to rotate. Defaults to True.
+            translation_flag (bool): Flag allowing the agent to translate. Defaults to True.
+        """
         self.exoskeleton = exoskeleton
         self.centered_sensor = centered_sensor
         self.obj_tracker = obj_tracker
         self._id = _id
-        self.sensors = sensors
+        self.sensors = sensors if sensors is not None else []
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
 
@@ -372,7 +387,7 @@ class SensingAgent:
             trk = self.obj_tracker.active_tracks[idx]
             trk_h = trk.get_track_heading()
             last_pt = trk.get_last_detection()
-            pred_pt = trk.predict_next_box()
+            pred_pt = trk.predict_next_detection()
 
         nd = (last_pt, pred_pt)
 

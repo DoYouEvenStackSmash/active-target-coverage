@@ -1,0 +1,38 @@
+namespace CoordinatorMessage;
+
+enum Tasklabel : byte {echo = 0, Target = 1, Nav = 2}
+
+table Coordinate {
+  x:float=0.0;
+  y:float=0.0;
+  z:float=0.0;
+}
+
+table TargetPriority {
+  class_id:int=-1;
+  priority:float=0.0;
+}
+
+table NavigationGoal {
+  coordinate:Coordinate;
+  priority:float=0.0;
+}
+
+table Task {
+  task_type:Tasklabel = echo;
+  target_coverage:[TargetPriority];
+  navigation_goal:[NavigationGoal];
+
+}
+
+table TaskList {
+  agent_id:int=-1;
+  tasks:[Task];
+}
+
+table TaskBroadcast {
+  time_stamp:int=0;
+  global_task_list:[TaskList];
+}
+
+root_type TaskBroadcast;

@@ -10,6 +10,7 @@ from aux_functions import *
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
+from OTFTrackerApi import StreamingAnnotations as sann
 
 """
   Global scope data structure for processing a set of images
@@ -37,46 +38,69 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 2,
+        "track_lifespan": 1,
         "default_avg_dist": 10,
-        "radial_exclusion": 60,
+        "radial_exclusion": 110,
     }
     display_constants = {"trail_len": 0}
 
     def __init__(
         self,
-        global_track_store={},  # Centralized storage for all tracks
-        inactive_tracks=[],  # list of inactive tracks
-        active_tracks=None,  # placeholder for deque of active tracks
-        img_filenames=[],  # DATA AUGMENTATION: image filenames for associating detections with images
-        annotation_list_fname="",  # input list of annotations
-        filenames=[],  # DATA AUGMENTATION: filenames for loaded detections
-        sys_paths=[],  # DATA AUGMENTATION: paths to filenames for loaded detections
-        frame_counter=0,  # PROCESSING: clock counter for tracking track lifespan
-        layers=[],  # PROCESSING: accumulator for detections by frame
-        linked_tracks=[],  # EXPORT: list of linked tracks for export
-        trackmap=[],  # EXPORT: list of identifiers for linked tracks
-        fdict={},  # EXPORT: List of filenames for associating with tracks and their detections
-        categories=CATEGORIES,  # class list for tracks and their identifiers
-        img_centers=[],  #
-        imported=False,  # flag denoting whether this is a live tracker or loading track history
-        parent_agent=None,  # placeholder for parent agent
+        global_track_store=None,  # Centralized storage for all tracks
+        inactive_tracks=None,  # List of inactive tracks
+        active_tracks=None,  # Placeholder for deque of active tracks
+        img_filenames=None,  # DATA AUGMENTATION: Image filenames for associating detections with images
+        annotation_list_fname="",  # Input list of annotations
+        filenames=None,  # DATA AUGMENTATION: Filenames for loaded detections
+        sys_paths=None,  # DATA AUGMENTATION: Paths to filenames for loaded detections
+        frame_counter=0,  # PROCESSING: Clock counter for tracking track lifespan
+        layers=None,  # PROCESSING: Accumulator for detections by frame
+        linked_tracks=None,  # EXPORT: List of linked tracks for export
+        trackmap=None,  # EXPORT: List of identifiers for linked tracks
+        fdict=None,  # EXPORT: List of filenames for associating with tracks and their detections
+        categories=None,  # Class list for tracks and their identifiers
+        img_centers=None,  #
+        imported=False,  # Flag denoting whether this is a live tracker or loading track history
+        parent_agent=None,  # Placeholder for parent agent
     ):
-        self.global_track_store = global_track_store
-        self.inactive_tracks = inactive_tracks
+        self.global_track_store = global_track_store if global_track_store is not None else {}
+        self.inactive_tracks = inactive_tracks if inactive_tracks is not None else []
         self.active_tracks = active_tracks
-        self.img_filenames = img_filenames
+        self.img_filenames = img_filenames if img_filenames is not None else []
         self.annotation_list_fname = annotation_list_fname
-        self.filenames = filenames
-        self.sys_paths = sys_paths
+        self.filenames = filenames if filenames is not None else []
+        self.sys_paths = sys_paths if sys_paths is not None else []
         self.frame_counter = frame_counter
-        self.layers = layers
-        self.linked_tracks = linked_tracks
-        self.fdict = fdict
-        self.categories = categories
-        self.img_centers = img_centers
+        self.layers = layers if layers is not None else []
+        self.linked_tracks = linked_tracks if linked_tracks is not None else []
+        self.fdict = fdict if fdict is not None else {}
+        self.categories = categories if categories is not None else CATEGORIES
+        self.img_centers = img_centers if img_centers is not None else []
         self.imported = imported
         self.parent_agent = parent_agent
+
+
+    def add_predictions(self):
+        """
+        Update predictionsfrom all active tracks
+        """
+        if not self.has_active_tracks():
+            return []
+        estimates = []
+        for i in range(len(self.active_tracks)):
+            trk = self.active_tracks[i]
+            pred = trk.predict_next_position()
+            if pred != None:
+                estimates.append(
+                    trk.add_new_prediction(
+                        sann.register_annotation(
+                            trk.class_id,
+                            (pred[0], pred[1], 1, 1),
+                            self.parent_agent.exoskeleton.get_age(),
+                        )
+                    )
+                )
+        return estimates
 
     def get_predictions(self):
         """
@@ -87,7 +111,9 @@ class ObjectTrackManager:
         estimates = []
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
-            estimates.append(trk.predict_next_box())
+            pred = trk.get_latest_prediction()
+            if pred != None:
+                estimates.append(pred)
         return estimates
 
     def add_angular_displacement(self, distance, angle, direction=1):
@@ -97,7 +123,7 @@ class ObjectTrackManager:
         if not self.has_active_tracks():
             return
         off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
-
+        print(f"OFFT {off_t}")
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
             last_d, last_v, delta_v, theta = trk.get_track_heading()
@@ -120,12 +146,15 @@ class ObjectTrackManager:
                 f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n"
             )
             # print(f"trk.theta: {trk.theta[-1]}\tnew_angle: {new_angle}")
+
             trk.theta[-1] = new_angle
             x, y = last_d
             print(x)
+            print(trk.predictions[-1])
             nx, ny = [last_d[0] + disp, last_d[1]]
-            # print(nx)
             trk.path[-1].bbox = [nx, ny, 1, 1]
+
+            # print(nx)
 
     def add_linear_displacement(self, distance, angle):
         """
@@ -204,7 +233,7 @@ class ObjectTrackManager:
         """
         track_id = len(self.global_track_store)
         T = ObjectTrack(track_id, entity.class_id)
-        T.add_new_step(entity, fc)
+        T.add_new_detection(entity, fc)
         self.global_track_store[track_id] = T
         self.active_tracks.append(T)
 
@@ -273,7 +302,7 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.predict_next_box()))
+            pred.append((t.track_id, t.predict_next_detection()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
@@ -307,7 +336,7 @@ class ObjectTrackManager:
 
             # add entity to nearest track
             T = self.global_track_store[elem[0]]
-            T.add_new_step(curr_layer[elem[1]], fc, elem[2])
+            T.add_new_detection(curr_layer[elem[1]], fc, elem[2])
 
             # update counters
             tc -= 1

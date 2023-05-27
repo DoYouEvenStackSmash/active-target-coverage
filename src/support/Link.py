@@ -10,17 +10,29 @@ from support.Polygon import *
 
 class Link:
     LINE_LEN = 30
+    """ A class which contains a geometric representation of a rigid body, which 
+        can be connected to other Links to form a Chain
 
+    Args:
+        point_set (List[points]): A legacy abstraction for holding the representative
+        points of a link
+        endpoint ((int, int)): endpoint of the link in a global coordinate frame
+        _prev (Link): reference to previous link for use in a chain
+        _next (Link): reference to next link for use in a chain
+        theta (float): angle of the link relative to some coordinate frame
+        rigid_body (Polygon): Abstraction containing geometric representation 
+        of a link
+    """
     def __init__(
         self,
-        point_set=[],
-        endpoint=(0, 0),  # endpoint of the link in a global coordinate frame
-        _prev=None,  # reference to previous link for use in a chain
-        _next=None,  # reference to next link for use in a chain
-        theta=0,  # angle of the link relative to some coordinate frame
+        point_set=None,
+        endpoint=(0, 0),  # 
+        _prev=None,  # 
+        _next=None,  # 
+        theta=0,  # 
         rigid_body=None,  # rigid body of the link
     ):
-        self.point_set = point_set
+        self.point_set = point_set if point_set != None else []
         self.body = rigid_body
         self.rel_theta = theta
         self.prev = _prev

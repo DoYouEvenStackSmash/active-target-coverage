@@ -1,9 +1,17 @@
 class State:
+    """A class representing state of the agent
+
+    Attributes:
+        position (List[float]): some vector with significance to a reference frame
+        orientation (List[float]): some vector with significance to a reference frame
+        time_stamp (float): some float with significance to a reference frame
+    """
+    
     def __init__(
         self,
-        position=None,  # some vector with significance to a reference frame
-        orientation=None,  # some vector with significance to a reference frame
-        time_stamp=0,  # some float with significance to a reference frame
+        position=None,  # 
+        orientation=None,  # 
+        time_stamp=0,  # 
     ):
         self.position = position
         self.orientation = orientation
