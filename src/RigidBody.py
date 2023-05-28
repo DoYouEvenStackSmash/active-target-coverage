@@ -9,6 +9,14 @@ from aux_functions import *
 import time
 from State import State
 
+def adjust_angle(theta):
+    """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
+    if theta > np.pi:
+        theta = theta + -2 * np.pi
+    elif theta < -np.pi:
+        theta = theta + 2 * np.pi
+
+    return theta
 
 class RigidBody:
     """A class representing a rigid body.
@@ -284,3 +292,22 @@ class RigidBody:
         Does not return
         """
         self.point_set = point_set
+
+    def get_horizontal_axis(self, off_t = 0):
+        """
+        Helper function for getting a horizontal line through the center of the agent
+        """
+        curr_rotation = self.get_rel_theta()
+        pos_x = [   mfn.pol2car(self.get_center(), 100, adjust_angle(curr_rotation + np.pi / 2)),
+                    mfn.pol2car(self.get_center(), 40, adjust_angle(curr_rotation - np.pi / 2))]
+        return pos_x
+        
+
+    def get_vertical_axis(self, off_t = 0):
+        """
+        Helper function for getting a vertical line through the center of the agent
+        """
+        curr_rotation = self.get_rel_theta()
+        pos_x = [   mfn.pol2car(self.get_center(), 100, curr_rotation),
+                    mfn.pol2car(self.get_center(), 40, adjust_angle(curr_rotation + np.pi))]
+        return pos_x

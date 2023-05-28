@@ -40,7 +40,7 @@ class ObjectTrackManager:
         "avg_tolerance": 10,
         "track_lifespan": 3,
         "default_avg_dist": 10,
-        "radial_exclusion": 200,
+        "radial_exclusion": 100,
     }
     display_constants = {"trail_len": 0}
 
@@ -123,10 +123,12 @@ class ObjectTrackManager:
         """
         if not self.has_active_tracks():
             return
+        angle = adjust_angle(angle)
         off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
         print(f"OFFT {off_t}")
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
+            attr = trk.path[-1].get_attributes()
             last_d, last_v, delta_v, theta = trk.get_track_heading()
 
             ratio = angle / self.parent_agent.get_fov_width()
@@ -146,15 +148,16 @@ class ObjectTrackManager:
             print(
                 f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n"
             )
-            # print(f"trk.theta: {trk.theta[-1]}\tnew_angle: {new_angle}")
 
             trk.theta[-1] = new_angle
             x, y = last_d
-            print(x)
-            print(trk.predictions[-1])
+            
             nx, ny = [last_d[0] + disp, last_d[1]]
-            trk.path[-1].bbox = [nx, ny, 1, 1]
-
+            attr.bbox = [nx, ny, 1, 1]
+            
+            if len(trk.predictions[-1]):
+                x,y,w,h = trk.predictions[-1][-1].bbox
+                trk.predictions[-1][-1].bbox = [x + disp, y, w, h]
             # print(nx)
 
     def add_linear_displacement(self, distance, angle):
@@ -165,12 +168,20 @@ class ObjectTrackManager:
             return
         for i in range(len(self.active_tracks)):
             trk = self.active_tracks[i]
-
+            attr = trk.path[-1].get_attributes()
+            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
+            
             last_d, last_v, delta_v, theta = trk.get_track_heading()
+            off_t = self.parent_agent.get_fov_width()
+
             new_posn = [last_d[0], last_d[1] + distance]
+            # new_posn = gfn.get_midpoint(prop_posn, new_posn)
 
-            trk.path[-1].bbox = [new_posn[0], new_posn[1], 1, 1]
-
+            attr.bbox = [new_posn[0], new_posn[1], 1, 1]
+            if len(trk.predictions[-1]):
+                x,y,w,h = trk.predictions[-1][-1].bbox
+                trk.predictions[-1][-1].bbox = [x, y + distance, w, h]
+    
     def init_new_layer(self):
         """
         Initialize a new empty layer
@@ -233,7 +244,8 @@ class ObjectTrackManager:
         Helper function for creating object tracks
         """
         track_id = len(self.global_track_store)
-        T = ObjectTrack(track_id, entity.class_id)
+        T = ObjectTrack(track_id, entity.attributes.class_id)
+        T.parent_agent = self.parent_agent
         T.add_new_detection(entity, fc)
         self.global_track_store[track_id] = T
         self.active_tracks.append(T)
@@ -245,7 +257,7 @@ class ObjectTrackManager:
         self.active_tracks = collections.deque()
         curr_layer = self.layers[idx]
         for elem in curr_layer:
-            self.create_new_track(elem, elem.class_id)
+            self.create_new_track(elem, idx)
 
     def close_all_tracks(self):
         """

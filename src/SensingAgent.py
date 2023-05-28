@@ -27,7 +27,7 @@ from Sensor import Sensor
 import pygame
 import time
 from typing import Any, List, Dict, Set
-
+from Detection import *
 
 def adjust_angle(theta):
     """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
@@ -119,7 +119,7 @@ class SensingAgent:
             self.obj_tracker.add_angular_displacement(0, -body_rotation, direction)
 
         if body_translation != 0:
-            self.obj_tracker.add_linear_displacement(-body_translation, 0)
+            self.obj_tracker.add_linear_displacement(-body_translation, -body_rotation)
 
     def heartbeat(self):
         """
@@ -291,9 +291,12 @@ class SensingAgent:
         detections = []
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
+
             dc = self.transform_to_local_bbox(a.get_origin())
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
-            detections.append(yb)
+            val = a.get_origin()
+            posn = Position(val[0], val[1])
+            detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
@@ -322,6 +325,16 @@ class SensingAgent:
         h = 1
 
         return [x, y, w, h]
+    
+    def transform_to_local_coord(self, target_pt):
+        """
+        transforms a target point to local rectangular coordinates
+        """
+        target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
+        r = mfn.euclidean_dist(self.get_center(), target_pt)
+        
+        local_pt = mfn.pol2car((0,0), r, target_rotation)
+        return local_pt
 
     def transform_from_local_coord(self, x, y, w=1, h=1):
         """
@@ -334,6 +347,17 @@ class SensingAgent:
         pt = mfn.pol2car(self.get_center(), r, theta)
 
         return pt
+
+    def transform_to_global_coord(self, position):
+        """
+        Transforms a position from agent local coords to world coords
+        returns a point
+        """
+        theta, r = mfn.car2pol((0,0),position.get_center_coord())
+        theta = adjust_angle(self.get_fov_theta() + theta)
+        pt = mfn.pol2car(self.get_center(), r, theta)
+        return pt
+
 
     def estimate_pose_update(self, idx=0):
         """

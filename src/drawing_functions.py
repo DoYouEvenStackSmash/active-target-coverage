@@ -132,7 +132,8 @@ def draw_rigid_body(screen, rigid_body):
     """
     draw_all_normals(screen, rigid_body)
     draw_all_links(screen, rigid_body, rigid_body.color)
-
+    pafn.frame_draw_bold_line(screen, rigid_body.get_horizontal_axis(), pafn.colors["black"])
+    pafn.frame_draw_bold_line(screen, rigid_body.get_vertical_axis(), pafn.colors["black"])
 
 def draw_sensing_agent(screen, sensing_agent):
     """
@@ -143,4 +144,5 @@ def draw_sensing_agent(screen, sensing_agent):
     """
     exoskeleton, sensor = sensing_agent.get_components()
     draw_coordinate_frame(screen, sensor)
+    # draw_body_coordinate_frame(screen, exoskeleton)
     draw_rigid_body(screen, exoskeleton)

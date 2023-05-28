@@ -91,8 +91,8 @@ def main():
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
     # circular_test(screen, sensing_agent, environment)
-    # interactive_single_agent_test(screen, sensing_agent, environment)
-    single_agent_mouse_test(screen, sensing_agent, environment)
+    stepwise_single_agent_test(screen, sensing_agent, environment)
+    # single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
 
 

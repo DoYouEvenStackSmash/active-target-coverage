@@ -29,6 +29,7 @@ import pygame
 import pygame.gfxdraw
 import time
 import os
+from Detection import *
 
 from drawing_functions import *
 
@@ -370,8 +371,9 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     ]:
                         continue
                     p = pygame.mouse.get_pos()
-                    dc = sensing_agent.transform_to_local_bbox(p)
-                    fc = sensing_agent.transform_from_local_coord(dc[0], dc[1])
+                    dc = sensing_agent.transform_to_local_coord(p)
+                    pt = Position(dc[0],dc[1])
+                    fc = sensing_agent.transform_to_global_coord(pt)
                     print(f"original {p}\tdc {dc}\tfc {fc}")
                     continue
                 else:
@@ -380,6 +382,8 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     ]:
                         continue
                     p = pygame.mouse.get_pos()
+                    pt = sensing_agent.transform_to_local_coord(p)
+                    print(pt)
                     dc = sensing_agent.transform_to_local_bbox(p)
                     detectable, flag = sensing_agent.is_detectable((dc[0], dc[1]))
                     if detectable:
@@ -596,9 +600,9 @@ def main():
     environment.add_target(target)
     sensing_agent = Agents[2]
     # sensing_agent._id = -1
-    # repeatable_sensing_agent(screen, sensing_agent)
+    repeatable_sensing_agent(screen, sensing_agent)
     # repeatable_environment_test(screen, sensing_agent, environment)
-    repeatable_multiagent_test(screen, environment)
+    # repeatable_multiagent_test(screen, environment)
     # repeatable_step_test(screen, sensing_agent, environment)
 
 

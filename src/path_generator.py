@@ -60,7 +60,7 @@ def render_path(screen, paths):
 
 def main():
     pygame.init()
-    screen = pafn.create_display(1000, 1000)
+    screen = pafn.create_display(1000, 1400)
     pafn.clear_frame(screen)
     paths = []
     origin = (500, 500)
@@ -72,7 +72,7 @@ def main():
 
     print(paths)
     start_pt = mfn.pol2car(intersection_pt, 300,  -np.pi / 2)
-    end_pt = mfn.pol2car(intersection_pt, 300, np.pi / 2)
+    end_pt = mfn.pol2car(intersection_pt, 600, np.pi / 2)
     paths.append(create_line(start_pt, intersection_pt, 25))
     paths.append(circ)
     paths.append(create_line(intersection_pt, end_pt, 25))

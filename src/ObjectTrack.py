@@ -62,6 +62,7 @@ class ObjectTrack:
         self.detection_time = 1
         self.avg_detection_time = 1
         self.clock = 0
+        self.parent_agent = None
 
     def heartbeat(self):
         """
@@ -69,28 +70,29 @@ class ObjectTrack:
         """
         self.clock += 1
 
-    def add_new_detection(self, yb, frame_id, error=-1):
+    def add_new_detection(self, detection, frame_id, error=-1):
         """
         Add a new bounding box to the object track
         """
         # update velocity
-        self.heartbeat()
+        
 
         self.detection_idx.append(self.clock)
+        self.heartbeat()
         if len(self.path) > 0:
             self.detection_time = (
                 self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
             )
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
 
-            self.update_track_vector(yb.get_center_coord())
+            self.update_track_vector(detection.get_center_coord())
 
         self.error_over_time.append(error)
 
         self.last_frame = frame_id
-        yb.parent_track = self.track_id
+        detection.parent_track = self.track_id
 
-        self.path.append(yb)
+        self.path.append(detection)
         self.predictions.append([])
 
     def add_new_prediction(self, pred):
@@ -99,7 +101,7 @@ class ObjectTrack:
         """
         if pred != None:
             self.predictions[-1].append(pred)
-        self.heartbeat()
+        # self.heartbeat()
         return pred
 
     def update_track_vector(self, pt, displacement=None):
@@ -110,13 +112,24 @@ class ObjectTrack:
         center = self.path[-1].get_center_coord()
         theta, distance = mfn.car2pol(center, pt)
 
+        # adjust delta_v
         if len(self.v) > 1 and distance != 0:
             self.delta_v.append(min(1.1, distance / self.v[-1]))
 
         self.v.append(distance)
 
         self.r = distance
-
+        
+        # adjust delta_theta
+        if len(self.theta) > 1:
+            old_theta = self.theta[-1]
+            new_theta = theta
+            if old_theta < 0:
+                old_theta = old_theta + 2 * np.pi
+            if theta < 0:
+                new_theta = new_theta + 2 * np.pi
+            self.delta_theta.append(new_theta - old_theta)
+        
         self.theta.append(theta)
 
         # add recent velocity to delta_v
@@ -140,7 +153,21 @@ class ObjectTrack:
         else:
             distance = last_distance
 
-        new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
+        adjustment_theta = 0
+        # if len(self.delta_theta) > 0:
+        #     adjustment_theta = self.delta_theta[-1]
+        
+        pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
+        # origin = (50,0)
+        pt1 = (lx,ly)
+        scaling_factor = np.square(min(1, abs(pt2[0] - 50) / 50))
+        scaling_factor = max(scaling_factor, np.square(abs(pt1[0] - 50) / 50))
+        adjustment_theta = ((pt2[0] - pt1[0]) / 100) * self.parent_agent.get_fov_width() * scaling_factor
+        new_posn = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
+        # theta1, r1 = mfn.car2pol(origin, pt1)
+        # theta2, r2 = mfn.car2pol(origin, pt2)
+
+        
 
         return new_posn
 
@@ -152,9 +179,11 @@ class ObjectTrack:
         if len(self.detection_idx) < 2:
             return None
 
-        time_since_detection = max(1, self.clock - self.detection_idx[-1])
-        scaling_factor = min(1, time_since_detection / self.avg_detection_time)
-
+        time_since_detection = abs(max(1, self.clock - self.detection_idx[-1]))
+        print(time_since_detection)
+        print(self.avg_detection_time)
+        scaling_factor = abs(min(1, time_since_detection / self.avg_detection_time))
+        print(scaling_factor)
         lx, ly = self.path[-1].get_center_coord()
 
         if len(self.predictions[-1]) != 0:
@@ -173,10 +202,23 @@ class ObjectTrack:
             distance = scaled_last_distance * last_change_in_distance
         else:
             distance = scaled_last_distance
-        # self.theta[-1] = adjust_angle(self.theta[-1])
-        scaled_last_theta = self.theta[-1]
+        
+        adjustment_theta = 0
+        if len(self.delta_theta) > 0:
+            adjustment_theta = self.delta_theta[-1]
+        
+        scaled_last_theta = self.theta[-1] + adjustment_theta
+        pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(scaled_last_theta))
+        
+        scaling_factor = np.square((abs(pt2[0] - 50) / 50))
+        # pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
+        
+        # origin = (50,0)
+        pt1 = (lx,ly)
+        scaling_factor = np.square(min(1, abs(pt2[0] - 50) / 50))
+        adjustment_theta = ((pt2[0] - pt1[0]) / 100) * self.parent_agent.get_fov_width() * scaling_factor
+        predicted_posn = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
 
-        predicted_posn = mfn.pol2car((lx, ly), distance, scaled_last_theta)
         return predicted_posn
 
     def predict_next_detection(self):
@@ -186,13 +228,13 @@ class ObjectTrack:
         estimated_detection = self.estimate_next_position()
         # self.add_new_prediction()
         predicted_posn = self.predict_next_position()
-        predicted_posn = None
+        predicted_posn = ()
         if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
             return predicted_posn
         
-        if predicted_posn != None:
+        if predicted_posn != ():
             # estimated_detection = predicted_posn
-            ed2 = gfn.get_midpoint(estimated_detection, predicted_posn)
+            ed2 = predicted_posn# = gfn.get_midpoint(estimated_detection, predicted_posn)
             estimated_detection = gfn.get_midpoint(estimated_detection, ed2)
 
         return estimated_detection
@@ -212,48 +254,6 @@ class ObjectTrack:
             Expiration (int): lifetime of the track
         """
         return bool(fc - self.last_frame < expiration)
-
-    def reflect_track(self, reflect_axis=None):
-        """
-        DATA AUGMENTATION: Reflect across an axis
-        """
-        if reflect_axis == None:
-            return
-        for ybx in self.path:
-            if reflect_axis == 1:
-                ybx.reflectX()
-            elif reflect_axis == 0:
-                ybx.reflectY()
-            else:
-                break
-
-    def rotate_track(self, offset_deg):
-        """
-        rotate all boxes on an object track
-        Adjusts rotations to ensure rotation is always 90 degrees
-          e.g. 270 -> -90
-          180 -> reflectXY()
-        """
-        if offset_deg == 0:
-            return
-
-        dir_flag = 1
-        if abs(offset_deg) == 180:
-            for ybx in self.path:
-                ybx.reflectXY()
-            return
-
-        # correct rotations to ensure 90 degrees
-        if abs(offset_deg) == 270:
-            offset_deg = 90 if offset_deg < 0 else -90
-
-        # adjust direction
-        if offset_deg < 0:
-            dir_flag = -1
-
-        # Rotate quadrant of each box
-        for ybx in self.path:
-            ybx.rotate_quad(dir_flag)
 
     def link_path(self):
         """
@@ -298,7 +298,8 @@ class ObjectTrack:
         """
         steps = steps if steps != None else []
 
-        for i, yb in enumerate(self.path):
+        for i, det in enumerate(self.path):
+            yb = det.get_attributes()
             fid = None
             # if fdict != None:
             #   fid = fdict[f'{yb.img_filename[:-3]}png']
