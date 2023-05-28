@@ -23,11 +23,12 @@ class Position:
   """
   An abstraction for describing a position
   """
-  def __init__(self, x=0, y=0, z=0, theta=0):
+  def __init__(self, x=0, y=0, z=0, theta=0, phi=0):
     self.x = x
     self.y = y
     self.z = z
     self.theta = theta
+    self.phi = phi
 
   def get_center_coord(self):
     return (self.x, self.y)

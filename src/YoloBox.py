@@ -6,7 +6,6 @@ import numpy as np
   Generic class for yolo annotation data
 """
 
-
 class YoloBox:
     """A class representing a single detection in Yolo format
     Attributes:

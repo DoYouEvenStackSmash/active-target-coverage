@@ -80,21 +80,25 @@ def circular_test(screen, sensing_agent, environment):
             #     continue
             last_pt = pt
             pafn.clear_frame(screen)
-            for i in range(15):
-                r, t = sensing_agent.tracker_query()
-                sensing_agent.reposition(r, t)
-                est = sensing_agent.obj_tracker.add_predictions()
-                curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            # for i in range(15):
+            r, t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, t)
+                # est = sensing_agent.obj_tracker.add_predictions()
+                # curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+            curr_pt, pred_pt = (),()
+            arr = sensing_agent.estimate_next_detection()
+            if len(arr):
+                curr_pt = arr[0][0]
+                pred_pt = arr[0][1]
+            if len(pred_pt):
+                pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
 
-                if len(pred_pt):
-                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
-                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-                    pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
-
-                draw_sensing_agent(screen, sensing_agent)
-                pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
-                pygame.display.update()
-                time.sleep(0.1)
+            draw_sensing_agent(screen, sensing_agent)
+            pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
+            pygame.display.update()
+            time.sleep(0.1)
             environment.targets[0].origin = pt
             environment.visible_targets()
             time.sleep(0.9)
@@ -123,16 +127,19 @@ def single_agent_mouse_test(screen, sensing_agent, environment):
                 continue
 
             last_pt = pt
-            print(pt)
+            # print(pt)
 
             pafn.clear_frame(screen)
-
-            # agent_update(sensing_agent)
             r, t = sensing_agent.tracker_query()
+            print(r,t)
             sensing_agent.reposition(r, t)
+            
 
-            curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-
+            curr_pt, pred_pt = (),()
+            arr = sensing_agent.estimate_next_detection()
+            if len(arr):
+                curr_pt = arr[0][0]
+                pred_pt = arr[0][1]
             if len(pred_pt):
                 pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
@@ -157,6 +164,7 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
                     pafn.clear_frame(screen)
                     draw_sensing_agent(screen, sensing_agent)
                     arr = sensing_agent.estimate_next_detection()
+                    curr_pt,pred_pt = (),()
                     if len(arr):
                         curr_pt = arr[0][0]
                         pred_pt = arr[0][1]

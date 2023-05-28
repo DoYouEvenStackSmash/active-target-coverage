@@ -4,6 +4,7 @@ from aux_functions import *
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+from Detection import *
 import sys
 
 
@@ -76,18 +77,27 @@ class ObjectTrack:
         """
         self.last_frame = frame_id
         detection.parent_track = self.track_id
-        self.path.append(detection)
+        
+        # set detection time
+        self.detection_idx.append(self.clock)
 
+        if len(self.path):
+            self.detection_time = (
+                self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
+            )
+            self.avg_detection_time = self.detection_time / len(self.detection_idx)
+            self.update_track_trajectory(detection)
+
+        self.path.append(detection)
+    
+    def update_track_trajectory(self, det, displacement=None):
+
+        pass
+
+    
     def add_new_prediction(self, pred):
         """
         Wrapper for object track adding its own prediction
-        """
-        pass
-
-    def update_track_trajectory(self, pt, displacement=None):
-        """
-        Update trajectory with a new measurement
-        Assumes path is not empty
         """
         pass
 
@@ -95,6 +105,11 @@ class ObjectTrack:
         """
         Estimate position of next detection using absolute measurements
         """
+        last_pos = self.get_last_detection()
+        if len(self.path):
+            return last_pos
+
+
         pass
 
     def predict_next_state(self, steps=1):
@@ -102,6 +117,7 @@ class ObjectTrack:
         Predict an intermediate position of the target using its
         movement characteristics, scaled by the average detection time
         """
+        
         pass
 
     def get_state_estimation(self):
@@ -110,7 +126,7 @@ class ObjectTrack:
         using a combination of measurements and predictions
         """
         if len(self.path):
-            return self.path[-1]
+            return self.estimate_next_position()
         return None
         # pass
 

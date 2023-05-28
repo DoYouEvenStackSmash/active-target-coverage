@@ -102,6 +102,7 @@ class SensingAgent:
 
         # perform translation
         if est_translation != None:
+            print(f"est_translation:{est_translation}")
             translation = self.apply_translation_to_agent(est_translation)
 
         # update tracker
@@ -292,7 +293,7 @@ class SensingAgent:
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
             
-            dc = self.transform_to_local_bbox(a.get_origin())
+            dc = self.transform_to_local_sensor_coord(a.get_origin())
             
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
             
@@ -329,10 +330,28 @@ class SensingAgent:
 
         return [x, y, w, h]
     
+    def transform_to_local_sensor_coord(self, target_pt, sensor_idx=-1):
+        """
+        Transforms a point to local sensor curved coordinate frame
+        """
+        target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
+        ratio = target_rotation / self.get_fov_width()
+
+        r = mfn.euclidean_dist(self.get_center(), target_pt)
+
+        x = Sensor.WINDOW_WIDTH * ratio + 50
+        
+        y = r
+        w = 1
+        h = 1
+
+        return x, r
+    
     def transform_to_local_coord(self, target_pt):
         """
         transforms a target point to local rectangular coordinates
         """
+        return self.transform_to_local_sensor_coord(target_pt)
         target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
         r = mfn.euclidean_dist(self.get_center(), target_pt)
         
@@ -367,27 +386,27 @@ class SensingAgent:
         Uses past information to predict the next rotation if it exists
         Returns () or the tuple containing the partial rotation
         """
-        
-        
+
         rel_det = self.estimate_rel_next_detection()
         
         if not len(rel_det):
+            print("empty")
             return (None, None)
         
         curr_pt, pred_pt = rel_det[0]
         pred_pt = pred_pt.get_center_coord()
         curr_pt = curr_pt.get_center_coord()
-
+        print(pred_pt)
         # if no estimate available
         if not len(pred_pt):
             return (None, None)
 
         # if first element in track, therefore duplicate
-        if curr_pt == pred_pt:
-            return (None, None)
+        # if curr_pt == pred_pt:
+        #     return (None, None)
 
         status, flag = self.centered_sensor.is_rel_detectable(pred_pt)
-
+        
         # if predicted point is detectable from pov of SensingAgent
         if status:
             return (None, None)
@@ -439,7 +458,7 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection(idx)
         abs_det = []
         for det in rel_det:
-            prev = self.transform_to_global_coord(det[0])
-            curr = self.transform_to_global_coord(det[1])
-            abs_det.append((prev,curr))
+            curr = self.transform_to_global_coord(det[0])
+            pred = self.transform_to_global_coord(det[1])
+            abs_det.append((curr,pred))
         return abs_det

@@ -11,6 +11,7 @@ from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
 from OTFTrackerApi import StreamingAnnotations as sann
+import numpy as np
 
 """
   Global scope data structure for processing a set of images
@@ -28,7 +29,6 @@ def adjust_angle(theta):
         theta = theta + 2 * np.pi
 
     return theta
-
 
 LABELS = True
 IDENTIFIERS = not LABELS
@@ -94,18 +94,28 @@ class ObjectTrackManager:
         
         return pred_arr
 
-        
-
     def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
+        print(f"displacement: \t{angle}")
+        if not self.has_active_tracks():
+            return
+        for i,trk in enumerate(self.active_tracks):
+            rot_mat = tfn.calculate_rotation_matrix(-angle, 1)
+            new_pt = trk.path[-1].get_center_coord()
+            new_pt = tfn.rotate_point(self.parent_agent.get_center(), new_pt, rot_mat)
+            trk.path[-1].attributes.x = new_pt[0]
+            trk.path[-1].attributes.y = new_pt[1]
+            
         pass
 
     def add_linear_displacement(self, distance, angle, direction=1):
+        
         """
         Apply a linear displacement to offset a translation by a parent agent
         """
+
         pass
 
     def init_new_layer(self):
@@ -133,7 +143,6 @@ class ObjectTrackManager:
         returns a layer of yoloboxes
         """
         if len(self.layers) == 0:
-            print()
             return []
         return self.layers[layer_idx]
 

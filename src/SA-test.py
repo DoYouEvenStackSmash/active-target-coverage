@@ -384,8 +384,10 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     p = pygame.mouse.get_pos()
                     pt = sensing_agent.transform_to_local_coord(p)
                     print(pt)
-                    dc = sensing_agent.transform_to_local_bbox(p)
-                    detectable, flag = sensing_agent.is_detectable((dc[0], dc[1]))
+                    # dc = sensing_agent.transform_to_local_bbox(p)
+                    theta, r = sensing_agent.transform_to_local_sensor_coord(p)
+
+                    detectable, flag = sensing_agent.is_detectable((theta, r))
                     if detectable:
                         pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
                     else:
