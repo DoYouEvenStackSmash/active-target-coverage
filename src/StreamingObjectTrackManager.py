@@ -6,7 +6,7 @@ from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
 from render_support import TransformFxns as tfn
-from aux_functions import *
+
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
@@ -81,107 +81,33 @@ class ObjectTrackManager:
         self.imported = imported
         self.parent_agent = parent_agent
 
-    def add_predictions(self):
-        """
-        Update predictionsfrom all active tracks
-        """
-        if not self.has_active_tracks():
-            return []
-        estimates = []
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            pred = trk.predict_next_position()
-            if pred != None:
-                estimates.append(
-                    trk.add_new_prediction(
-                        sann.register_annotation(
-                            trk.class_id,
-                            (pred[0], pred[1], 1, 1),
-                            self.parent_agent.exoskeleton.get_age(),
-                        )
-                    )
-                )
-        return estimates
 
-    def get_predictions(self):
+    def get_predictions(self, pred_arr):
         """
-        Get estimates from all active tracks
+        Returns the predictions from all active tracks, or a specified index
         """
         if not self.has_active_tracks():
             return []
-        estimates = []
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            pred = trk.get_latest_prediction()
-            if pred != None:
-                estimates.append(pred)
-        return estimates
+        
+        for i,trk in enumerate(self.active_tracks):
+            pred_arr.append((trk.get_last_detection(),trk.get_state_estimation()))
+        
+        return pred_arr
+
+        
 
     def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
-        if not self.has_active_tracks():
-            return
-        angle = adjust_angle(angle)
-        off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
-        print(f"OFFT {off_t}")
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            attr = trk.path[-1].get_attributes()
-            last_d, last_v, delta_v, theta = trk.get_track_heading()
+        pass
 
-            ratio = angle / self.parent_agent.get_fov_width()
-            disp = ratio * 100
-
-            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
-
-            new_angle = 0
-            # # angle = 0
-            if disp < 0:
-                new_angle = adjust_angle(trk.theta[-1] + angle + off_t)
-            if disp > 0:
-                if trk.theta[-1] < -np.pi / 2:
-                    new_angle = adjust_angle(trk.theta[-1] - angle + off_t)
-                else:
-                    new_angle = adjust_angle(trk.theta[-1] + angle - off_t)
-            print(
-                f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n"
-            )
-
-            trk.theta[-1] = new_angle
-            x, y = last_d
-            
-            nx, ny = [last_d[0] + disp, last_d[1]]
-            attr.bbox = [nx, ny, 1, 1]
-            
-            if len(trk.predictions[-1]):
-                x,y,w,h = trk.predictions[-1][-1].bbox
-                trk.predictions[-1][-1].bbox = [x + disp, y, w, h]
-            # print(nx)
-
-    def add_linear_displacement(self, distance, angle):
+    def add_linear_displacement(self, distance, angle, direction=1):
         """
         Apply a linear displacement to offset a translation by a parent agent
         """
-        if not self.has_active_tracks():
-            return
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            attr = trk.path[-1].get_attributes()
-            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
-            
-            last_d, last_v, delta_v, theta = trk.get_track_heading()
-            off_t = self.parent_agent.get_fov_width()
+        pass
 
-            new_posn = [last_d[0], last_d[1] + distance]
-            # new_posn = gfn.get_midpoint(prop_posn, new_posn)
-
-            attr.bbox = [new_posn[0], new_posn[1], 1, 1]
-            if len(trk.predictions[-1]):
-                x,y,w,h = trk.predictions[-1][-1].bbox
-                trk.predictions[-1][-1].bbox = [x, y + distance, w, h]
-    
     def init_new_layer(self):
         """
         Initialize a new empty layer
@@ -315,12 +241,12 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.predict_next_detection()))
+            pred.append((t.track_id, t.get_state_estimation().get_center_coord()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = MathFxns.euclidean_dist(p[1], curr_layer[c].get_center_coord())
+                d = mfn.euclidean_dist(p[1], curr_layer[c].get_center_coord())
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

@@ -280,7 +280,7 @@ class SensingAgent:
         }
         return e
 
-    def new_detection_layer(self, frame_id, detection_list):
+    def new_detection_set(self, frame_id, detection_list):
         """
         Ingest for a new layer of detections from the outside world.
 
@@ -291,11 +291,14 @@ class SensingAgent:
         detections = []
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
-
+            
             dc = self.transform_to_local_bbox(a.get_origin())
+            
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
-            val = a.get_origin()
+            
+            val = self.transform_to_local_coord(a.get_origin())
             posn = Position(val[0], val[1])
+            
             detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
@@ -359,12 +362,21 @@ class SensingAgent:
         return pt
 
 
-    def estimate_pose_update(self, idx=0):
+    def estimate_pose_update(self, priorities=0):
         """
         Uses past information to predict the next rotation if it exists
         Returns () or the tuple containing the partial rotation
         """
-        curr_pt, pred_pt = self.estimate_rel_next_detection()
+        
+        
+        rel_det = self.estimate_rel_next_detection()
+        
+        if not len(rel_det):
+            return (None, None)
+        
+        curr_pt, pred_pt = rel_det[0]
+        pred_pt = pred_pt.get_center_coord()
+        curr_pt = curr_pt.get_center_coord()
 
         # if no estimate available
         if not len(pred_pt):
@@ -399,37 +411,35 @@ class SensingAgent:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, offset)
+    
+    def get_predictions(self, idx=-1):
+        pred = []
+        if idx != -1:
+            pred = self.obj_tracker.get_predictions(pred)
+        else:
+            pred = self.obj_tracker.get_predictions(pred)
+        return pred
 
     def estimate_rel_next_detection(self, idx=0):
         """
         Estimates next detection in local coordinate system
-        returns a pair of points
+        returns a pair of Positions
         """
-        last_pt, pred_pt = (), ()
-
-        if self.obj_tracker.has_active_tracks():
-            trk = self.obj_tracker.active_tracks[idx]
-            trk_h = trk.get_track_heading()
-            last_pt = trk.get_last_detection()
-            pred_pt = trk.predict_next_detection()
-
-        nd = (last_pt, pred_pt)
-
-        return nd
+        pred = self.get_predictions()
+        
+        return pred
+        
 
     def estimate_next_detection(self, idx=0):
         """
         Estimates next detection in external coordinate system
         returns a pair of points
         """
-        last_pt, pred_pt = (), ()
-        nd = self.estimate_rel_next_detection(idx)
-        if len(nd[0]) and len(nd[1]):
-            lx, ly = nd[0]
-            px, py = nd[1]
-            last_pt = self.transform_from_local_coord(lx, ly)
-            pred_pt = self.transform_from_local_coord(px, py)
-
-        nd = (last_pt, pred_pt)
-
-        return nd
+        
+        rel_det = self.estimate_rel_next_detection(idx)
+        abs_det = []
+        for det in rel_det:
+            prev = self.transform_to_global_coord(det[0])
+            curr = self.transform_to_global_coord(det[1])
+            abs_det.append((prev,curr))
+        return abs_det

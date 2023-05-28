@@ -79,7 +79,7 @@ class Environment:
 
         # update the trackers of all agents
         for k in updates:
-            self.agents[k].new_detection_layer(frame_id, updates[k])
+            self.agents[k].new_detection_set(frame_id, updates[k])
 
     def add_target(self, T):
         """

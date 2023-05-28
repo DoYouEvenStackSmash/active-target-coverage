@@ -156,7 +156,10 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
                 if pygame.key.get_mods() == LCTRL:
                     pafn.clear_frame(screen)
                     draw_sensing_agent(screen, sensing_agent)
-                    curr_pt, pred_pt = sensing_agent.estimate_next_detection()
+                    arr = sensing_agent.estimate_next_detection()
+                    if len(arr):
+                        curr_pt = arr[0][0]
+                        pred_pt = arr[0][1]
                     if len(pred_pt):
                         # print((curr_pt,pred_pt))
                         pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
@@ -183,8 +186,12 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
                     r, t = sensing_agent.tracker_query()
                     sensing_agent.reposition(r, t)
 
-                    curr_pt, pred_pt = sensing_agent.estimate_next_detection()
-
+                    curr_pt, pred_pt = (),()
+                    arr = sensing_agent.estimate_next_detection()
+                    if len(arr):
+                        curr_pt = arr[0][0]
+                        pred_pt = arr[0][1]
+                    print(arr)
                     if len(pred_pt):
                         pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
                         pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])

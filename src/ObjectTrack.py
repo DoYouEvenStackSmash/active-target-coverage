@@ -74,170 +74,45 @@ class ObjectTrack:
         """
         Add a new bounding box to the object track
         """
-        # update velocity
-        
-
-        self.detection_idx.append(self.clock)
-        self.heartbeat()
-        if len(self.path) > 0:
-            self.detection_time = (
-                self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
-            )
-            self.avg_detection_time = self.detection_time / len(self.detection_idx)
-
-            self.update_track_vector(detection.get_center_coord())
-
-        self.error_over_time.append(error)
-
         self.last_frame = frame_id
         detection.parent_track = self.track_id
-
         self.path.append(detection)
-        self.predictions.append([])
 
     def add_new_prediction(self, pred):
         """
         Wrapper for object track adding its own prediction
         """
-        if pred != None:
-            self.predictions[-1].append(pred)
-        # self.heartbeat()
-        return pred
+        pass
 
-    def update_track_vector(self, pt, displacement=None):
+    def update_track_trajectory(self, pt, displacement=None):
         """
-        Update track trajectory information
+        Update trajectory with a new measurement
         Assumes path is not empty
         """
-        center = self.path[-1].get_center_coord()
-        theta, distance = mfn.car2pol(center, pt)
-
-        # adjust delta_v
-        if len(self.v) > 1 and distance != 0:
-            self.delta_v.append(min(1.1, distance / self.v[-1]))
-
-        self.v.append(distance)
-
-        self.r = distance
-        
-        # adjust delta_theta
-        if len(self.theta) > 1:
-            old_theta = self.theta[-1]
-            new_theta = theta
-            if old_theta < 0:
-                old_theta = old_theta + 2 * np.pi
-            if theta < 0:
-                new_theta = new_theta + 2 * np.pi
-            self.delta_theta.append(new_theta - old_theta)
-        
-        self.theta.append(theta)
-
-        # add recent velocity to delta_v
+        pass
 
     def estimate_next_position(self):
         """
-        Predict next bounding box center
+        Estimate position of next detection using absolute measurements
         """
-        # last_detection = self.detection_idx[-1]
-        lx, ly = self.path[-1].get_center_coord()
-        if len(self.path) == 1:
-            return (lx, ly)
+        pass
 
-        last_distance = self.v[-1]
-        distance = 0
-        # consider acceleration in estimate
-        last_change_in_distance = self.delta_v[-1]
-
-        if last_change_in_distance != 0:
-            distance = last_distance * last_change_in_distance
-        else:
-            distance = last_distance
-
-        adjustment_theta = 0
-        # if len(self.delta_theta) > 0:
-        #     adjustment_theta = self.delta_theta[-1]
-        
-        pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
-        # origin = (50,0)
-        pt1 = (lx,ly)
-        scaling_factor = np.square(min(1, abs(pt2[0] - 50) / 50))
-        scaling_factor = max(scaling_factor, np.square(abs(pt1[0] - 50) / 50))
-        adjustment_theta = ((pt2[0] - pt1[0]) / 100) * self.parent_agent.get_fov_width() * scaling_factor
-        new_posn = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
-        # theta1, r1 = mfn.car2pol(origin, pt1)
-        # theta2, r2 = mfn.car2pol(origin, pt2)
-
-        
-
-        return new_posn
-
-    def predict_next_position(self):
+    def predict_next_state(self, steps=1):
         """
-        Prediction for the next position by scaled theta and velocity, constant acceleration
+        Predict an intermediate position of the target using its
+        movement characteristics, scaled by the average detection time
         """
-        # Need at least two detections to make a prediction
-        if len(self.detection_idx) < 2:
-            return None
+        pass
 
-        time_since_detection = abs(max(1, self.clock - self.detection_idx[-1]))
-        print(time_since_detection)
-        print(self.avg_detection_time)
-        scaling_factor = abs(min(1, time_since_detection / self.avg_detection_time))
-        print(scaling_factor)
-        lx, ly = self.path[-1].get_center_coord()
-
-        if len(self.predictions[-1]) != 0:
-            lx, ly, w, h = self.predictions[-1][-1].bbox
-
-            time_since_detection = 1
-
-        scaled_last_distance = self.v[-1] * scaling_factor
-        distance = 0
-
-        # consider acceleration in estimate
-        last_change_in_distance = self.delta_v[-1]
-        if last_change_in_distance > 1:
-            last_change_in_distance = 1
-        if last_change_in_distance != 0:
-            distance = scaled_last_distance * last_change_in_distance
-        else:
-            distance = scaled_last_distance
-        
-        adjustment_theta = 0
-        if len(self.delta_theta) > 0:
-            adjustment_theta = self.delta_theta[-1]
-        
-        scaled_last_theta = self.theta[-1] + adjustment_theta
-        pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(scaled_last_theta))
-        
-        scaling_factor = np.square((abs(pt2[0] - 50) / 50))
-        # pt2 = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
-        
-        # origin = (50,0)
-        pt1 = (lx,ly)
-        scaling_factor = np.square(min(1, abs(pt2[0] - 50) / 50))
-        adjustment_theta = ((pt2[0] - pt1[0]) / 100) * self.parent_agent.get_fov_width() * scaling_factor
-        predicted_posn = mfn.pol2car((lx, ly), distance, adjust_angle(self.theta[-1] + adjustment_theta))
-
-        return predicted_posn
-
-    def predict_next_detection(self):
+    def get_state_estimation(self):
         """
-        wrapper for estimating next bounding box center
+        Using filters, estimate the future kinematic state of the target
+        using a combination of measurements and predictions
         """
-        estimated_detection = self.estimate_next_position()
-        # self.add_new_prediction()
-        predicted_posn = self.predict_next_position()
-        predicted_posn = ()
-        if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
-            return predicted_posn
-        
-        if predicted_posn != ():
-            # estimated_detection = predicted_posn
-            ed2 = predicted_posn# = gfn.get_midpoint(estimated_detection, predicted_posn)
-            estimated_detection = gfn.get_midpoint(estimated_detection, ed2)
-
-        return estimated_detection
+        if len(self.path):
+            return self.path[-1]
+        return None
+        # pass
 
     def get_track_heading(self):
         """
@@ -272,10 +147,19 @@ class ObjectTrack:
     def get_last_detection(self):
         """
         Accessor for getting the last detection in a track
+        returns a Detection
+        """
+        if len(self.path) > 0:
+            return self.path[-1]
+        return None
+    
+    def get_last_detection_coordinate(self):
+        """
+        Accessor for the coordinate of the last detection
         """
         if len(self.path) > 0:
             return self.path[-1].get_center_coord()
-        return ()
+        return None
 
     def get_loco_track(self, fdict=None, steps=None):
         """
@@ -305,20 +189,5 @@ class ObjectTrack:
             #   fid = fdict[f'{yb.img_filename[:-3]}png']
             fid = yb.img_filename
             steps.append(
-                {
-                    "id": -1,
-                    "image_id": fid,
-                    "category_id": yb.class_id,
-                    "bbox": yb.bbox,
-                    "area": yb.bbox[2] * yb.bbox[3],
-                    "segmentation": [],
-                    "iscrowd": 0,
-                    "track_id": self.track_id,
-                    "trackmap_index": -1,
-                    "vid_id": 0,
-                    "track_color": self.color,
-                    "displaced": yb.displaced,
-                    "error": self.error_over_time[i],
-                    "state_id": fid,
-                }
+                yb.to_json(fid, self.error_over_time[i], fid, self.color)
             )
