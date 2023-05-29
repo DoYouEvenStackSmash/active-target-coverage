@@ -296,7 +296,8 @@ class SensingAgent:
             # print(f"val {val}")
             dc = self.transform_to_local_sensor_coord((0,0),(val[0],val[1]))
             print(dc)
-            yb = sann.register_annotation(a.get_id(), dc, curr_state)
+            bbox = [dc[0],dc[1], 1,1]
+            yb = sann.register_annotation(a.get_id(), bbox, curr_state)
             posn = Position(val[0], val[1])
             detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)

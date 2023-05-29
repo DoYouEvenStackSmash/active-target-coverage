@@ -87,7 +87,7 @@ class ObjectTrack:
             )
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
-
+        self.error_over_time.append(error)
         self.path.append(detection)
     
     def update_track_trajectory(self, det, displacement=None):
@@ -135,7 +135,6 @@ class ObjectTrack:
             print("ERROR")
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
-        
         
         det = Detection(Position(pt[0],pt[1]), yb)
         return det
@@ -236,6 +235,9 @@ class ObjectTrack:
             # if fdict != None:
             #   fid = fdict[f'{yb.img_filename[:-3]}png']
             fid = yb.img_filename
+            yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
+            yb_json["track_id"] = self.track_id
             steps.append(
-                yb.to_json(fid, self.error_over_time[i], fid, self.color)
+                yb_json
             )
+        return steps

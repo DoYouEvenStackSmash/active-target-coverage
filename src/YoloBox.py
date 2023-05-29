@@ -74,6 +74,7 @@ class YoloBox:
         return [mpx, mpy, w, h]
     
     def to_json(self, fid = None, error = -1 ,sid = -1, color = (255,255,255)):
+        # print(self.bbox)
         return {
             "id": -1,
             "image_id": fid,
@@ -82,7 +83,7 @@ class YoloBox:
             "area": self.bbox[2] * self.bbox[3],
             "segmentation": [],
             "iscrowd": 0,
-            "track_id": self.parent_track,
+            "track_id": -1,
             "trackmap_index": -1,
             "vid_id": 0,
             "track_color": color,
