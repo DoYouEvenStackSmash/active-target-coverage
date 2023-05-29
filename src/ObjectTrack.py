@@ -120,10 +120,11 @@ class ObjectTrack:
         Estimate position of next detection using absolute measurements
         """
         last_pos = self.get_last_detection()
+        
         if len(self.path) == 1:
             return last_pos
         scale_distance = 1
-        if len(self.delta_v) > 1:
+        if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
             scale_distance = self.delta_v[-1]
         pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, self.theta[-1])
         

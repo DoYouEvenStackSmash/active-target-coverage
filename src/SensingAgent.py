@@ -293,7 +293,7 @@ class SensingAgent:
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
-            print(f"val {val}")
+            # print(f"val {val}")
             dc = self.transform_to_local_sensor_coord((0,0),(val[0],val[1]))
             print(dc)
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
@@ -422,7 +422,8 @@ class SensingAgent:
 
         # if predicted point is out of coverage by range
         if flag == Sensor.RANGE:
-            pred_pt = pred_det.get_cartesian_coord()
+            pred_pt = pred_det.get_attr_coord()
+            print(f"pred_pt {pred_pt}")
             offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
             if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE

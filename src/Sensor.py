@@ -20,7 +20,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.1
+    TOLERANCE = 0.15
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 
@@ -152,9 +152,7 @@ class Sensor:
         """
         # boundary conditions
         adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
-        print(f"adj_win_bnd")
         adj_rad_bnd = self.get_fov_radius()
-        print(f"adj_rad_bnd {adj_rad_bnd}")
         target_x = target_pt[0]
         target_y = target_pt[1]
         flags = 0

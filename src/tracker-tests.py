@@ -145,18 +145,20 @@ def constant_angular_test(screen, path, environment):
             sensing_agent = environment.agents[k]
 
             # if not i % 2:
-            curr_pt,pred_pt = sensing_agent.estimate_rel_next_detection()
-            print(pred_pt)
+            curr_pt, pred_pt = (),()
+            arr = sensing_agent.estimate_next_detection()
+            if len(arr):
+                curr_pt = arr[0][0]
+                pred_pt = arr[0][1]
             if len(pred_pt):
-                pred_pt = sensing_agent.transform_from_local_coord(pred_pt[0], pred_pt[1])
-                curr_pt = sensing_agent.transform_from_local_coord(curr_pt[0], curr_pt[1])
-                curr_pts.append(curr_pt)
-                pred_pts.append(pred_pt)
+                pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
             for i in range(len(pred_pts)):
               draw_prediction_vec(screen, curr_pts[i], pred_pts[i])
               # pygame.display.update()
-            if i % 2:
-              est = sensing_agent.obj_tracker.add_predictions()
+            # if i % 2:
+            #   est = sensing_agent.obj_tracker.add_predictions()
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
 
@@ -167,7 +169,7 @@ def constant_angular_test(screen, path, environment):
             t.origin = p
             pafn.frame_draw_dot(screen, t.origin, pafn.colors["green"])
         pygame.display.update()
-        if i < 2 or not i % 7:
+        if True or i < 2 or not i % 7:
           for t in environment.targets:
             # t.origin = p
             pafn.frame_draw_dot(screen, t.origin, pafn.colors["cyan"])

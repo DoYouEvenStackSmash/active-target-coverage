@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 class Detection:
   """ An abstraction for describing a detection
+    
   """
   def __init__( self, 
                 position,

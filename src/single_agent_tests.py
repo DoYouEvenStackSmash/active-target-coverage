@@ -192,7 +192,8 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
 
                     pafn.clear_frame(screen)
                     r, t = sensing_agent.tracker_query()
-                    print(f"partial_rotation = {r}")
+                    print(f"partial translation: {t}")
+                    # print(f"partial_rotation = {r}")
                     sensing_agent.reposition(r, t)
 
                     curr_pt, pred_pt = (),()
@@ -213,5 +214,16 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
                     pafn.frame_draw_dot(screen, pt, pafn.colors["lawngreen"])
                     environment.targets[0].origin = pt
                     environment.visible_targets()
-
+                    curr_pt, pred_pt = (),()
+                    arr = sensing_agent.estimate_next_detection()
+                    if len(arr):
+                        curr_pt = arr[0][0]
+                        pred_pt = arr[0][1]
+                    print(arr)
+                    if len(pred_pt):
+                        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                        pafn.frame_draw_line(
+                            screen, (curr_pt, pred_pt), pafn.colors["white"]
+                        )
                     pygame.display.update()
