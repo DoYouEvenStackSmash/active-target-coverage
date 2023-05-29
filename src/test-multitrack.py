@@ -172,7 +172,7 @@ def multitrack(screen, environment, paths, colors, n=10):
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
         for prpt in pred_pts:
             pafn.frame_draw_dot(screen, prpt, pafn.colors["cyan"])
-        if i < 4 or not i % 4:
+        if i < 4 or not i % 11:
             for j, t in enumerate(environment.targets):
                 t.origin = paths[j][i]
                 pred_pts.append(paths[j][i])
@@ -227,8 +227,8 @@ def path_handler(screen):
         for pt in p:
             path_1.append(pt)
     # paths = [path_1]
-    # paths = []
-    # paths.append(get_lerp(origins[0], destinations[0]))
+    paths = []
+    paths.append(get_lerp(origins[0], destinations[0]))
     # print(paths)
     # paths = [paths[0]]
 
@@ -246,7 +246,7 @@ def path_handler(screen):
     sensing_agent.centered_sensor.fov_width = 3 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
-    for i in range(2):
+    for i in range(1):
         environment.add_target(Target(origins[i], _id=i))
 
     environment.agents[0] = sensing_agent

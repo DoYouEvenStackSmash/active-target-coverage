@@ -100,19 +100,19 @@ class ObjectTrack:
         
         if len(self.v) and distance != 0:
             self.delta_v.append(min(1.1, distance / self.v[-1]))
-        
+        if len(self.delta_theta):
+            self.delta_theta.append(adjust_angle(theta - self.theta[-1]))
+
         self.v.append(distance)
 
         self.theta.append(theta)
 
         pass
 
-    
     def add_new_prediction(self, pred):
         """
         Wrapper for object track adding its own prediction
         """
-        
         pass
 
     def estimate_next_position(self):
@@ -126,13 +126,14 @@ class ObjectTrack:
         scale_distance = 1
         if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
             scale_distance = self.delta_v[-1]
-        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, self.theta[-1])
+        
+        angle_adjust = self.delta_theta[-1]
+        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, adjust_angle(self.theta[-1] + angle_adjust))
         
         pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), pt)
         yb = None
         yb = last_pos.get_attributes()
-        if yb == None:
-            print("ERROR")
+
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
         

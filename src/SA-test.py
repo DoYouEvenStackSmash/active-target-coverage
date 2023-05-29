@@ -472,11 +472,15 @@ def repeatable_multiagent_test(screen, environment):
                 r, t = agent.tracker_query()
                 agent.reposition(r, t)
 
-                curr_pt, pred_pt = agent.estimate_next_detection()
-                # # environment.agents[_id] = sensing_agent
+                curr_pt, pred_pt = (),()
+                arr = sensing_agent.estimate_next_detection()
+                if len(arr):
+                    curr_pt = arr[0][0]
+                    pred_pt = arr[0][1]
+                print(arr)
                 if len(pred_pt):
-                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["tangerine"])
+                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
                     pafn.frame_draw_line(
                         screen, (curr_pt, pred_pt), pafn.colors["white"]
                     )
@@ -603,9 +607,9 @@ def main():
     environment.add_target(target)
     sensing_agent = Agents[2]
     # sensing_agent._id = -1
-    repeatable_sensing_agent(screen, sensing_agent)
+    # repeatable_sensing_agent(screen, sensing_agent)
     # repeatable_environment_test(screen, sensing_agent, environment)
-    # repeatable_multiagent_test(screen, environment)
+    repeatable_multiagent_test(screen, environment)
     # repeatable_step_test(screen, sensing_agent, environment)
 
 
