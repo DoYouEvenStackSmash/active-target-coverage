@@ -127,7 +127,7 @@ def get_lerp(origin, p):
 
 
 def multitrack(screen, environment, paths, colors, n=10):
-    n = len(paths[0])#, len(paths[1]))
+    n = len(paths[0])  # , len(paths[1]))
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
     # curr_pts = []
@@ -151,10 +151,10 @@ def multitrack(screen, environment, paths, colors, n=10):
                 print("no active tracks")
                 draw_sensing_agent(screen, environment.agents[k])
                 continue
- 
+
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
-            curr_pt, pred_pt = (),()
+            curr_pt, pred_pt = (), ()
             arr = sensing_agent.estimate_next_detection()
             if len(arr):
                 curr_pt = arr[0][0]
@@ -164,9 +164,7 @@ def multitrack(screen, environment, paths, colors, n=10):
                 est_pts.append(pred_pt)
                 pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-                pafn.frame_draw_line(
-                    screen, (curr_pt, pred_pt), pafn.colors["white"]
-                )
+                pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
             draw_sensing_agent(screen, environment.agents[k])
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])

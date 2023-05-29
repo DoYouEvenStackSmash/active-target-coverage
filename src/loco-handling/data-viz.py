@@ -3,6 +3,7 @@ import flatbuffers
 import matplotlib.pyplot as plt
 from LOCO.TopLoco import *
 import sys
+
 buf = open(sys.argv[1], "rb").read()
 buf = bytearray(buf)
 b = TopLoco.GetRootAsTopLoco(buf, 0)

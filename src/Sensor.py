@@ -167,11 +167,7 @@ class Sensor:
             flags += Sensor.RANGE
 
         # if angle out of bounds
-        if (
-            target_x < 0 + adj_win_bnd
-            or target_x > Sensor.WINDOW_WIDTH - adj_win_bnd
-        ):
-            
+        if target_x < 0 + adj_win_bnd or target_x > Sensor.WINDOW_WIDTH - adj_win_bnd:
             flags += Sensor.ANGULAR
             print("angle oob")
         if flags > 0:

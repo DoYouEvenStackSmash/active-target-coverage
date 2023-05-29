@@ -15,15 +15,15 @@ def create_circle(center_pt, radius=50, num_pts=50):
     Creates a circle of points in euclidean coordinates around the center
     return a list of (x,y) points
     """
-    
+
     step = 2 * np.pi / num_pts
     counter = num_pts // 2
     angles = []
     pts = []
 
-    for i in range(num_pts//2):
+    for i in range(num_pts // 2):
         angles.append(i * step)
-    for i in range(num_pts//2):
+    for i in range(num_pts // 2):
         angles.append(-np.pi + i * step)
 
     for i in range(len(angles)):
@@ -45,7 +45,7 @@ def create_line(pt1, pt2, num_pts=50):
     return pts
 
 
-def render_path(screen, paths,filename="out.json"):
+def render_path(screen, paths, filename="out.json"):
     """
     Renders and serializes a path
     """
@@ -54,7 +54,7 @@ def render_path(screen, paths,filename="out.json"):
             print(pt)
             pafn.frame_draw_dot(screen, pt, pafn.colors["magenta"])
         pygame.display.update()
-            # time.sleep(0.02)
+        # time.sleep(0.02)
     while 1:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -65,7 +65,7 @@ def render_path(screen, paths,filename="out.json"):
                 sys.exit()
 
 
-def create_grid(origin=(0,0), width=1000, height=1000, points = 10):
+def create_grid(origin=(0, 0), width=1000, height=1000, points=10):
     """
     Creates a grid of points
     returns a list of (x,y) points
@@ -82,7 +82,7 @@ def create_grid(origin=(0,0), width=1000, height=1000, points = 10):
         for pt in line:
             pts.append(pt)
     return [pts]
-    
+
 
 def loop_line():
     """
@@ -96,7 +96,7 @@ def loop_line():
     intersection_pt = mfn.pol2car(origin, 100, 0)
 
     print(paths)
-    start_pt = mfn.pol2car(intersection_pt, 300,  -np.pi / 2)
+    start_pt = mfn.pol2car(intersection_pt, 300, -np.pi / 2)
     end_pt = mfn.pol2car(intersection_pt, 600, np.pi / 2)
     paths.append(create_line(start_pt, intersection_pt, 25))
     paths.append(circ)
@@ -107,7 +107,6 @@ def loop_line():
             super_path.append(pt)
     paths = [super_path]
     return paths
-
 
 
 def main():
@@ -131,8 +130,7 @@ def main():
         else:
             print(f"options: {opts}")
             sys.exit()
-    
-            
+
 
 if __name__ == "__main__":
     main()

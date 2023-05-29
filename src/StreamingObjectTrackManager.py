@@ -30,6 +30,7 @@ def adjust_angle(theta):
 
     return theta
 
+
 LABELS = True
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
@@ -81,19 +82,18 @@ class ObjectTrackManager:
         self.imported = imported
         self.parent_agent = parent_agent
 
-
     def get_predictions(self, pred_arr):
         """
         Returns the predictions from all active tracks, or a specified index
         """
         if not self.has_active_tracks():
             return []
-        
-        for i,trk in enumerate(self.active_tracks):
+
+        for i, trk in enumerate(self.active_tracks):
             if trk.get_state_estimation() == None:
                 continue
-            pred_arr.append((trk.get_last_detection(),trk.get_state_estimation()))
-        
+            pred_arr.append((trk.get_last_detection(), trk.get_state_estimation()))
+
         return pred_arr
 
     def add_angular_displacement(self, distance, angle, direction=1):
@@ -103,24 +103,24 @@ class ObjectTrackManager:
         # print(f"displacement: \t{angle}")
         if not self.has_active_tracks():
             return
-        for i,trk in enumerate(self.active_tracks):
+        for i, trk in enumerate(self.active_tracks):
             rot_mat = tfn.calculate_rotation_matrix(angle, 1)
             new_pt = trk.path[-1].get_cartesian_coord()
-            new_pt = tfn.rotate_point((0,0), new_pt, rot_mat)
+            new_pt = tfn.rotate_point((0, 0), new_pt, rot_mat)
 
-            pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), new_pt)
-            
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), new_pt)
+
             trk.path[-1].position.x = new_pt[0]
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
             print(yb.bbox)
-            x,y = yb.bbox[:2]
+            x, y = yb.bbox[:2]
             yb.bbox = [pt2[0], pt2[1], 1, 1]
             trk.path[-1].attributes = yb
 
             trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
-            
+
         pass
 
     def add_linear_displacement(self, distance, angle, direction=1):
@@ -129,22 +129,26 @@ class ObjectTrackManager:
         """
         if not self.has_active_tracks():
             return
-        for i,trk in enumerate(self.active_tracks):
+        for i, trk in enumerate(self.active_tracks):
             pt1 = trk.path[-1].get_cartesian_coord()
-            origin = mfn.pol2car(self.parent_agent.get_origin(), distance, self.parent_agent.get_fov_theta())
+            origin = mfn.pol2car(
+                self.parent_agent.get_origin(),
+                distance,
+                self.parent_agent.get_fov_theta(),
+            )
             # theta, r = mfn.car2pol(self.parent_agent.get_origin(), origin)
             new_pt = mfn.pol2car(pt1, -distance, np.pi)
-            print(pt1,new_pt)
+            print(pt1, new_pt)
             # print(new_pt)
             # continue
-            pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), new_pt)
-            
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), new_pt)
+
             trk.path[-1].position.x = new_pt[0]
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
             print(yb.bbox)
-            x,y = yb.bbox[:2]
+            x, y = yb.bbox[:2]
             yb.bbox = [pt2[0], pt2[1], 1, 1]
             trk.path[-1].attributes = yb
 

@@ -77,7 +77,7 @@ class ObjectTrack:
         """
         self.last_frame = frame_id
         detection.parent_track = self.track_id
-        
+
         # set detection time
         self.detection_idx.append(self.clock)
 
@@ -89,7 +89,7 @@ class ObjectTrack:
             self.update_track_trajectory(detection)
         self.error_over_time.append(error)
         self.path.append(detection)
-    
+
     def update_track_trajectory(self, det, displacement=None):
         """
         Updates the track trajectory components using cartesian coordinates
@@ -104,7 +104,7 @@ class ObjectTrack:
         curr_pt = det.get_cartesian_coord()
 
         theta, distance = mfn.car2pol(last_pt, curr_pt)
-        
+
         if len(self.v) and distance != 0:
             self.delta_v.append(min(1.1, distance / self.v[-1]))
         if len(self.delta_theta):
@@ -128,7 +128,7 @@ class ObjectTrack:
         Returns a Detection
         """
         last_pos = self.get_last_detection()
-        
+
         if len(self.path) == 1:
             return last_pos
 
@@ -136,24 +136,28 @@ class ObjectTrack:
         scale_distance = 1
         if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
             scale_distance = self.delta_v[-1]
-        
+
         # angular acceleration
         angle_adjust = self.delta_theta[-1]
-        
+
         # velocity
         velocity = self.v[-1] * scale_distance
-        pt = mfn.pol2car(last_pos.get_cartesian_coord(), velocity , adjust_angle(self.theta[-1] + angle_adjust))
-        
+        pt = mfn.pol2car(
+            last_pos.get_cartesian_coord(),
+            velocity,
+            adjust_angle(self.theta[-1] + angle_adjust),
+        )
+
         # map cartesian coordinates to sensor coordinates
-        pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), pt)
-        
+        pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), pt)
+
         # update sensor yolobox coordinates
         yb = None
         yb = last_pos.get_attributes()
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
-        
-        det = Detection(Position(pt[0],pt[1]), yb)
+
+        det = Detection(Position(pt[0], pt[1]), yb)
         return det
 
         pass
@@ -163,7 +167,7 @@ class ObjectTrack:
         Predict an intermediate position of the target using its
         movement characteristics, scaled by the average detection time
         """
-        
+
         pass
 
     def get_state_estimation(self):
@@ -214,7 +218,7 @@ class ObjectTrack:
         if len(self.path) > 0:
             return self.path[-1]
         return None
-    
+
     def get_last_detection_coordinate(self):
         """
         Accessor for the coordinate of the last detection
@@ -247,11 +251,9 @@ class ObjectTrack:
         for i, det in enumerate(self.path):
             yb = det.get_attributes()
             fid = None
-            
+
             fid = yb.img_filename
             yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
             yb_json["track_id"] = self.track_id
-            steps.append(
-                yb_json
-            )
+            steps.append(yb_json)
         return steps

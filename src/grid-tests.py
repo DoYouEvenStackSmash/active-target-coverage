@@ -30,6 +30,7 @@ import os
 from drawing_functions import *
 
 from support.file_loader import *
+
 COLLISION_THRESHOLD = 10
 VERBOSE = True
 SAMPLE_RATE = 400
@@ -76,7 +77,7 @@ def grid_sensing_agent(screen, sensing_agent, points):
                             pafn.frame_draw_dot(screen, p, pafn.colors["green"], 8, 6)
                         else:
                             pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)
-                    
+
                 elif pygame.key.get_mods() == LCTRL:
                     while pygame.MOUSEBUTTONUP not in [
                         event.type for event in pygame.event.get()
@@ -84,32 +85,33 @@ def grid_sensing_agent(screen, sensing_agent, points):
                         continue
                     p = pygame.mouse.get_pos()
                     pt = sensing_agent.transform_to_local_detection_coord(p)
-                    pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
-                    detectable, flag = sensing_agent.is_detectable(pt2)                    
+                    pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
+                    detectable, flag = sensing_agent.is_detectable(pt2)
                     if detectable:
                         print(f"p: {p}\tpt3: {pt2}")
                         pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
                     else:
                         pafn.frame_draw_dot(screen, p, pafn.colors["red"])
-                    
+
                     print(pt2)
                     continue
 
                 for p in points:
                     pt = sensing_agent.transform_to_local_detection_coord(p)
 
-                    pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
+                    pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
                     pt3 = sensing_agent.transform_to_global_coord(pt)
 
                     detectable, flag = sensing_agent.is_detectable(pt2)
-                    
+
                     if detectable:
                         print(f"p: {p}\tpt3: {pt2}")
                         pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
                     else:
                         pafn.frame_draw_dot(screen, p, pafn.colors["red"])
-                    
+
                 pygame.display.update()
+
 
 def init_test_agent(origin, orientation, _id=0):
     sensing_agent = SensingAgent()
@@ -150,6 +152,7 @@ def init_test_agent(origin, orientation, _id=0):
     rotation = sensing_agent.rotate_agent(orientation)
     return sensing_agent
 
+
 def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
@@ -158,8 +161,9 @@ def main():
     theta, r = mfn.car2pol(p[1], p[0])
     start_pt = mfn.pol2car(p[0], 50, theta)
 
-    sensing_agent = init_test_agent((500,500),p[0], "A")
+    sensing_agent = init_test_agent((500, 500), p[0], "A")
     grid_sensing_agent(screen, sensing_agent, p)
-    
+
+
 if __name__ == "__main__":
-  main()
+    main()

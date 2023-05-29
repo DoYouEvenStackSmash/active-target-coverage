@@ -372,7 +372,7 @@ def repeatable_sensing_agent(screen, sensing_agent):
                         continue
                     p = pygame.mouse.get_pos()
                     dc = sensing_agent.transform_to_local_coord(p)
-                    pt = Position(dc[0],dc[1])
+                    pt = Position(dc[0], dc[1])
                     fc = sensing_agent.transform_to_global_coord(pt)
                     print(f"original {p}\tdc {dc}\tfc {fc}")
                     continue
@@ -385,7 +385,7 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     pt = sensing_agent.transform_to_local_detection_coord(p)
                     # print(pt)
                     # dc = sensing_agent.transform_to_local_bbox(p)
-                    pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
+                    pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
                     pt3 = sensing_agent.transform_to_global_coord(pt)
                     print(f"p: {p}\tpt3: {pt3}")
                     detectable, flag = sensing_agent.is_detectable(pt2)
@@ -472,7 +472,7 @@ def repeatable_multiagent_test(screen, environment):
                 r, t = agent.tracker_query()
                 agent.reposition(r, t)
 
-                curr_pt, pred_pt = (),()
+                curr_pt, pred_pt = (), ()
                 arr = sensing_agent.estimate_next_detection()
                 if len(arr):
                     curr_pt = arr[0][0]

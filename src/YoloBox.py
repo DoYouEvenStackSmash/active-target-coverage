@@ -6,6 +6,7 @@ import numpy as np
   Generic class for yolo annotation data
 """
 
+
 class YoloBox:
     """A class representing a single detection in Yolo format
     Attributes:
@@ -72,8 +73,8 @@ class YoloBox:
         # calculate width and height
         w, h = abs(pt1[0] - pt2[0]), abs(pt1[1] - pt2[1])
         return [mpx, mpy, w, h]
-    
-    def to_json(self, fid = None, error = -1 ,sid = -1, color = (255,255,255)):
+
+    def to_json(self, fid=None, error=-1, sid=-1, color=(255, 255, 255)):
         # print(self.bbox)
         return {
             "id": -1,

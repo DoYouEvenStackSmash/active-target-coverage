@@ -136,11 +136,12 @@ def draw_rigid_body(screen, rigid_body):
     # pafn.frame_draw_bold_line(screen, rigid_body.get_horizontal_axis(), pafn.colors["black"])
     # pafn.frame_draw_bold_line(screen, rigid_body.get_vertical_axis(), pafn.colors["black"])
 
+
 def draw_body_grid(screen, rigid_body):
     axes = rigid_body.get_grid()
     for ax in axes:
         pafn.frame_draw_line(screen, ax, pafn.colors["black"])
-    
+
 
 def draw_sensing_agent(screen, sensing_agent):
     """
