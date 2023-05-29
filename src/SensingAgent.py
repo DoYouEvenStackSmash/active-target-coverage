@@ -14,7 +14,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 
 import json
 from State import State
@@ -27,7 +27,7 @@ from Sensor import Sensor
 import pygame
 import time
 from typing import Any, List, Dict, Set
-
+from Detection import *
 
 def adjust_angle(theta):
     """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
@@ -102,6 +102,7 @@ class SensingAgent:
 
         # perform translation
         if est_translation != None:
+            print(f"est_translation:{est_translation}")
             translation = self.apply_translation_to_agent(est_translation)
 
         # update tracker
@@ -119,7 +120,7 @@ class SensingAgent:
             self.obj_tracker.add_angular_displacement(0, -body_rotation, direction)
 
         if body_translation != 0:
-            self.obj_tracker.add_linear_displacement(-body_translation, 0)
+            self.obj_tracker.add_linear_displacement(-body_translation, -body_rotation)
 
     def heartbeat(self):
         """
@@ -280,7 +281,7 @@ class SensingAgent:
         }
         return e
 
-    def new_detection_layer(self, frame_id, detection_list):
+    def new_detection_set(self, frame_id, detection_list):
         """
         Ingest for a new layer of detections from the outside world.
 
@@ -291,9 +292,14 @@ class SensingAgent:
         detections = []
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
-            dc = self.transform_to_local_bbox(a.get_origin())
-            yb = sann.register_annotation(a.get_id(), dc, curr_state)
-            detections.append(yb)
+            val = self.transform_to_local_detection_coord(a.get_origin())
+            # print(f"val {val}")
+            dc = self.transform_to_local_sensor_coord((0,0),(val[0],val[1]))
+            print(dc)
+            bbox = [dc[0],dc[1], 1,1]
+            yb = sann.register_annotation(a.get_id(), bbox, curr_state)
+            posn = Position(val[0], val[1])
+            detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
@@ -322,6 +328,35 @@ class SensingAgent:
         h = 1
 
         return [x, y, w, h]
+    
+    def transform_to_local_sensor_coord(self, origin, target_pt, sensor_idx=-1):
+        """
+        Transforms a point to local sensor curved coordinate frame
+        """
+
+        theta, r = mfn.car2pol(origin, target_pt)
+
+        
+        ratio = theta / self.get_fov_width()
+
+        x = Sensor.WINDOW_WIDTH * ratio + 50
+        # print(x)
+        y = r
+        w = 1
+        h = 1
+
+        return (x,y)
+    
+    def transform_to_local_detection_coord(self, target_pt):
+        """
+        transforms a target point to local rectangular coordinates
+        """
+        
+        target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
+        r = mfn.euclidean_dist(self.get_center(), target_pt)
+        
+        local_pt = mfn.pol2car((0,0), r, target_rotation)
+        return local_pt
 
     def transform_from_local_coord(self, x, y, w=1, h=1):
         """
@@ -335,29 +370,61 @@ class SensingAgent:
 
         return pt
 
-    def estimate_pose_update(self, idx=0):
+    def transform_to_global_coord(self, target_pt):
+        """
+        Transforms a position from agent local coords to world coords
+        returns a point
+        """
+        # pt1 = self.get_relative_angle()
+        # pt1 = position.get_attr_coord()
+        
+        pt1 = target_pt
+        x,y = pt1
+        # print(self.get_rel_theta())
+        theta2, r = mfn.car2pol(target_pt, (0,0))
+        theta2 = adjust_angle(theta2 + self.get_fov_theta() + np.pi)
+
+        
+        pt = mfn.pol2car(self.get_center(), r, theta2)
+        return pt
+
+
+    def estimate_pose_update(self, priorities=0):
         """
         Uses past information to predict the next rotation if it exists
         Returns () or the tuple containing the partial rotation
         """
-        curr_pt, pred_pt = self.estimate_rel_next_detection()
 
+        rel_det = self.estimate_rel_next_detection()
+        
+        if not len(rel_det):
+            print("empty")
+            return (None, None)
+        
+        curr_det, pred_det = rel_det[0]
+        if pred_det == None:
+            return (None, None)
+        pred_pt = pred_det.get_attr_coord()
+        curr_pt = curr_det.get_attr_coord()
+        print(pred_pt)
         # if no estimate available
         if not len(pred_pt):
             return (None, None)
 
         # if first element in track, therefore duplicate
-        if curr_pt == pred_pt:
-            return (None, None)
+        # if curr_pt == pred_pt:
+        #     return (None, None)
 
-        status, flag = self.centered_sensor.is_rel_detectable(pred_pt)
-
+        status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
+        
         # if predicted point is detectable from pov of SensingAgent
         if status:
             return (None, None)
 
         # if predicted point is out of coverage by range
         if flag == Sensor.RANGE:
+            pred_pt = pred_det.get_attr_coord()
+            print(f"pred_pt {pred_pt}")
             offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
             if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
@@ -365,6 +432,7 @@ class SensingAgent:
 
         # if predicted point is out of coverage by angle
         if flag == Sensor.ANGULAR:
+            pred_pt = pred_det.get_attr_coord()
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, None)
 
@@ -375,37 +443,35 @@ class SensingAgent:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, offset)
+    
+    def get_predictions(self, idx=-1):
+        pred = []
+        if idx != -1:
+            pred = self.obj_tracker.get_predictions(pred)
+        else:
+            pred = self.obj_tracker.get_predictions(pred)
+        return pred
 
     def estimate_rel_next_detection(self, idx=0):
         """
         Estimates next detection in local coordinate system
-        returns a pair of points
+        returns a pair of Positions
         """
-        last_pt, pred_pt = (), ()
-
-        if self.obj_tracker.has_active_tracks():
-            trk = self.obj_tracker.active_tracks[idx]
-            trk_h = trk.get_track_heading()
-            last_pt = trk.get_last_detection()
-            pred_pt = trk.predict_next_detection()
-
-        nd = (last_pt, pred_pt)
-
-        return nd
+        pred = self.get_predictions()
+        
+        return pred
+        
 
     def estimate_next_detection(self, idx=0):
         """
         Estimates next detection in external coordinate system
         returns a pair of points
         """
-        last_pt, pred_pt = (), ()
-        nd = self.estimate_rel_next_detection(idx)
-        if len(nd[0]) and len(nd[1]):
-            lx, ly = nd[0]
-            px, py = nd[1]
-            last_pt = self.transform_from_local_coord(lx, ly)
-            pred_pt = self.transform_from_local_coord(px, py)
-
-        nd = (last_pt, pred_pt)
-
-        return nd
+        
+        rel_det = self.estimate_rel_next_detection(idx)
+        abs_det = []
+        for det in rel_det:
+            curr = self.transform_to_global_coord(det[0].get_cartesian_coord())
+            pred = self.transform_to_global_coord(det[1].get_cartesian_coord())
+            abs_det.append((curr,pred))
+        return abs_det

@@ -298,12 +298,12 @@ class PygameArtFxns:
         s, e = point_set
         pygame.draw.line(screen, color, s, e, width=4)
 
-    def frame_draw_dot(screen, point, color=(0, 0, 0), width=0):
+    def frame_draw_dot(screen, point, color=(0, 0, 0), width=0, thickness=4):
         """
         Draws a single dot given a point (x, y)
         Returns nothing
         """
-        pygame.draw.circle(screen, color, point, 9, width)
+        pygame.draw.circle(screen, color, point, thickness, width)
 
     def clear_frame(screen, color=(255, 255, 255)):
         """

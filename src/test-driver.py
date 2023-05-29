@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import numpy as np
 from render_support import PygameArtFxns as pafn
 from render_support import GeometryFxns as gfn
@@ -12,7 +13,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
@@ -90,8 +91,10 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
+    # sensing_agent.ALLOW_ROTATION = False
+    # sensing_agent.ALLOW_TRANSLATION = False
     # circular_test(screen, sensing_agent, environment)
-    # interactive_single_agent_test(screen, sensing_agent, environment)
+    # stepwise_single_agent_test(screen, sensing_agent, environment)
     single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
 

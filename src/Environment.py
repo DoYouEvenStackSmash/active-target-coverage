@@ -14,7 +14,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 
 import json
 
@@ -79,7 +79,7 @@ class Environment:
 
         # update the trackers of all agents
         for k in updates:
-            self.agents[k].new_detection_layer(frame_id, updates[k])
+            self.agents[k].new_detection_set(frame_id, updates[k])
 
     def add_target(self, T):
         """

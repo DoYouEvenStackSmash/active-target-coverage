@@ -6,11 +6,12 @@ from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
 from render_support import TransformFxns as tfn
-from aux_functions import *
+
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
+import numpy as np
 
 """
   Global scope data structure for processing a set of images
@@ -29,7 +30,6 @@ def adjust_angle(theta):
 
     return theta
 
-
 LABELS = True
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
@@ -38,9 +38,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 3,
+        "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 200,
+        "radial_exclusion": 150,
     }
     display_constants = {"trail_len": 0}
 
@@ -81,95 +81,72 @@ class ObjectTrackManager:
         self.imported = imported
         self.parent_agent = parent_agent
 
-    def add_predictions(self):
-        """
-        Update predictionsfrom all active tracks
-        """
-        if not self.has_active_tracks():
-            return []
-        estimates = []
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            pred = trk.predict_next_position()
-            if pred != None:
-                estimates.append(
-                    trk.add_new_prediction(
-                        sann.register_annotation(
-                            trk.class_id,
-                            (pred[0], pred[1], 1, 1),
-                            self.parent_agent.exoskeleton.get_age(),
-                        )
-                    )
-                )
-        return estimates
 
-    def get_predictions(self):
+    def get_predictions(self, pred_arr):
         """
-        Get estimates from all active tracks
+        Returns the predictions from all active tracks, or a specified index
         """
         if not self.has_active_tracks():
             return []
-        estimates = []
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            pred = trk.get_latest_prediction()
-            if pred != None:
-                estimates.append(pred)
-        return estimates
+        
+        for i,trk in enumerate(self.active_tracks):
+            if trk.get_state_estimation() == None:
+                continue
+            pred_arr.append((trk.get_last_detection(),trk.get_state_estimation()))
+        
+        return pred_arr
 
     def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
+        # print(f"displacement: \t{angle}")
         if not self.has_active_tracks():
             return
-        off_t = min(abs(angle), self.parent_agent.get_fov_width() / 2)
-        print(f"OFFT {off_t}")
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
-            last_d, last_v, delta_v, theta = trk.get_track_heading()
+        for i,trk in enumerate(self.active_tracks):
+            rot_mat = tfn.calculate_rotation_matrix(angle, 1)
+            new_pt = trk.path[-1].get_cartesian_coord()
+            new_pt = tfn.rotate_point((0,0), new_pt, rot_mat)
 
-            ratio = angle / self.parent_agent.get_fov_width()
-            disp = ratio * 100
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), new_pt)
+            
+            trk.path[-1].position.x = new_pt[0]
+            trk.path[-1].position.y = new_pt[1]
 
-            orig_theta = adjust_angle(self.parent_agent.get_fov_theta() + angle)
+            yb = trk.path[-1].get_attributes()
+            print(yb.bbox)
+            x,y = yb.bbox[:2]
+            yb.bbox = [pt2[0], pt2[1], 1, 1]
+            trk.path[-1].attributes = yb
 
-            new_angle = 0
-            # # angle = 0
-            if disp < 0:
-                new_angle = adjust_angle(trk.theta[-1] + angle + off_t)
-            if disp > 0:
-                if trk.theta[-1] < -np.pi / 2:
-                    new_angle = adjust_angle(trk.theta[-1] - angle + off_t)
-                else:
-                    new_angle = adjust_angle(trk.theta[-1] + angle - off_t)
-            print(
-                f"orig:\t{orig_theta}\nangle:\t{angle}\nofft:\t{off_t}\ntrk:\t{trk.theta[-1]}\ndisp:\t{disp}\nnew:\t{new_angle}\n\n"
-            )
-            # print(f"trk.theta: {trk.theta[-1]}\tnew_angle: {new_angle}")
+            trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
+            
+        pass
 
-            trk.theta[-1] = new_angle
-            x, y = last_d
-            print(x)
-            print(trk.predictions[-1])
-            nx, ny = [last_d[0] + disp, last_d[1]]
-            trk.path[-1].bbox = [nx, ny, 1, 1]
-
-            # print(nx)
-
-    def add_linear_displacement(self, distance, angle):
+    def add_linear_displacement(self, distance, angle, direction=1):
         """
         Apply a linear displacement to offset a translation by a parent agent
         """
         if not self.has_active_tracks():
             return
-        for i in range(len(self.active_tracks)):
-            trk = self.active_tracks[i]
+        for i,trk in enumerate(self.active_tracks):
+            pt1 = trk.path[-1].get_cartesian_coord()
+            origin = mfn.pol2car(self.parent_agent.get_origin(), distance, self.parent_agent.get_fov_theta())
+            # theta, r = mfn.car2pol(self.parent_agent.get_origin(), origin)
+            new_pt = mfn.pol2car(pt1, -distance, np.pi)
+            print(pt1,new_pt)
+            # print(new_pt)
+            # continue
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), new_pt)
+            
+            trk.path[-1].position.x = new_pt[0]
+            trk.path[-1].position.y = new_pt[1]
 
-            last_d, last_v, delta_v, theta = trk.get_track_heading()
-            new_posn = [last_d[0], last_d[1] + distance]
-
-            trk.path[-1].bbox = [new_posn[0], new_posn[1], 1, 1]
+            yb = trk.path[-1].get_attributes()
+            print(yb.bbox)
+            x,y = yb.bbox[:2]
+            yb.bbox = [pt2[0], pt2[1], 1, 1]
+            trk.path[-1].attributes = yb
 
     def init_new_layer(self):
         """
@@ -196,7 +173,6 @@ class ObjectTrackManager:
         returns a layer of yoloboxes
         """
         if len(self.layers) == 0:
-            print()
             return []
         return self.layers[layer_idx]
 
@@ -233,7 +209,8 @@ class ObjectTrackManager:
         Helper function for creating object tracks
         """
         track_id = len(self.global_track_store)
-        T = ObjectTrack(track_id, entity.class_id)
+        T = ObjectTrack(track_id, entity.attributes.class_id)
+        T.parent_agent = self.parent_agent
         T.add_new_detection(entity, fc)
         self.global_track_store[track_id] = T
         self.active_tracks.append(T)
@@ -245,7 +222,7 @@ class ObjectTrackManager:
         self.active_tracks = collections.deque()
         curr_layer = self.layers[idx]
         for elem in curr_layer:
-            self.create_new_track(elem, elem.class_id)
+            self.create_new_track(elem, idx)
 
     def close_all_tracks(self):
         """
@@ -303,12 +280,12 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.predict_next_detection()))
+            pred.append((t.track_id, t.get_state_estimation().get_cartesian_coord()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = MathFxns.euclidean_dist(p[1], curr_layer[c].get_center_coord())
+                d = mfn.euclidean_dist(p[1], curr_layer[c].get_cartesian_coord())
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

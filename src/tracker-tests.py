@@ -13,7 +13,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
@@ -109,9 +109,30 @@ def import_agent_record(screen, agent_record):
         # render_path(screen, pts, color)
         pygame.display.update()
 
+def draw_yolobox_arr(screen, arr, points_arr = None):
+    for yb in arr:
+        # print(yb.bbox)
+        x, y, w, h = yb.bbox
+        pred_pt = (x, y)
+
+        curr_pt = pred_pt
+
+        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+        pafn.frame_draw_line(
+            screen, (curr_pt, pred_pt), pafn.colors["white"]
+        )
+
+def draw_prediction_vec(screen, curr_pt, pred_pt):
+    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
+    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+    pafn.frame_draw_line(
+        screen, (curr_pt, pred_pt), pafn.colors["white"]
+    )
 
 def constant_angular_test(screen, path, environment):
     pred_pts = []
+    curr_pts = []
     est_pts = []
     for i in range(0, len(path)):
         p = path[i]
@@ -122,41 +143,25 @@ def constant_angular_test(screen, path, environment):
         # pygame.display.update()
         for k in environment.agents:
             sensing_agent = environment.agents[k]
-            # est = sensing_agent.add_predictions()
-            
-            
 
-            
-            for L in range(2):
-                if i % 2:
-                    break
-                r, tr = sensing_agent.tracker_query()
-                sensing_agent.reposition(r, tr)
-                continue
-                
-                
-                print(est)
-                # print(est)
-                for yb in est:
-                    # print(yb.bbox)
-                    x, y, w, h = yb.bbox
-                    pred_pt = (x, y)
+            # if not i % 2:
+            curr_pt, pred_pt = (),()
+            arr = sensing_agent.estimate_next_detection()
+            if len(arr):
+                curr_pt = arr[0][0]
+                pred_pt = arr[0][1]
+            if len(pred_pt):
+                pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+                pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+            for i in range(len(pred_pts)):
+              draw_prediction_vec(screen, curr_pts[i], pred_pts[i])
+              # pygame.display.update()
+            # if i % 2:
+            #   est = sensing_agent.obj_tracker.add_predictions()
+            r, tr = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, tr)
 
-                    curr_pt = pred_pt
-
-                    pred_pt = sensing_agent.transform_from_local_coord(x, y)
-
-                    est_pts.append(pred_pt)
-
-                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-                    pafn.frame_draw_line(
-                        screen, (curr_pt, pred_pt), pafn.colors["white"]
-                    )
-
-            # pygame.display.update()
-                  # time.sleep(0.06)
-            # est = sensing_agent.obj_tracker.add_predictions()
             draw_sensing_agent(screen, sensing_agent)
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
@@ -164,9 +169,12 @@ def constant_angular_test(screen, path, environment):
             t.origin = p
             pafn.frame_draw_dot(screen, t.origin, pafn.colors["green"])
         pygame.display.update()
-        if i < 5 or not i % 4:
+        if True or i < 2 or not i % 7:
+          for t in environment.targets:
+            # t.origin = p
+            pafn.frame_draw_dot(screen, t.origin, pafn.colors["cyan"])
           environment.visible_targets()
-        time.sleep(0.01)
+        time.sleep(0.1)
 
     while 1:
         for event in pygame.event.get():
@@ -184,14 +192,14 @@ def constant_angular_test(screen, path, environment):
 
 def main():
     pygame.init()
-    screen = pafn.create_display(1000, 1000)
+    screen = pafn.create_display(1000, 1400)
     pafn.clear_frame(screen)
     p = load_json_file(sys.argv[1])
     theta, r = mfn.car2pol(p[1], p[0])
     start_pt = mfn.pol2car(p[0], 50, theta)
 
-    sensing_agent = init_test_agent(start_pt, p[0], "A")
-    sensing_agent.centered_sensor.fov_radius = 400
+    sensing_agent = init_test_agent(start_pt,p[0], "A")
+    sensing_agent.centered_sensor.fov_radius = 259
     environment = Environment()
     target = Target(p[0])
     environment.add_target(target)

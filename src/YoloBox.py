@@ -6,7 +6,6 @@ import numpy as np
   Generic class for yolo annotation data
 """
 
-
 class YoloBox:
     """A class representing a single detection in Yolo format
     Attributes:
@@ -73,42 +72,22 @@ class YoloBox:
         # calculate width and height
         w, h = abs(pt1[0] - pt2[0]), abs(pt1[1] - pt2[1])
         return [mpx, mpy, w, h]
-
-    def rotate_quad(self, dir_flag):
-        """
-        Rotate a yolobox 90 degrees
-        Since the expectation is a transpose of the image, center is changed
-        """
-        cbx, cby, w, h = self.bbox
-        cx, cy = self.center_xy
-        self.bbox[0] = cy + ((cby - cy) * dir_flag)
-        self.bbox[1] = cx + ((cbx - cx) * dir_flag * -1)
-        self.bbox[2] = h
-        self.bbox[3] = w
-
-        # swap dimensions after rotation
-        self.center_xy = cy, cx
-
-    def reflectXY(self):
-        """
-        Reflect a box across the x, then the Y axis.
-        Equivalent to a rotation by 180 degrees
-        """
-        # cbx,cby,w,h = self.bbox
-        cx, cy = self.center_xy
-        self.bbox[0] = cx + ((self.bbox[0] - cx) * -1)
-        self.bbox[1] = cy + ((self.bbox[1] - cy) * -1)
-
-    def reflectX(self):
-        """
-        reflect a box across the y axis
-        """
-        cx = self.center_xy[0]
-        self.bbox[0] = cx + ((self.bbox[0] - cx) * -1)
-
-    def reflectY(self):
-        """
-        reflect a box across the X axis
-        """
-        cy = self.center_xy[1]
-        self.bbox[1] = cy + ((self.bbox[1] - cy) * -1)
+    
+    def to_json(self, fid = None, error = -1 ,sid = -1, color = (255,255,255)):
+        # print(self.bbox)
+        return {
+            "id": -1,
+            "image_id": fid,
+            "category_id": self.class_id,
+            "bbox": self.bbox,
+            "area": self.bbox[2] * self.bbox[3],
+            "segmentation": [],
+            "iscrowd": 0,
+            "track_id": -1,
+            "trackmap_index": -1,
+            "vid_id": 0,
+            "track_color": color,
+            "displaced": self.displaced,
+            "error": error,
+            "state_id": sid,
+        }

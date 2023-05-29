@@ -17,7 +17,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
@@ -29,6 +29,7 @@ import pygame
 import pygame.gfxdraw
 import time
 import os
+from Detection import *
 
 from drawing_functions import *
 
@@ -370,8 +371,9 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     ]:
                         continue
                     p = pygame.mouse.get_pos()
-                    dc = sensing_agent.transform_to_local_bbox(p)
-                    fc = sensing_agent.transform_from_local_coord(dc[0], dc[1])
+                    dc = sensing_agent.transform_to_local_coord(p)
+                    pt = Position(dc[0],dc[1])
+                    fc = sensing_agent.transform_to_global_coord(pt)
                     print(f"original {p}\tdc {dc}\tfc {fc}")
                     continue
                 else:
@@ -380,8 +382,13 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     ]:
                         continue
                     p = pygame.mouse.get_pos()
-                    dc = sensing_agent.transform_to_local_bbox(p)
-                    detectable, flag = sensing_agent.is_detectable((dc[0], dc[1]))
+                    pt = sensing_agent.transform_to_local_detection_coord(p)
+                    # print(pt)
+                    # dc = sensing_agent.transform_to_local_bbox(p)
+                    pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
+                    pt3 = sensing_agent.transform_to_global_coord(pt)
+                    print(f"p: {p}\tpt3: {pt3}")
+                    detectable, flag = sensing_agent.is_detectable(pt2)
                     if detectable:
                         pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
                     else:
@@ -465,11 +472,15 @@ def repeatable_multiagent_test(screen, environment):
                 r, t = agent.tracker_query()
                 agent.reposition(r, t)
 
-                curr_pt, pred_pt = agent.estimate_next_detection()
-                # # environment.agents[_id] = sensing_agent
+                curr_pt, pred_pt = (),()
+                arr = sensing_agent.estimate_next_detection()
+                if len(arr):
+                    curr_pt = arr[0][0]
+                    pred_pt = arr[0][1]
+                print(arr)
                 if len(pred_pt):
-                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["red"])
-                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["tangerine"])
+                    pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+                    pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
                     pafn.frame_draw_line(
                         screen, (curr_pt, pred_pt), pafn.colors["white"]
                     )

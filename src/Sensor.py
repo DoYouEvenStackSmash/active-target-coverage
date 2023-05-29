@@ -20,7 +20,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.1
+    TOLERANCE = 0.15
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 
@@ -151,11 +151,8 @@ class Sensor:
         Returns a boolean indicator and a type identifier
         """
         # boundary conditions
-        adj_win_bnd = (self.get_fov_width() / 2) - (
-            self.get_fov_width() / 2
-        ) * Sensor.TOLERANCE * 2
+        adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
         adj_rad_bnd = self.get_fov_radius()
-
         target_x = target_pt[0]
         target_y = target_pt[1]
         flags = 0
@@ -171,10 +168,12 @@ class Sensor:
 
         # if angle out of bounds
         if (
-            target_x < 0 + Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
-            or target_x > Sensor.WINDOW_WIDTH - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
+            target_x < 0 + adj_win_bnd
+            or target_x > Sensor.WINDOW_WIDTH - adj_win_bnd
         ):
+            
             flags += Sensor.ANGULAR
+            print("angle oob")
         if flags > 0:
             return False, flags
 

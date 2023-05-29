@@ -4,6 +4,7 @@ from aux_functions import *
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+from Detection import *
 import sys
 
 
@@ -62,6 +63,7 @@ class ObjectTrack:
         self.detection_time = 1
         self.avg_detection_time = 1
         self.clock = 0
+        self.parent_agent = None
 
     def heartbeat(self):
         """
@@ -69,133 +71,110 @@ class ObjectTrack:
         """
         self.clock += 1
 
-    def add_new_detection(self, yb, frame_id, error=-1):
+    def add_new_detection(self, detection, frame_id, error=-1):
         """
         Add a new bounding box to the object track
         """
-        # update velocity
-        self.heartbeat()
-
+        self.last_frame = frame_id
+        detection.parent_track = self.track_id
+        
+        # set detection time
         self.detection_idx.append(self.clock)
-        if len(self.path) > 0:
+
+        if len(self.path):
             self.detection_time = (
                 self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
             )
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
-
-            self.update_track_vector(yb.get_center_coord())
-
+            self.update_track_trajectory(detection)
         self.error_over_time.append(error)
+        self.path.append(detection)
+    
+    def update_track_trajectory(self, det, displacement=None):
+        """
+        Updates the track trajectory components using cartesian coordinates
+            Velocity
+            Acceleration
+            Angular velocity
+            Angular Acceleration
+        """
+        last_det = self.get_last_detection()
+        last_pt = last_det.get_cartesian_coord()
 
-        self.last_frame = frame_id
-        yb.parent_track = self.track_id
+        curr_pt = det.get_cartesian_coord()
 
-        self.path.append(yb)
-        self.predictions.append([])
+        theta, distance = mfn.car2pol(last_pt, curr_pt)
+        
+        if len(self.v) and distance != 0:
+            self.delta_v.append(min(1.1, distance / self.v[-1]))
+        if len(self.delta_theta):
+            self.delta_theta.append(adjust_angle(theta - self.theta[-1]))
+
+        self.v.append(distance)
+
+        self.theta.append(theta)
+
+        pass
 
     def add_new_prediction(self, pred):
         """
         Wrapper for object track adding its own prediction
         """
-        if pred != None:
-            self.predictions[-1].append(pred)
-        self.heartbeat()
-        return pred
-
-    def update_track_vector(self, pt, displacement=None):
-        """
-        Update track trajectory information
-        Assumes path is not empty
-        """
-        center = self.path[-1].get_center_coord()
-        theta, distance = mfn.car2pol(center, pt)
-
-        if len(self.v) > 1 and distance != 0:
-            self.delta_v.append(min(1.1, distance / self.v[-1]))
-
-        self.v.append(distance)
-
-        self.r = distance
-
-        self.theta.append(theta)
-
-        # add recent velocity to delta_v
+        pass
 
     def estimate_next_position(self):
         """
-        Predict next bounding box center
+        Estimate position of next detection using trajectory components
+        Returns a Detection
         """
-        # last_detection = self.detection_idx[-1]
-        lx, ly = self.path[-1].get_center_coord()
-        if len(self.path) == 1:
-            return (lx, ly)
-
-        last_distance = self.v[-1]
-        distance = 0
-        # consider acceleration in estimate
-        last_change_in_distance = self.delta_v[-1]
-
-        if last_change_in_distance != 0:
-            distance = last_distance * last_change_in_distance
-        else:
-            distance = last_distance
-
-        new_posn = mfn.pol2car((lx, ly), distance, self.theta[-1])
-
-        return new_posn
-
-    def predict_next_position(self):
-        """
-        Prediction for the next position by scaled theta and velocity, constant acceleration
-        """
-        # Need at least two detections to make a prediction
-        if len(self.detection_idx) < 2:
-            return None
-
-        time_since_detection = max(1, self.clock - self.detection_idx[-1])
-        scaling_factor = min(1, time_since_detection / self.avg_detection_time)
-
-        lx, ly = self.path[-1].get_center_coord()
-
-        if len(self.predictions[-1]) != 0:
-            lx, ly, w, h = self.predictions[-1][-1].bbox
-
-            time_since_detection = 1
-
-        scaled_last_distance = self.v[-1] * scaling_factor
-        distance = 0
-
-        # consider acceleration in estimate
-        last_change_in_distance = self.delta_v[-1]
-        if last_change_in_distance > 1:
-            last_change_in_distance = 1
-        if last_change_in_distance != 0:
-            distance = scaled_last_distance * last_change_in_distance
-        else:
-            distance = scaled_last_distance
-        # self.theta[-1] = adjust_angle(self.theta[-1])
-        scaled_last_theta = self.theta[-1]
-
-        predicted_posn = mfn.pol2car((lx, ly), distance, scaled_last_theta)
-        return predicted_posn
-
-    def predict_next_detection(self):
-        """
-        wrapper for estimating next bounding box center
-        """
-        estimated_detection = self.estimate_next_position()
-        # self.add_new_prediction()
-        predicted_posn = self.predict_next_position()
-        predicted_posn = None
-        if self.clock - self.detection_idx[-1] > self.avg_detection_time * 10:
-            return predicted_posn
+        last_pos = self.get_last_detection()
         
-        if predicted_posn != None:
-            # estimated_detection = predicted_posn
-            ed2 = gfn.get_midpoint(estimated_detection, predicted_posn)
-            estimated_detection = gfn.get_midpoint(estimated_detection, ed2)
+        if len(self.path) == 1:
+            return last_pos
 
-        return estimated_detection
+        # acceleration
+        scale_distance = 1
+        if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
+            scale_distance = self.delta_v[-1]
+        
+        # angular acceleration
+        angle_adjust = self.delta_theta[-1]
+        
+        # velocity
+        velocity = self.v[-1] * scale_distance
+        pt = mfn.pol2car(last_pos.get_cartesian_coord(), velocity , adjust_angle(self.theta[-1] + angle_adjust))
+        
+        # map cartesian coordinates to sensor coordinates
+        pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), pt)
+        
+        # update sensor yolobox coordinates
+        yb = None
+        yb = last_pos.get_attributes()
+        bbox = [pt2[0], pt2[1], 1, 1]
+        yb.bbox = bbox
+        
+        det = Detection(Position(pt[0],pt[1]), yb)
+        return det
+
+        pass
+
+    def predict_next_state(self, steps=1):
+        """
+        Predict an intermediate position of the target using its
+        movement characteristics, scaled by the average detection time
+        """
+        
+        pass
+
+    def get_state_estimation(self):
+        """
+        Using filters, estimate the future kinematic state of the target
+        using a combination of measurements and predictions
+        """
+        if len(self.path):
+            return self.estimate_next_position()
+        return None
+        # pass
 
     def get_track_heading(self):
         """
@@ -212,48 +191,6 @@ class ObjectTrack:
             Expiration (int): lifetime of the track
         """
         return bool(fc - self.last_frame < expiration)
-
-    def reflect_track(self, reflect_axis=None):
-        """
-        DATA AUGMENTATION: Reflect across an axis
-        """
-        if reflect_axis == None:
-            return
-        for ybx in self.path:
-            if reflect_axis == 1:
-                ybx.reflectX()
-            elif reflect_axis == 0:
-                ybx.reflectY()
-            else:
-                break
-
-    def rotate_track(self, offset_deg):
-        """
-        rotate all boxes on an object track
-        Adjusts rotations to ensure rotation is always 90 degrees
-          e.g. 270 -> -90
-          180 -> reflectXY()
-        """
-        if offset_deg == 0:
-            return
-
-        dir_flag = 1
-        if abs(offset_deg) == 180:
-            for ybx in self.path:
-                ybx.reflectXY()
-            return
-
-        # correct rotations to ensure 90 degrees
-        if abs(offset_deg) == 270:
-            offset_deg = 90 if offset_deg < 0 else -90
-
-        # adjust direction
-        if offset_deg < 0:
-            dir_flag = -1
-
-        # Rotate quadrant of each box
-        for ybx in self.path:
-            ybx.rotate_quad(dir_flag)
 
     def link_path(self):
         """
@@ -272,10 +209,19 @@ class ObjectTrack:
     def get_last_detection(self):
         """
         Accessor for getting the last detection in a track
+        returns a Detection
+        """
+        if len(self.path) > 0:
+            return self.path[-1]
+        return None
+    
+    def get_last_detection_coordinate(self):
+        """
+        Accessor for the coordinate of the last detection
         """
         if len(self.path) > 0:
             return self.path[-1].get_center_coord()
-        return ()
+        return None
 
     def get_loco_track(self, fdict=None, steps=None):
         """
@@ -298,26 +244,14 @@ class ObjectTrack:
         """
         steps = steps if steps != None else []
 
-        for i, yb in enumerate(self.path):
+        for i, det in enumerate(self.path):
+            yb = det.get_attributes()
             fid = None
-            # if fdict != None:
-            #   fid = fdict[f'{yb.img_filename[:-3]}png']
+            
             fid = yb.img_filename
+            yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
+            yb_json["track_id"] = self.track_id
             steps.append(
-                {
-                    "id": -1,
-                    "image_id": fid,
-                    "category_id": yb.class_id,
-                    "bbox": yb.bbox,
-                    "area": yb.bbox[2] * yb.bbox[3],
-                    "segmentation": [],
-                    "iscrowd": 0,
-                    "track_id": self.track_id,
-                    "trackmap_index": -1,
-                    "vid_id": 0,
-                    "track_color": self.color,
-                    "displaced": yb.displaced,
-                    "error": self.error_over_time[i],
-                    "state_id": fid,
-                }
+                yb_json
             )
+        return steps

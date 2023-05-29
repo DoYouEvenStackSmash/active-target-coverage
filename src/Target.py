@@ -16,6 +16,7 @@ class Target:
     ):
         self.origin = origin
         self.color = color
+        self.attributes = origin
         self._id = _id
         # self.path = []
 
@@ -31,6 +32,13 @@ class Target:
         Returns an (x,y) point
         """
         return self.origin
+
+    def get_attributes(self):
+        """
+        Accessor for target attributes
+        Generally for use in simulation only
+        """
+        return self.attributes
 
     def get_id(self):
         """
