@@ -125,10 +125,9 @@ class ObjectTrack:
         scale_distance = 1
         if len(self.delta_v) > 1:
             scale_distance = self.delta_v[-1]
-        # if flag == ROTATION_FLAG:
-        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, adjust_angle(self.theta[-1]))
-        # pt2 = last_pos.get_attr_coord()
-        pt2 = self.parent_agent.transform_to_local_sensor_coord((50,0), pt)
+        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, self.theta[-1])
+        
+        pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), pt)
         yb = None
         yb = last_pos.get_attributes()
         if yb == None:
@@ -136,8 +135,6 @@ class ObjectTrack:
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
         
-        # last_pos.attributes.bbox[0] = pt2[0]
-        # last_pos.attributes.bbox[1] = pt2[1]
         
         det = Detection(Position(pt[0],pt[1]), yb)
         return det

@@ -385,8 +385,9 @@ def repeatable_sensing_agent(screen, sensing_agent):
                     pt = sensing_agent.transform_to_local_detection_coord(p)
                     # print(pt)
                     # dc = sensing_agent.transform_to_local_bbox(p)
-                    pt2 = sensing_agent.transform_to_local_sensor_coord((50,0),pt)
-                    print(pt2)
+                    pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
+                    pt3 = sensing_agent.transform_to_global_coord(pt)
+                    print(f"p: {p}\tpt3: {pt3}")
                     detectable, flag = sensing_agent.is_detectable(pt2)
                     if detectable:
                         pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])

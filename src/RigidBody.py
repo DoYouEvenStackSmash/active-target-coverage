@@ -293,6 +293,27 @@ class RigidBody:
         """
         self.point_set = point_set
 
+    def get_grid(self, spacing=10):
+        r = 300
+        tlpt = mfn.pol2car(self.get_center(), r, adjust_angle(self.get_rel_theta() - np.pi / 4))
+        trpt = mfn.pol2car(self.get_center(), r, adjust_angle(self.get_rel_theta() + np.pi / 4))
+        blpt = mfn.pol2car(self.get_center(), r, adjust_angle(self.get_rel_theta() - 3 * np.pi / 4))
+        horiz_theta, horiz_r = mfn.car2pol(tlpt, trpt)
+        vert_theta, vert_r = mfn.car2pol(tlpt, blpt)
+        
+        axes = []
+        step = vert_r / spacing
+        for i in range(spacing + 1):
+            lpt = mfn.pol2car(tlpt, step * i,vert_theta)
+            rpt = mfn.pol2car(trpt, step * i,vert_theta)
+            axes.append([lpt, rpt])
+        for i in range(spacing + 1):
+            lpt = mfn.pol2car(tlpt, step * i, horiz_theta)
+            rpt = mfn.pol2car(blpt, step * i, horiz_theta)
+            axes.append([lpt, rpt])
+        return axes
+
+
     def get_horizontal_axis(self, off_t = 0):
         """
         Helper function for getting a horizontal line through the center of the agent
@@ -311,3 +332,4 @@ class RigidBody:
         pos_x = [   mfn.pol2car(self.get_center(), 100, curr_rotation),
                     mfn.pol2car(self.get_center(), 40, adjust_angle(curr_rotation + np.pi))]
         return pos_x
+    

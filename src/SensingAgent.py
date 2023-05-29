@@ -294,7 +294,7 @@ class SensingAgent:
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
             print(f"val {val}")
-            dc = self.transform_to_local_sensor_coord((50,0),(val[0],val[1]))
+            dc = self.transform_to_local_sensor_coord((0,0),(val[0],val[1]))
             print(dc)
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
             posn = Position(val[0], val[1])
@@ -332,16 +332,14 @@ class SensingAgent:
         """
         Transforms a point to local sensor curved coordinate frame
         """
-        # target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
+
         theta, r = mfn.car2pol(origin, target_pt)
-        # print(f"theta {theta}")
-        # ratio = target_rotation * self.get_fov_width()
+
+        
         ratio = theta / self.get_fov_width()
-        
-        # r = mfn.euclidean_dist(origin, target_pt)
-        
+
         x = Sensor.WINDOW_WIDTH * ratio + 50
-        
+        # print(x)
         y = r
         w = 1
         h = 1
@@ -371,14 +369,22 @@ class SensingAgent:
 
         return pt
 
-    def transform_to_global_coord(self, position):
+    def transform_to_global_coord(self, target_pt):
         """
         Transforms a position from agent local coords to world coords
         returns a point
         """
-        theta, r = mfn.car2pol((0,0),position.get_attr_coord())
-        theta = adjust_angle(self.get_fov_theta() + theta)
-        pt = mfn.pol2car(self.get_center(), r, theta)
+        # pt1 = self.get_relative_angle()
+        # pt1 = position.get_attr_coord()
+        
+        pt1 = target_pt
+        x,y = pt1
+        # print(self.get_rel_theta())
+        theta2, r = mfn.car2pol(target_pt, (0,0))
+        theta2 = adjust_angle(theta2 + self.get_fov_theta() + np.pi)
+
+        
+        pt = mfn.pol2car(self.get_center(), r, theta2)
         return pt
 
 
@@ -463,7 +469,7 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection(idx)
         abs_det = []
         for det in rel_det:
-            curr = self.transform_to_global_coord(det[0])
-            pred = self.transform_to_global_coord(det[1])
+            curr = self.transform_to_global_coord(det[0].get_cartesian_coord())
+            pred = self.transform_to_global_coord(det[1].get_cartesian_coord())
             abs_det.append((curr,pred))
         return abs_det

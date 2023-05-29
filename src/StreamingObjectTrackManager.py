@@ -107,7 +107,8 @@ class ObjectTrackManager:
             rot_mat = tfn.calculate_rotation_matrix(angle, 1)
             new_pt = trk.path[-1].get_cartesian_coord()
             new_pt = tfn.rotate_point((0,0), new_pt, rot_mat)
-            pt2 = self.parent_agent.transform_to_local_sensor_coord((50,0), new_pt)
+
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), new_pt)
             
             trk.path[-1].position.x = new_pt[0]
             trk.path[-1].position.y = new_pt[1]
@@ -117,6 +118,9 @@ class ObjectTrackManager:
             x,y = yb.bbox[:2]
             yb.bbox = [pt2[0], pt2[1], 1, 1]
             trk.path[-1].attributes = yb
+
+            trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
+            
             
             
             
