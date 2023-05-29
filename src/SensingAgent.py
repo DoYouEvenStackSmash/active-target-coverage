@@ -82,6 +82,11 @@ class SensingAgent:
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
 
+    def get_clock(self):
+        """accessor for clock"""
+        
+        return self.exoskeleton.time_stamp
+
     def tracker_query(self):
         """
         Wrapper function for querying the tracker

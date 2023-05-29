@@ -151,9 +151,11 @@ def multitrack(screen, environment, paths, colors, n=10):
                 print("no active tracks")
                 draw_sensing_agent(screen, environment.agents[k])
                 continue
-
+            
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
+            sensing_agent.heartbeat()
+            
             curr_pt, pred_pt = (), ()
             arr = sensing_agent.estimate_next_detection()
             if len(arr):
@@ -165,15 +167,16 @@ def multitrack(screen, environment, paths, colors, n=10):
                 pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
                 pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+                pred_pts.append(pred_pt)
             draw_sensing_agent(screen, environment.agents[k])
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
         for prpt in pred_pts:
             pafn.frame_draw_dot(screen, prpt, pafn.colors["cyan"])
-        if i < 4 or not i % 11:
+        if i < 4 or not i % 1:
             for j, t in enumerate(environment.targets):
                 t.origin = paths[j][i]
-                pred_pts.append(paths[j][i])
+                # pred_pts.append(paths[j][i])
 
             environment.visible_targets()
         pygame.display.update()

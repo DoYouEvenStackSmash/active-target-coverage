@@ -61,7 +61,7 @@ class Environment:
         updates = {}
 
         for k in self.agents:
-            self.agents[k].heartbeat()
+            #self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
                 d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())

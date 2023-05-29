@@ -137,8 +137,8 @@ def constant_angular_test(screen, path, environment):
         p = path[i]
         pafn.clear_frame(screen)
 
-        for j in path[:i]:
-            pafn.frame_draw_dot(screen, j, pafn.colors["magenta"])
+        # for j in path[:i]:
+        #     pafn.frame_draw_dot(screen, j, pafn.colors["magenta"])
         # pygame.display.update()
         for k in environment.agents:
             sensing_agent = environment.agents[k]
@@ -153,14 +153,17 @@ def constant_angular_test(screen, path, environment):
                 pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
                 pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+                curr_pts.append(curr_pt)
+                pred_pts.append(pred_pt)
             for i in range(len(pred_pts)):
                 draw_prediction_vec(screen, curr_pts[i], pred_pts[i])
                 # pygame.display.update()
             # if i % 2:
             #   est = sensing_agent.obj_tracker.add_predictions()
+            sensing_agent.heartbeat()
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
-
+            
             draw_sensing_agent(screen, sensing_agent)
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
@@ -168,7 +171,7 @@ def constant_angular_test(screen, path, environment):
             t.origin = p
             pafn.frame_draw_dot(screen, t.origin, pafn.colors["green"])
         pygame.display.update()
-        if True or i < 2 or not i % 7:
+        if i < 4 or not i % 7:
             for t in environment.targets:
                 # t.origin = p
                 pafn.frame_draw_dot(screen, t.origin, pafn.colors["cyan"])
