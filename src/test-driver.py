@@ -13,7 +13,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor

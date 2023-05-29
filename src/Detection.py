@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 class Detection:
   """ An abstraction for describing a detection
-    
+    Position(Position): The location of the detection in agent reference frame
+    attributes (Yolobox): the attributes of the detection in agent fov reference frame
   """
   def __init__( self, 
                 position,
@@ -29,6 +30,10 @@ class Detection:
 class Position:
   """
   An abstraction for describing a position
+  Attributes:
+    x,y,z(float,float,float): cartesian coordinates
+    theta(float): expansion for polar coordinates
+    phi(float): expansion for spherical coordinates
   """
   def __init__(self, x=0, y=0, z=0, theta=0, phi=0):
     self.x = x
@@ -39,5 +44,3 @@ class Position:
 
   def get_center_coord(self):
     return (self.x, self.y)
-
-  

@@ -294,6 +294,10 @@ class RigidBody:
         self.point_set = point_set
 
     def get_grid(self, spacing=10):
+        """
+        Drawing function for getting a coordinate grid oriented with the rigid body
+        returns a List of (pt1, pt2) points
+        """
         r = 300
         tlpt = mfn.pol2car(self.get_center(), r, adjust_angle(self.get_rel_theta() - np.pi / 4))
         trpt = mfn.pol2car(self.get_center(), r, adjust_angle(self.get_rel_theta() + np.pi / 4))
@@ -317,6 +321,7 @@ class RigidBody:
     def get_horizontal_axis(self, off_t = 0):
         """
         Helper function for getting a horizontal line through the center of the agent
+        Returns a list of (pt1, pt2) points
         """
         curr_rotation = self.get_rel_theta()
         pos_x = [   mfn.pol2car(self.get_center(), 100, adjust_angle(curr_rotation + np.pi / 2)),
@@ -327,6 +332,7 @@ class RigidBody:
     def get_vertical_axis(self, off_t = 0):
         """
         Helper function for getting a vertical line through the center of the agent
+        Returns a list of (pt1, pt2) points
         """
         curr_rotation = self.get_rel_theta()
         pos_x = [   mfn.pol2car(self.get_center(), 100, curr_rotation),

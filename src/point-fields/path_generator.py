@@ -11,6 +11,11 @@ import json
 
 
 def create_circle(center_pt, radius=50, num_pts=50):
+    """
+    Creates a circle of points in euclidean coordinates around the center
+    return a list of (x,y) points
+    """
+    
     step = 2 * np.pi / num_pts
     counter = num_pts // 2
     angles = []
@@ -28,6 +33,10 @@ def create_circle(center_pt, radius=50, num_pts=50):
 
 
 def create_line(pt1, pt2, num_pts=50):
+    """
+    Creates a straight line of num_points between pt1 and pt2
+    returns a list of (x,y) points
+    """
     pts = []
     theta, r = mfn.car2pol(pt1, pt2)
     step = r / num_pts
@@ -37,8 +46,10 @@ def create_line(pt1, pt2, num_pts=50):
 
 
 def render_path(screen, paths,filename="out.json"):
+    """
+    Renders and serializes a path
+    """
     for path in paths:
-        # pafn.clear_frame(screen)
         for pt in path:
             print(pt)
             pafn.frame_draw_dot(screen, pt, pafn.colors["magenta"])
@@ -55,7 +66,10 @@ def render_path(screen, paths,filename="out.json"):
 
 
 def create_grid(origin=(0,0), width=1000, height=1000, points = 10):
-
+    """
+    Creates a grid of points
+    returns a list of (x,y) points
+    """
     height_endpoint = mfn.pol2car(origin, height, np.pi / 2)
     vertical_axis = create_line(origin, height_endpoint, points)
     lines = []
@@ -71,6 +85,10 @@ def create_grid(origin=(0,0), width=1000, height=1000, points = 10):
     
 
 def loop_line():
+    """
+    Creates a line with a loop in the center
+    Returns a list of (x,y) points
+    """
     paths = []
     origin = (500, 500)
     circ = create_circle(origin, 100, 50)

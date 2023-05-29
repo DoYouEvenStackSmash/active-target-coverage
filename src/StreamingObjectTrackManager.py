@@ -10,7 +10,7 @@ from render_support import TransformFxns as tfn
 from YoloBox import YoloBox
 from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 import numpy as np
 
 """

@@ -91,6 +91,13 @@ class ObjectTrack:
         self.path.append(detection)
     
     def update_track_trajectory(self, det, displacement=None):
+        """
+        Updates the track trajectory components using cartesian coordinates
+            Velocity
+            Acceleration
+            Angular velocity
+            Angular Acceleration
+        """
         last_det = self.get_last_detection()
         last_pt = last_det.get_cartesian_coord()
 
@@ -117,30 +124,37 @@ class ObjectTrack:
 
     def estimate_next_position(self):
         """
-        Estimate position of next detection using absolute measurements
+        Estimate position of next detection using trajectory components
+        Returns a Detection
         """
         last_pos = self.get_last_detection()
         
         if len(self.path) == 1:
             return last_pos
+
+        # acceleration
         scale_distance = 1
         if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
             scale_distance = self.delta_v[-1]
         
+        # angular acceleration
         angle_adjust = self.delta_theta[-1]
-        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, adjust_angle(self.theta[-1] + angle_adjust))
         
+        # velocity
+        velocity = self.v[-1] * scale_distance
+        pt = mfn.pol2car(last_pos.get_cartesian_coord(), velocity , adjust_angle(self.theta[-1] + angle_adjust))
+        
+        # map cartesian coordinates to sensor coordinates
         pt2 = self.parent_agent.transform_to_local_sensor_coord((0,0), pt)
+        
+        # update sensor yolobox coordinates
         yb = None
         yb = last_pos.get_attributes()
-
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
         
         det = Detection(Position(pt[0],pt[1]), yb)
         return det
-        # print(pt)
-        
 
         pass
 
@@ -233,8 +247,7 @@ class ObjectTrack:
         for i, det in enumerate(self.path):
             yb = det.get_attributes()
             fid = None
-            # if fdict != None:
-            #   fid = fdict[f'{yb.img_filename[:-3]}png']
+            
             fid = yb.img_filename
             yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
             yb_json["track_id"] = self.track_id

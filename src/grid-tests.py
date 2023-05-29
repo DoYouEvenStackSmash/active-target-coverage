@@ -13,7 +13,7 @@ from YoloBox import YoloBox
 from StreamingObjectTrackManager import ObjectTrackManager
 from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
-from OTFTrackerApi import StreamingAnnotations as sann
+from StreamingAnnotations import StreamingAnnotations as sann
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
@@ -68,7 +68,6 @@ def grid_sensing_agent(screen, sensing_agent, points):
                     rotation = sensing_agent.rotate_agent(p)
                     draw_sensing_agent(screen, sensing_agent)
                     pygame.display.update()
-                    # continue
                 elif pygame.key.get_mods() == LALT:  # estimate
                     for p in points:
                         # p = pygame.mouse.get_pos()
@@ -77,7 +76,7 @@ def grid_sensing_agent(screen, sensing_agent, points):
                             pafn.frame_draw_dot(screen, p, pafn.colors["green"], 8, 6)
                         else:
                             pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)
-                    # continue
+                    
                 elif pygame.key.get_mods() == LCTRL:
                     while pygame.MOUSEBUTTONUP not in [
                         event.type for event in pygame.event.get()
@@ -95,17 +94,12 @@ def grid_sensing_agent(screen, sensing_agent, points):
                     
                     print(pt2)
                     continue
-                # while pygame.MOUSEBUTTONUP not in [
-                #     event.type for event in pygame.event.get()
-                # ]:
-                #     continue
+
                 for p in points:
                     pt = sensing_agent.transform_to_local_detection_coord(p)
-                    # print(pt)
-                    # dc = sensing_agent.transform_to_local_bbox(p)
+
                     pt2 = sensing_agent.transform_to_local_sensor_coord((0,0),pt)
                     pt3 = sensing_agent.transform_to_global_coord(pt)
-                    
 
                     detectable, flag = sensing_agent.is_detectable(pt2)
                     
