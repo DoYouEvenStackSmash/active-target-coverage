@@ -12,18 +12,33 @@ class Detection:
         self._id = None
 
     def get_attributes(self):
+        """
+        Accessor for attributes
+        """
         return self.attributes
 
     def get_position(self):
+        """
+        Accessor for position
+        """
         return self.position
 
     def get_cartesian_coord(self):
+        """
+        Accessor for position's cartesian coordinates
+        """
         return self.position.get_center_coord()
 
     def get_attr_coord(self):
+        """
+        Accessor for the center coordinate of attributes
+        """
         return self.attributes.get_center_coord()
 
     def set_attributes(self, attr):
+        """
+        Exposes attributes for modification
+        """
         self.attributes = attr
 
 
