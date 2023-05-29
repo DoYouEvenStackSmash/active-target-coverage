@@ -91,11 +91,11 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
-    sensing_agent.ALLOW_ROTATION = True
+    # sensing_agent.ALLOW_ROTATION = False
     sensing_agent.ALLOW_TRANSLATION = False
-    # circular_test(screen, sensing_agent, environment)
+    circular_test(screen, sensing_agent, environment)
     # stepwise_single_agent_test(screen, sensing_agent, environment)
-    single_agent_mouse_test(screen, sensing_agent, environment)
+    # single_agent_mouse_test(screen, sensing_agent, environment)
     # multi_agent_mouse_test(screen, environment)
 
 

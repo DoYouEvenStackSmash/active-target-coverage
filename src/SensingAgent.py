@@ -292,14 +292,12 @@ class SensingAgent:
         detections = []
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
-            
-            dc = self.transform_to_local_sensor_coord(a.get_origin())
-            
+            val = self.transform_to_local_detection_coord(a.get_origin())
+            print(f"val {val}")
+            dc = self.transform_to_local_sensor_coord((50,0),(val[0],val[1]))
+            print(dc)
             yb = sann.register_annotation(a.get_id(), dc, curr_state)
-            
-            val = self.transform_to_local_coord(a.get_origin())
             posn = Position(val[0], val[1])
-            
             detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
@@ -330,28 +328,31 @@ class SensingAgent:
 
         return [x, y, w, h]
     
-    def transform_to_local_sensor_coord(self, target_pt, sensor_idx=-1):
+    def transform_to_local_sensor_coord(self, origin, target_pt, sensor_idx=-1):
         """
         Transforms a point to local sensor curved coordinate frame
         """
-        target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
-        ratio = target_rotation / self.get_fov_width()
-
-        r = mfn.euclidean_dist(self.get_center(), target_pt)
-
+        # target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
+        theta, r = mfn.car2pol(origin, target_pt)
+        # print(f"theta {theta}")
+        # ratio = target_rotation * self.get_fov_width()
+        ratio = theta / self.get_fov_width()
+        
+        # r = mfn.euclidean_dist(origin, target_pt)
+        
         x = Sensor.WINDOW_WIDTH * ratio + 50
         
         y = r
         w = 1
         h = 1
 
-        return x, r
+        return (x,y)
     
-    def transform_to_local_coord(self, target_pt):
+    def transform_to_local_detection_coord(self, target_pt):
         """
         transforms a target point to local rectangular coordinates
         """
-        return self.transform_to_local_sensor_coord(target_pt)
+        
         target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
         r = mfn.euclidean_dist(self.get_center(), target_pt)
         
@@ -375,7 +376,7 @@ class SensingAgent:
         Transforms a position from agent local coords to world coords
         returns a point
         """
-        theta, r = mfn.car2pol((0,0),position.get_center_coord())
+        theta, r = mfn.car2pol((0,0),position.get_attr_coord())
         theta = adjust_angle(self.get_fov_theta() + theta)
         pt = mfn.pol2car(self.get_center(), r, theta)
         return pt
@@ -393,9 +394,11 @@ class SensingAgent:
             print("empty")
             return (None, None)
         
-        curr_pt, pred_pt = rel_det[0]
-        pred_pt = pred_pt.get_center_coord()
-        curr_pt = curr_pt.get_center_coord()
+        curr_det, pred_det = rel_det[0]
+        if pred_det == None:
+            return (None, None)
+        pred_pt = pred_det.get_attr_coord()
+        curr_pt = curr_det.get_attr_coord()
         print(pred_pt)
         # if no estimate available
         if not len(pred_pt):
@@ -405,7 +408,7 @@ class SensingAgent:
         # if curr_pt == pred_pt:
         #     return (None, None)
 
-        status, flag = self.centered_sensor.is_rel_detectable(pred_pt)
+        status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
         
         # if predicted point is detectable from pov of SensingAgent
         if status:
@@ -413,6 +416,7 @@ class SensingAgent:
 
         # if predicted point is out of coverage by range
         if flag == Sensor.RANGE:
+            pred_pt = pred_det.get_cartesian_coord()
             offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
             if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
@@ -420,6 +424,7 @@ class SensingAgent:
 
         # if predicted point is out of coverage by angle
         if flag == Sensor.ANGULAR:
+            pred_pt = pred_det.get_attr_coord()
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, None)
 

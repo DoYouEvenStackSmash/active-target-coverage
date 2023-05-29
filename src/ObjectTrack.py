@@ -91,6 +91,19 @@ class ObjectTrack:
         self.path.append(detection)
     
     def update_track_trajectory(self, det, displacement=None):
+        last_det = self.get_last_detection()
+        last_pt = last_det.get_cartesian_coord()
+
+        curr_pt = det.get_cartesian_coord()
+
+        theta, distance = mfn.car2pol(last_pt, curr_pt)
+        
+        if len(self.v) and distance != 0:
+            self.delta_v.append(min(1.1, distance / self.v[-1]))
+        
+        self.v.append(distance)
+
+        self.theta.append(theta)
 
         pass
 
@@ -99,6 +112,7 @@ class ObjectTrack:
         """
         Wrapper for object track adding its own prediction
         """
+        
         pass
 
     def estimate_next_position(self):
@@ -106,9 +120,29 @@ class ObjectTrack:
         Estimate position of next detection using absolute measurements
         """
         last_pos = self.get_last_detection()
-        if len(self.path):
+        if len(self.path) == 1:
             return last_pos
-
+        scale_distance = 1
+        if len(self.delta_v) > 1:
+            scale_distance = self.delta_v[-1]
+        # if flag == ROTATION_FLAG:
+        pt = mfn.pol2car(last_pos.get_cartesian_coord(), self.v[-1] * scale_distance, adjust_angle(self.theta[-1]))
+        # pt2 = last_pos.get_attr_coord()
+        pt2 = self.parent_agent.transform_to_local_sensor_coord((50,0), pt)
+        yb = None
+        yb = last_pos.get_attributes()
+        if yb == None:
+            print("ERROR")
+        bbox = [pt2[0], pt2[1], 1, 1]
+        yb.bbox = bbox
+        
+        # last_pos.attributes.bbox[0] = pt2[0]
+        # last_pos.attributes.bbox[1] = pt2[1]
+        
+        det = Detection(Position(pt[0],pt[1]), yb)
+        return det
+        # print(pt)
+        
 
         pass
 

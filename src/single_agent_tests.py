@@ -192,6 +192,7 @@ def stepwise_single_agent_test(screen, sensing_agent, environment):
 
                     pafn.clear_frame(screen)
                     r, t = sensing_agent.tracker_query()
+                    print(f"partial_rotation = {r}")
                     sensing_agent.reposition(r, t)
 
                     curr_pt, pred_pt = (),()

@@ -38,7 +38,7 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 3,
+        "track_lifespan": 1,
         "default_avg_dist": 10,
         "radial_exclusion": 100,
     }
@@ -90,6 +90,8 @@ class ObjectTrackManager:
             return []
         
         for i,trk in enumerate(self.active_tracks):
+            if trk.get_state_estimation() == None:
+                continue
             pred_arr.append((trk.get_last_detection(),trk.get_state_estimation()))
         
         return pred_arr
@@ -98,15 +100,25 @@ class ObjectTrackManager:
         """
         Apply an angular displacement to offset a rotation by a parent agent
         """
-        print(f"displacement: \t{angle}")
+        # print(f"displacement: \t{angle}")
         if not self.has_active_tracks():
             return
         for i,trk in enumerate(self.active_tracks):
-            rot_mat = tfn.calculate_rotation_matrix(-angle, 1)
-            new_pt = trk.path[-1].get_center_coord()
-            new_pt = tfn.rotate_point(self.parent_agent.get_center(), new_pt, rot_mat)
-            trk.path[-1].attributes.x = new_pt[0]
-            trk.path[-1].attributes.y = new_pt[1]
+            rot_mat = tfn.calculate_rotation_matrix(angle, 1)
+            new_pt = trk.path[-1].get_cartesian_coord()
+            new_pt = tfn.rotate_point((0,0), new_pt, rot_mat)
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((50,0), new_pt)
+            
+            trk.path[-1].position.x = new_pt[0]
+            trk.path[-1].position.y = new_pt[1]
+
+            yb = trk.path[-1].get_attributes()
+            print(yb.bbox)
+            x,y = yb.bbox[:2]
+            yb.bbox = [pt2[0], pt2[1], 1, 1]
+            trk.path[-1].attributes = yb
+            
+            
             
         pass
 
@@ -250,12 +262,12 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.get_state_estimation().get_center_coord()))
+            pred.append((t.track_id, t.get_state_estimation().get_cartesian_coord()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = mfn.euclidean_dist(p[1], curr_layer[c].get_center_coord())
+                d = mfn.euclidean_dist(p[1], curr_layer[c].get_cartesian_coord())
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

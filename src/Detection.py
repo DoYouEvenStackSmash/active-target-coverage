@@ -16,8 +16,14 @@ class Detection:
   def get_position(self):
     return self.position
   
-  def get_center_coord(self):
+  def get_cartesian_coord(self):
     return self.position.get_center_coord()
+  
+  def get_attr_coord(self):
+    return self.attributes.get_center_coord()
+  
+  def set_attributes(self, attr):
+    self.attributes = attr
   
 class Position:
   """

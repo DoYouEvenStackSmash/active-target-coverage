@@ -151,7 +151,8 @@ class Sensor:
         Returns a boolean indicator and a type identifier
         """
         # boundary conditions
-        adj_win_bnd = Sensor.TOLERANCE * Sensor.WINDOW_WIDTH
+        adj_win_bnd = Sensor.WINDOW_WIDTH/2 - Sensor.WINDOW_WIDTH * Sensor.TOLERANCE/ 2
+        print(f"adj_win_bnd {target_pt}")
         adj_rad_bnd = self.get_fov_radius()
 
         target_x = target_pt[0]
@@ -169,8 +170,8 @@ class Sensor:
 
         # if angle out of bounds
         if (
-            target_x < 0 + adj_win_bnd
-            or target_x > 100 - adj_win_bnd
+            target_x < 50 - adj_win_bnd
+            or target_x > 50 + adj_win_bnd
         ):
             
             flags += Sensor.ANGULAR
