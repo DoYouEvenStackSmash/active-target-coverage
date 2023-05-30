@@ -58,7 +58,7 @@ class SensingAgent:
         exoskeleton=None,
         centered_sensor=None,
         obj_tracker=None,
-        _id=None,
+        _id=0,
         sensors=None,
         rotation_flag=True,
         translation_flag=True,

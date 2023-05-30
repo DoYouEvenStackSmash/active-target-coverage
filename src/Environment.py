@@ -66,7 +66,7 @@ class Environment:
             # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
-                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())
+                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_position())
                 pairs.append((self.agents[k]._id, target, d))
 
         pairs = sorted(pairs, key=sortkey)
@@ -76,7 +76,7 @@ class Environment:
         for c in range(len(pairs)):
             if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
                 continue
-            if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_origin()):
+            if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
                 updates[pairs[c][0]].append(pairs[c][1])
 
         # update the trackers of all agents
