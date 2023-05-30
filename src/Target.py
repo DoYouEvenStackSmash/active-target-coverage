@@ -23,6 +23,8 @@ class Target:
         if self.idx + 1 < len(self.path):
             self.idx += 1
             self.origin = self.path[self.idx]
+            return True
+        return False
 
     def get_origin(self):
         """
