@@ -111,3 +111,15 @@ class Environment:
 
         r = y
         return mfn.pol2car(self.agent.get_origin(), r, theta)
+    
+    def serialize_agent_tracks(self):
+        """
+        export tracks of all agents
+        """
+        for k in self.agents:
+            sensing_agent = self.agents[k]
+            e = sensing_agent.export_tracks()
+            f = open(f"{sensing_agent._id}_out.json", "w")
+
+            f.write(json.dumps(e, indent=2))
+            f.close()

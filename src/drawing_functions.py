@@ -170,3 +170,46 @@ def render_predictions(screen, sensing_agent):
         pafn.frame_draw_line(
             screen, (curr_pt, pred_pt), pafn.colors["white"]
         )
+
+def render_path(screen, path, color):
+    """
+    renders a sequence of points on the screen
+    """
+    for i in range(1, len(path)):
+        pafn.frame_draw_bold_line(screen, (path[i - 1], path[i]), color)
+
+def import_agent_record(screen, agent_record):
+    """
+    Imports a LOCO formatted json
+
+    draws the paths on the screen
+    """
+
+    fov_width = agent_record["sensor_params"]["fov_width"]
+    fov_radius = agent_record["sensor_params"]["fov_radius"]
+
+    trackmap = agent_record["trackmap"]
+    lt = agent_record["linked_tracks"]
+
+    get_center = lambda state: state["position"]
+    get_orientation = lambda state: state["orientation"]
+    annotations = agent_record["annotations"]
+    states = agent_record["states"]
+    # for anno in annotations:
+
+    for track in lt:
+        pts = []
+        color = None
+        for step_id in track["steps"]:
+            anno = annotations[step_id]
+            color = anno["track_color"]
+            state = states[anno["state_id"] - 1]
+            x, y, w, h = anno["bbox"]
+            theta = (x - 50) / Sensor.WINDOW_WIDTH * fov_width
+            theta = adjust_angle(get_orientation(state) + theta)
+            r = y
+            pt = mfn.pol2car(get_center(state), r, theta)
+            pts.append(pt)
+
+        render_path(screen, pts, color)
+        pygame.display.update()

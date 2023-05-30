@@ -8,14 +8,6 @@ from env_init import *
 
 from drawing_functions import *
 
-def serialize_agent_tracks(environment):
-  for k in environment.agents:
-    sensing_agent = environment.agents[k]
-    e = sensing_agent.export_tracks()
-    f = open(f"{sensing_agent._id}_out.json", "w")
-
-    f.write(json.dumps(e, indent=2))
-    f.close()
 
 def mouse_test(screen, environment):
   pt = None
@@ -23,7 +15,7 @@ def mouse_test(screen, environment):
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN:
-        serialize_agent_tracks(environment)
+        environment.serialize_agent_tracks()
         sys.exit()
       
       pt = pygame.mouse.get_pos()

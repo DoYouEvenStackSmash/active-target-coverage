@@ -15,6 +15,7 @@ class Target:
         self._id = _id
         self.path = path if path != None else []
         self.idx = 0
+        self.frequency = 1
 
     def step(self):
         """
