@@ -10,15 +10,8 @@ from drawing_functions import *
 
 from support.file_loader import *
 
-COLLISION_THRESHOLD = 10
-VERBOSE = True
-SAMPLE_RATE = 400
 LALT = 256
 LSHIFT = 1
-LCTRL = 64
-SPACE = 32
-OFFT = 20
-SPLINE_COUNT = 2
 
 def grid_sensing_agent(screen, sensing_agent, points):
     draw_sensing_agent(screen, sensing_agent)
