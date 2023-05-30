@@ -1,15 +1,18 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("../")
+sys.path.append(".")
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
 from render_support import TransformFxns as tfn
 import pygame
 import time
-import sys
+
 import numpy as np
 import json
 
-MAGNITUDE = 12
+MAGNITUDE = 6
 
 rng = np.random.default_rng(12345)
 
@@ -65,14 +68,12 @@ def render_path(screen, paths, filename="out.json"):
             pafn.frame_draw_dot(screen, path[i], pafn.colors["magenta"])
         pygame.display.update()
         # time.sleep(0.02)
-    while 1:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                f = open(filename, "w")
-                path = {"points": [{"x": p[0], "y": p[1]} for p in paths[0]]}
-                f.write(json.dumps(path, indent=2))
-                f.close()
-                sys.exit()
+
+    f = open(filename, "w")
+    path = {"points": [{"x": p[0], "y": p[1]} for p in paths[0]]}
+    f.write(json.dumps(path, indent=2))
+    f.close()
+    sys.exit()
 
 
 def create_grid(origin=(0, 0), width=1000, height=1000, points=10):
@@ -170,19 +171,19 @@ def main():
     for f in flags:
         if f == "ACC":
             paths = loop_line()
-            render_path(screen, paths, "loop.json")
+            render_path(screen, paths, f"loop_{MAGNITUDE}noise.json")
         elif f == "GRID":
             paths = create_grid()
-            render_path(screen, paths, "grid.json")
+            render_path(screen, paths, f"grid_{MAGNITUDE}noise.json")
         elif f == "CIRCLE":
             origin = (500, 500)
             paths = create_circle(origin, 150, 50)
-            render_path(screen, [paths], "circle.json")
+            render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
         elif "LERP":
             origin = (800, 200)
             dest = (400, 1000)
             paths = get_lerp(origin, dest)
-            render_path(screen, [paths], "lerp.json")
+            render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         else:
             print(f"options: {opts}")
             sys.exit()

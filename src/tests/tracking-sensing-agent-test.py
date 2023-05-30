@@ -39,10 +39,11 @@ def tracking_test(screen, environment):
     sensing_agent = environment.agents[i]
     import_agent_record(screen, sensing_agent.export_tracks())
   pygame.display.update()
-  
+
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN: 
+        environment.serialize_agent_tracks()
         sys.exit()
 
 
