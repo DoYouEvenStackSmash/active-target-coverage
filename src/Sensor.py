@@ -33,7 +33,7 @@ class Sensor:
 
     def __init__(
         self,
-        parent_agent,
+        parent_agent=None,
         sensor_radius=300,
         sensor_width=np.pi / 4,
         _id=None,

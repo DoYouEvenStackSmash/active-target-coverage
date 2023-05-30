@@ -18,6 +18,10 @@ def adjust_angle(theta):
     return theta
 
 
+ACCELERATION_THRESHOLD = 1.5
+MAX_SCALE_FACTOR = 1.2
+
+
 class ObjectTrack:
     """A class representing an object track.
 
@@ -87,7 +91,7 @@ class ObjectTrack:
             )
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
-        
+
         self.error_over_time.append(error)
         self.path.append(detection)
 
@@ -107,11 +111,13 @@ class ObjectTrack:
         theta, distance = mfn.car2pol(last_pt, curr_pt)
 
         if len(self.v) and distance != 0:
-            self.delta_v.append(min(1.1, distance / self.v[-1]))
+            self.delta_v.append(min(ACCELERATION_THRESHOLD, distance / self.v[-1]))
         delta_theta = 0
-        
-        int_theta = theta + 2*np.pi if theta < 0 else theta
-        last_theta = self.theta[-1] + 2 * np.pi if self.theta[-1] < 0 else self.theta[-1]
+
+        int_theta = theta + 2 * np.pi if theta < 0 else theta
+        last_theta = (
+            self.theta[-1] + 2 * np.pi if self.theta[-1] < 0 else self.theta[-1]
+        )
         delta_theta = adjust_angle(int_theta - last_theta)
 
         self.delta_theta.append(delta_theta)
@@ -143,13 +149,14 @@ class ObjectTrack:
         scale_distance = 1
         if len(self.delta_v) > 1 and self.delta_v[-1] != 0:
             scale_distance = self.delta_v[-1]
-
+        if scale_distance > 1:
+            scale_distance = 1
         # angular acceleration
         # angle_adjust = self.delta_theta[-1] * scale_factor
 
         angle = self.theta[-1] + self.delta_theta[-1] * scale_factor
         # velocity
-        
+
         velocity = self.v[-1] * scale_distance * scale_factor
         pt = mfn.pol2car(
             last_pos.get_cartesian_coord(),
@@ -176,7 +183,11 @@ class ObjectTrack:
         Predict an intermediate position of the target using its
         movement characteristics, scaled by the average detection time
         """
-        scale_factor = min(1, (self.parent_agent.get_clock() - self.detection_idx[-1]) / self.avg_detection_time)
+        scale_factor = min(
+            MAX_SCALE_FACTOR,
+            (self.parent_agent.get_clock() - self.detection_idx[-1])
+            / self.avg_detection_time,
+        )
         return self.estimate_next_position(scale_factor)
 
         pass

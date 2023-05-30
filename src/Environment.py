@@ -39,11 +39,13 @@ class Environment:
 
     def __init__(
         self,
+        world_origin=(0, 0),
         agent=None,  # single agent for backwards compatibility
         agents=None,  # dictionary of agents, accessible by their unique identifiers
         targets=None,  # list of targets in the world
         counter=0,  # global counter for synchronizing "time"
     ):
+        self.world_origin = world_origin
         self._agent = agent
         self.agents = agents if agents != None else {}
         self.targets = targets if targets != None else []
@@ -61,7 +63,7 @@ class Environment:
         updates = {}
 
         for k in self.agents:
-            #self.agents[k].heartbeat()
+            # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
                 d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())

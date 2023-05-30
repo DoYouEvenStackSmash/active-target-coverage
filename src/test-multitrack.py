@@ -130,7 +130,7 @@ def multitrack(screen, environment, paths, colors, n=10):
     n = len(paths[0])  # , len(paths[1]))
     for k in environment.agents:
         draw_sensing_agent(screen, environment.agents[k])
-    # curr_pts = []
+    curr_pts = []
     pred_pts = []
     est_pts = []
     for i in range(0, n):
@@ -151,11 +151,11 @@ def multitrack(screen, environment, paths, colors, n=10):
                 print("no active tracks")
                 draw_sensing_agent(screen, environment.agents[k])
                 continue
-            
+
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
             sensing_agent.heartbeat()
-            
+
             curr_pt, pred_pt = (), ()
             arr = sensing_agent.estimate_next_detection()
             if len(arr):
@@ -168,12 +168,17 @@ def multitrack(screen, environment, paths, colors, n=10):
                 pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
                 pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
                 pred_pts.append(pred_pt)
+                curr_pts.append(curr_pt)
             draw_sensing_agent(screen, environment.agents[k])
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
-        for prpt in pred_pts:
-            pafn.frame_draw_dot(screen, prpt, pafn.colors["cyan"])
-        if i < 4 or not i % 1:
+        for prpt in range(len(pred_pts)):
+            pred_pt = pred_pts[prpt]
+            curr_pt = curr_pts[prpt]
+            pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
+            pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+            pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+        if i < 4 or not i % 4:
             for j, t in enumerate(environment.targets):
                 t.origin = paths[j][i]
                 # pred_pts.append(paths[j][i])
@@ -211,7 +216,7 @@ def path_handler(screen):
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1]))
     # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
     # vertices.append(gfn.get_isosceles_vertex(origins[1], destinations[1], -1, -65))
-    vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
+    # vertices.append(gfn.get_midpoint(origins[1], destinations[1]))
     n = 170
     paths = []
     for i in range(len(vertices)):
@@ -227,9 +232,9 @@ def path_handler(screen):
     for p in paths:
         for pt in p:
             path_1.append(pt)
-    # paths = [path_1]
-    paths = []
-    paths.append(get_lerp(origins[0], destinations[0]))
+    paths = [path_1]
+    # paths = []
+    paths.append(get_lerp(origins[1], destinations[1]))
     # print(paths)
     # paths = [paths[0]]
 
@@ -247,7 +252,7 @@ def path_handler(screen):
     sensing_agent.centered_sensor.fov_width = 3 * np.pi / 5
     # sensing_agent.exoskeleton.fov_theta = np.pi / 4
 
-    for i in range(1):
+    for i in range(2):
         environment.add_target(Target(origins[i], _id=i))
 
     environment.agents[0] = sensing_agent
@@ -286,7 +291,7 @@ def init_sensing_agent(
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 5 * np.pi / 5
+    sensor.fov_width = 3 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []

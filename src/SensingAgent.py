@@ -84,7 +84,7 @@ class SensingAgent:
 
     def get_clock(self):
         """accessor for clock"""
-        
+
         return self.exoskeleton.time_stamp
 
     def tracker_query(self):

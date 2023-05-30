@@ -54,7 +54,7 @@ def init_test_agent(origin, orientation, _id=0):
         rigid_link=ap,
     )
     sensor = Sensor(parent_agent=sensing_agent)
-    sensor.fov_width = 3 * np.pi / 5
+    sensor.fov_width = 2 * np.pi / 5
 
     sensing_agent.exoskeleton = rb
     sensing_agent.exoskeleton.states = []
@@ -129,7 +129,7 @@ def draw_prediction_vec(screen, curr_pt, pred_pt):
     pafn.frame_draw_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
 
 
-def constant_angular_test(screen, path, environment):
+def constant_angular_test(screen, path, environment, step_size=1):
     pred_pts = []
     curr_pts = []
     est_pts = []
@@ -163,7 +163,7 @@ def constant_angular_test(screen, path, environment):
             sensing_agent.heartbeat()
             r, tr = sensing_agent.tracker_query()
             sensing_agent.reposition(r, tr)
-            
+
             draw_sensing_agent(screen, sensing_agent)
         for ep in est_pts:
             pafn.frame_draw_dot(screen, ep, pafn.colors["tangerine"])
@@ -171,13 +171,13 @@ def constant_angular_test(screen, path, environment):
             t.origin = p
             pafn.frame_draw_dot(screen, t.origin, pafn.colors["green"])
         pygame.display.update()
-        if i < 4 or not i % 7:
+        if i < 4 or not i % step_size:
             for t in environment.targets:
                 # t.origin = p
                 pafn.frame_draw_dot(screen, t.origin, pafn.colors["cyan"])
             environment.visible_targets()
         time.sleep(0.1)
-
+    # return
     while 1:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -192,23 +192,57 @@ def constant_angular_test(screen, path, environment):
                     sys.exit()
 
 
+def drive_loop(screen, environment):
+    while 1:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                counter = 0
+                pt_path = []
+                last_p = (0, 0)
+                # path = {"points": [{"x":p[0], "y":p[1]} for p in  paths[0]]}
+                while pygame.MOUSEBUTTONUP not in [
+                    event.type for event in pygame.event.get()
+                ]:
+                    if not counter % 2:
+                        p = pygame.mouse.get_pos()
+                        if p == last_p:
+                            continue
+                        last_p = p
+                        pafn.frame_draw_dot(screen, p, pafn.colors["green"])
+                        pt_path.append(p)
+                        pygame.display.update()
+                    counter += 1
+                environment.targets[0].origin = pt_path[0]
+                constant_angular_test(screen, pt_path, environment, int(sys.argv[2]))
+                # for _id in environment.agents:
+                #     sensing_agent = environment.agents[_id]
+                #     e = sensing_agent.export_tracks()
+                #     import_agent_record(screen, e)
+                #     f = open(f"{_id}_out.json", "w")
+                #     f.write(json.dumps(e, indent=2))
+                #     f.close()
+                #     sys.exit()
+
+
 def main():
     pygame.init()
     screen = pafn.create_display(1000, 1400)
     pafn.clear_frame(screen)
+
     p = load_json_file(sys.argv[1])
     theta, r = mfn.car2pol(p[1], p[0])
     start_pt = mfn.pol2car(p[0], 50, theta)
 
     sensing_agent = init_test_agent(start_pt, p[0], "A")
-    sensing_agent.centered_sensor.fov_radius = 259
+    sensing_agent.centered_sensor.fov_radius = 400
     environment = Environment()
     target = Target(p[0])
     environment.add_target(target)
     environment.agents["A"] = sensing_agent
     draw_sensing_agent(screen, sensing_agent)
     pygame.display.update()
-    constant_angular_test(screen, p, environment)
+    # drive_loop(screen, environment)
+    constant_angular_test(screen, p, environment, int(sys.argv[2]))
     # time.sleep(4)
 
     print(p)
