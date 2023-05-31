@@ -1,13 +1,24 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("../")
+sys.path.append(".")
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
 from render_support import TransformFxns as tfn
 import pygame
 import time
-import sys
+
 import numpy as np
 import json
+
+MAGNITUDE = 6
+
+rng = np.random.default_rng(12345)
+
+rand_angle = lambda: (rng.uniform() * 2 * np.pi) - np.pi
+
+rand_mag = lambda: (rng.uniform() * MAGNITUDE)
 
 
 def create_circle(center_pt, radius=50, num_pts=50):
@@ -49,20 +60,20 @@ def render_path(screen, paths, filename="out.json"):
     """
     Renders and serializes a path
     """
-    for path in paths:
-        for pt in path:
+    for p in range(len(paths)):
+        path = paths[p]
+        for i, pt in enumerate(path):
             print(pt)
-            pafn.frame_draw_dot(screen, pt, pafn.colors["magenta"])
+            path[i] = mfn.pol2car(pt, rand_mag(), rand_angle())
+            pafn.frame_draw_dot(screen, path[i], pafn.colors["magenta"])
         pygame.display.update()
         # time.sleep(0.02)
-    while 1:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                f = open(filename, "w")
-                path = {"points": [{"x": p[0], "y": p[1]} for p in paths[0]]}
-                f.write(json.dumps(path, indent=2))
-                f.close()
-                sys.exit()
+
+    f = open(filename, "w")
+    path = {"points": [{"x": p[0], "y": p[1]} for p in paths[0]]}
+    f.write(json.dumps(path, indent=2))
+    f.close()
+    sys.exit()
 
 
 def create_grid(origin=(0, 0), width=1000, height=1000, points=10):
@@ -109,6 +120,47 @@ def loop_line():
     return paths
 
 
+def get_lerp(origin, p):
+    segment = 4
+    pts = []
+    if segment > 0:
+        spts = []
+        pts = []
+        ev = []
+        l1_pts = []
+        l2_pts = []
+
+        seg_step = 1 / segment
+        # break origin-target segment into regions
+        for i in range(segment):
+            spts.append(gfn.lerp(origin, p, i * seg_step))
+        spts.append(p)
+
+        # get equilateral vertex of each segment
+        sign = 1
+        for i in range(len(spts) - 1):
+            ev.append(gfn.get_equilateral_vertex(spts[i], spts[i + 1], sign))
+            sign = sign * -1
+
+        # calculate lerp points
+        n = 20
+        step = 1 / n
+        print(len(spts))
+        for sp in range(len(spts) - 1):
+            for i in range(n):
+                # lerp between origin and equilateral vertex
+                l1 = gfn.lerp(spts[sp], ev[sp], step * i)
+                # lerp between equilateral vertex and target
+                l2 = gfn.lerp(ev[sp], spts[sp + 1], step * i)
+                # lerp between lerps
+                m1 = gfn.lerp(l1, l2, step * i)
+
+                l1_pts.append(l1)
+                l2_pts.append(l2)
+                pts.append(m1)
+    return pts
+
+
 def main():
     pygame.init()
     screen = pafn.create_display(1000, 1400)
@@ -119,14 +171,19 @@ def main():
     for f in flags:
         if f == "ACC":
             paths = loop_line()
-            render_path(screen, paths, "loop.json")
+            render_path(screen, paths, f"loop_{MAGNITUDE}noise.json")
         elif f == "GRID":
             paths = create_grid()
-            render_path(screen, paths, "grid.json")
+            render_path(screen, paths, f"grid_{MAGNITUDE}noise.json")
         elif f == "CIRCLE":
             origin = (500, 500)
             paths = create_circle(origin, 150, 50)
-            render_path(screen, [paths], "circle.json")
+            render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
+        elif "LERP":
+            origin = (800, 200)
+            dest = (400, 1000)
+            paths = get_lerp(origin, dest)
+            render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         else:
             print(f"options: {opts}")
             sys.exit()

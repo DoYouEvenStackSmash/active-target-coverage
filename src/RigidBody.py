@@ -41,7 +41,7 @@ class RigidBody:
 
     def __init__(
         self,
-        parent_agent,
+        parent_agent=None,
         rigid_link=None,
         ref_origin=(0, 0),
         endpoint=(0, 0, 0),

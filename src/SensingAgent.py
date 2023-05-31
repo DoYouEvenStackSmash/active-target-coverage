@@ -58,7 +58,7 @@ class SensingAgent:
         exoskeleton=None,
         centered_sensor=None,
         obj_tracker=None,
-        _id=None,
+        _id=0,
         sensors=None,
         rotation_flag=True,
         translation_flag=True,
@@ -81,6 +81,11 @@ class SensingAgent:
         self.sensors = sensors if sensors is not None else []
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
+
+    def get_clock(self):
+        """accessor for clock"""
+
+        return self.exoskeleton.time_stamp
 
     def tracker_query(self):
         """

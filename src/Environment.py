@@ -39,11 +39,13 @@ class Environment:
 
     def __init__(
         self,
+        world_origin=(0, 0),
         agent=None,  # single agent for backwards compatibility
         agents=None,  # dictionary of agents, accessible by their unique identifiers
         targets=None,  # list of targets in the world
         counter=0,  # global counter for synchronizing "time"
     ):
+        self.world_origin = world_origin
         self._agent = agent
         self.agents = agents if agents != None else {}
         self.targets = targets if targets != None else []
@@ -61,10 +63,10 @@ class Environment:
         updates = {}
 
         for k in self.agents:
-            self.agents[k].heartbeat()
+            # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
-                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_origin())
+                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_position())
                 pairs.append((self.agents[k]._id, target, d))
 
         pairs = sorted(pairs, key=sortkey)
@@ -74,7 +76,7 @@ class Environment:
         for c in range(len(pairs)):
             if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
                 continue
-            if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_origin()):
+            if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
                 updates[pairs[c][0]].append(pairs[c][1])
 
         # update the trackers of all agents
@@ -109,3 +111,15 @@ class Environment:
 
         r = y
         return mfn.pol2car(self.agent.get_origin(), r, theta)
+    
+    def serialize_agent_tracks(self):
+        """
+        export tracks of all agents
+        """
+        for k in self.agents:
+            sensing_agent = self.agents[k]
+            e = sensing_agent.export_tracks()
+            f = open(f"{sensing_agent._id}_out.json", "w")
+
+            f.write(json.dumps(e, indent=2))
+            f.close()

@@ -8,23 +8,24 @@ class Target:
 
     """
 
-    def __init__(
-        self,
-        origin,
-        color=None,
-        _id=0,
-    ):
+    def __init__(self, origin, color=None, _id=0, path=None):
         self.origin = origin
         self.color = color
-        self.attributes = origin
+        self.attributes = None
         self._id = _id
-        # self.path = []
+        self.path = path if path != None else []
+        self.idx = 0
+        self.frequency = 1
 
-    def reposition(self, destination):
+    def step(self):
         """
         Repositions the origin of the target to some destination
         """
-        self.origin = destination
+        if self.idx + 1 < len(self.path):
+            self.idx += 1
+            self.origin = self.path[self.idx]
+            return True
+        return False
 
     def get_origin(self):
         """
@@ -32,6 +33,16 @@ class Target:
         Returns an (x,y) point
         """
         return self.origin
+    
+    def get_position(self):
+        """
+        Accessor for the position of the target
+        Returns an (x,y) point
+        """
+        if not len(self.path):
+            return self.get_origin()
+        return self.path[self.idx]
+
 
     def get_attributes(self):
         """
