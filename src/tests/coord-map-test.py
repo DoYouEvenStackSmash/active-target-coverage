@@ -13,6 +13,7 @@ zx,zy = sa.get_center()
 # prints a sensor coordinate to the left of center line
 pxny = (zx + 10, zy - 5)
 det_pxny = sa.transform_to_local_detection_coord(pxny)
+print(det_pxny)
 print(sa.transform_to_local_sensor_coord((0,0), det_pxny))
 
 # prints a sensor coordinate on center line

@@ -52,7 +52,7 @@ def main():
   screen = pafn.create_display(1000, 1000)
   pafn.clear_frame(screen)
   sensing_agents = {}
-  sa = init_sensing_agent(origin=(500,200))
+  sa = init_sensing_agent(origin=(500,200),radius=300)
   sensing_agents[sa._id] = sa
   targets = []
   # load json point files
