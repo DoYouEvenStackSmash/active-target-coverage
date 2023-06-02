@@ -106,12 +106,13 @@ class ObjectTrackManager:
         for i, trk in enumerate(self.active_tracks):
             rot_mat = tfn.calculate_rotation_matrix(angle, 1)
             new_pt = trk.path[-1].get_cartesian_coord()
-            new_pt = tfn.rotate_point((0, 0), new_pt, rot_mat)
+            new_pt = tfn.rotate_point((0, 0, 0), new_pt, rot_mat)
 
-            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), new_pt)
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0, 0), new_pt)
 
             trk.path[-1].position.x = new_pt[0]
             trk.path[-1].position.y = new_pt[1]
+            trk.path[-1].position.z = new_pt[2]
 
             yb = trk.path[-1].get_attributes()
             print(yb.bbox)
@@ -141,10 +142,11 @@ class ObjectTrackManager:
             print(pt1, new_pt)
             # print(new_pt)
             # continue
-            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), new_pt)
+            pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0, 0), new_pt)
 
             trk.path[-1].position.x = new_pt[0]
             trk.path[-1].position.y = new_pt[1]
+            trk.path[-1].position.z = new_pt[2]
 
             yb = trk.path[-1].get_attributes()
             print(yb.bbox)
@@ -289,7 +291,7 @@ class ObjectTrackManager:
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = mfn.euclidean_dist(p[1], curr_layer[c].get_cartesian_coord())
+                d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coord())
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

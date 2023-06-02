@@ -33,7 +33,8 @@ class Detection:
         """
         Accessor for the center coordinate of attributes
         """
-        return self.attributes.get_center_coord()
+        x,y = self.attributes.get_center_coord()
+        return (x,y,0)
 
     def set_attributes(self, attr):
         """
@@ -59,4 +60,4 @@ class Position:
         self.phi = phi
 
     def get_center_coord(self):
-        return (self.x, self.y)
+        return (self.x, self.y, self.z)

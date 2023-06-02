@@ -39,9 +39,9 @@ class Polygon:
             return -1
 
         # make sure points are in counterclockwise order
-        p1_x, p1_y = point_list[0]
-        p2_x, p2_y = point_list[1]
-        p3_x, p3_y = point_list[2]
+        p1_x, p1_y, p1_z = point_list[0]
+        p2_x, p2_y, p2_z = point_list[1]
+        p3_x, p3_y, p3_z = point_list[2]
 
         if ((p2_x - p1_x) * (p3_y - p1_y)) - ((p2_y - p1_y) * (p3_x - p1_x)) < 0:
             point_list = [i for i in reversed(point_list)]

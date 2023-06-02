@@ -63,11 +63,11 @@ class TransformFxns:
         Rotates a single point about an origin based on the rotation matrix
         Returns a point (x, y)
         """
-        x_o, y_o = origin
-        lp_x, lp_y = pt
+        x_o, y_o, z_o = origin
+        lp_x, lp_y, lp_z = pt
 
         step = np.matmul(rot_mat, np.array([[lp_x - x_o], [lp_y - y_o]]))
-        return (step[0][0] + x_o, step[1][0] + y_o)
+        return (step[0][0] + x_o, step[1][0] + y_o, z_o + lp_z)
 
     def get_translation_function(origin, t, steps=1):
         """
@@ -87,7 +87,8 @@ class TransformFxns:
         step_dist = r / steps
         x_step = step_dist * np.cos(theta)
         y_step = step_dist * np.sin(theta)
-        val = (x_step, y_step)
+        z_step = step_dist * np.sin(theta)
+        val = (x_step, y_step,z_step)
         return val
 
 
@@ -98,38 +99,49 @@ class MathFxns:
 
     def euclidean_dist(p1, p2):
         """
-        Calculates euclidean distance between two points
+        Calculates euclidean distance between two cartesian points
         Returns a scalar value
         """
         return np.sqrt(np.square(p1[0] - p2[0]) + np.square(p1[1] - p2[1]))
+
+    def frobenius_dist(p1, p2):
+        """
+        Calculates frobenius norm between two cylindrical points
+        """
+        return np.sqrt(np.square(p1[0] - p2[0]) + np.square(p1[1] - p2[1]) + np.square(p1[2] - p2[2]))
 
     def car2pol(origin, pt):
         """
         Converts a pair of points into a vector
         returns a vector (radians, radius)
         """
-        x, y = pt
-        ox, oy = origin
+        x, y, z = pt
+        ox, oy, oz = origin
         rad = np.arctan2(y - oy, x - ox)
-        r = MathFxns.euclidean_dist(origin, pt)
+        r = MathFxns.frobenius_dist(origin, pt)
         return (rad, r)
 
-    def pol2car(pt, r, theta):
+    def car2phi(origin, pt):
+        x, y, z = pt
+        return MathFxns.car2pol(origin, (x,z,y))
+
+    def pol2car(pt, r, theta,phi=0):
         """
         Convert polar coordinate to cartesian
         Returns a point
         """
-        ox, oy = pt
+        ox, oy, oz = pt
         x = r * np.cos(theta)
         y = r * np.sin(theta)
-        return [(ox, oy), (x, y)]
+        z = r * np.sin(phi)
+        return (ox + x, oy + y, oz + z)
 
     def correct_angle(rad_theta):
         """
         Normalizes a negative angle theta, created by arctan2
         Returns an angle between -pi/2 and 2pi
         """
-        if rad_theta < -np.pi / 2:
+        if rad_theta <= -np.pi / 2:
             rad_theta = rad_theta + 2 * np.pi
         return rad_theta
 
@@ -138,7 +150,12 @@ class GeometryFxns:
     """
     Geometry helper functions
     """
-
+    def reduce_dimension(pt):
+        return (pt[0], pt[1])
+    
+    def raise_dimension(pt):
+        return (pt[0], pt[1], 0)
+    
     def get_equilateral_vertex(pt1, pt2, sign=1):
         """
         Calculates the vertex of an equilateral triangle
@@ -147,7 +164,14 @@ class GeometryFxns:
         rad, r = MathFxns.car2pol(pt1, pt2)
         nx = r * np.cos(rad + np.pi * sign / 3)
         ny = r * np.sin(rad + np.pi * sign / 3)
-        return (nx + pt1[0], ny + pt1[1])
+        return (nx + pt1[0], ny + pt1[1], 0)
+
+    def get_isosceles_vertex(pt1, pt2, sign=1, theta=45):
+        rad, r = MathFxns.car2pol(pt1, pt2)
+        radians = theta * (np.pi / 180) * sign
+        nx = r * np.cos(rad + radians)
+        ny = r * np.sin(rad + radians)
+        return (nx + pt1[0], ny + pt1[1], 0)
 
     def get_midpoint(pt1, pt2):
         """
@@ -157,7 +181,7 @@ class GeometryFxns:
         rad, r = MathFxns.car2pol(pt1, pt2)
         nx = r / 2 * np.cos(rad)
         ny = r / 2 * np.sin(rad)
-        return (nx + pt1[0], ny + pt1[1])
+        return (nx + pt1[0], ny + pt1[1], 0)
 
     def lerp(pt1, pt2, t):
         """
@@ -167,7 +191,7 @@ class GeometryFxns:
         rad, r = MathFxns.car2pol(pt1, pt2)
         nx = r * t * np.cos(rad)
         ny = r * t * np.sin(rad)
-        return (nx + pt1[0], ny + pt1[1])
+        return (nx + pt1[0], ny + pt1[1], 0)
 
     def lerp_list(p1, p2, n=100):
         """
@@ -180,6 +204,28 @@ class GeometryFxns:
             pts.append(GeometryFxns.lerp(p1, p2, step * i))
         pts.append(p2)
         return pts
+
+    def get_unit_norm_angle(ray_origin, ray_target, switch=False):
+        """
+        Returns the angle in radians of the vector normal to the line between two
+        points.
+        Switch is used by caller functions to flip the angle around the unit circle.
+        """
+        x1, y1 = ray_origin
+        x2, y2 = ray_target
+
+        rad_theta = np.arctan2(y2 - y1, x2 - x1)
+        # print(rad_theta)
+        rad_prime = rad_theta
+        if rad_prime < -np.pi / 2:
+            rad_prime = 2 * np.pi + rad_prime
+        rad_prime = rad_prime - np.pi / 2
+
+        if switch:
+            if rad_prime > 0:
+                return rad_prime - np.pi
+            return rad_prime + np.pi
+        return rad_prime
 
     def cubic_lerp_calculate(pts, n=100):
         """
@@ -211,28 +257,6 @@ class GeometryFxns:
         p1.append(GeometryFxns.lerp(m1[-1], m2[-1], 1))
         return l1, l2, l3, m1, m2, p1
 
-    def get_unit_norm_angle(ray_origin, ray_target, switch=False):
-        """
-        Returns the angle in radians of the vector normal to the line between two
-        points.
-        Switch is used by caller functions to flip the angle around the unit circle.
-        """
-        x1, y1 = ray_origin
-        x2, y2 = ray_target
-
-        rad_theta = np.arctan2(y2 - y1, x2 - x1)
-        # print(rad_theta)
-        rad_prime = rad_theta
-        if rad_prime < -np.pi / 2:
-            rad_prime = 2 * np.pi + rad_prime
-        rad_prime = rad_prime - np.pi / 2
-
-        if switch:
-            if rad_prime > 0:
-                return rad_prime - np.pi
-            return rad_prime + np.pi
-        return rad_prime
-
 
 class PygameArtFxns:
     """set of colors"""
@@ -251,6 +275,12 @@ class PygameArtFxns:
         "magenta": (255, 0, 255),
         "red": (255, 0, 0),
         "white": (255, 255, 255),
+        "dimgray": (105, 105, 105),
+        "lightslategray": (119, 136, 153),
+        "silver": (192, 192, 192),
+        "forestgreen": (34, 139, 34),
+        "seagreen": (46, 139, 87),
+        "lawngreen": (124, 252, 0),
     }
 
     def create_display(width, height):
@@ -267,7 +297,7 @@ class PygameArtFxns:
         Draws a polygon of specified color
         Returns nothing
         """
-        pygame.draw.polygon(screen, color, point_set, width=1)
+        pygame.draw.polygon(screen, color, [GeometryFxns.reduce_dimension(i) for i in point_set], width=2)
 
     def frame_draw_line(screen, point_set, color=(0, 0, 0)):
         """
@@ -275,6 +305,8 @@ class PygameArtFxns:
         Returns nothing
         """
         s, e = point_set
+        s = GeometryFxns.reduce_dimension(s)
+        e = GeometryFxns.reduce_dimension(e)
         pygame.draw.aaline(screen, color, s, e)
 
     def frame_draw_bold_line(screen, point_set, color=(0, 0, 0)):
@@ -285,19 +317,19 @@ class PygameArtFxns:
         s, e = point_set
         pygame.draw.line(screen, color, s, e, width=4)
 
-    def frame_draw_dot(screen, point, color=(0, 0, 0), width=4):
+    def frame_draw_dot(screen, point, color=(0, 0, 0), width=0, thickness=4):
         """
         Draws a single dot given a point (x, y)
         Returns nothing
         """
-        pygame.draw.circle(screen, color, point, 1, width)
+        pygame.draw.circle(screen, color, GeometryFxns.reduce_dimension(point), thickness, width)
 
-    def clear_frame(screen, color=(0, 0, 0)):
+    def clear_frame(screen, color=(255, 255, 255)):
         """
         Resets the pygame display to a given color
         Returns nothing
         """
-        pygame.Surface.fill(screen, color)
+        pygame.Surface.fill(screen, PygameArtFxns.colors["silver"])
 
     def draw_lines_between_points(screen, pts, color=(255, 255, 255)):
         """
@@ -316,3 +348,22 @@ class PygameArtFxns:
 
         # frame_draw_dot(screen, pts[-1], PygameArtFxns.colors["red"])
         PygameArtFxns.frame_draw_line(screen, (pts[-1], pts[0]), color)
+
+    def frame_draw_filled_polygon(screen, pts, color=(255, 255, 255)):
+        """
+        Draws a filled polygon
+        Does not return
+        """
+        pygame.gfxdraw.filled_polygon(screen, pts, color)
+    
+    def frame_draw_cross(screen, origin, color = (255,255,255), size=10, vertical=True):
+        """
+        draws a cross at a point
+        """
+        x,y,z = origin
+        line1 = [(x-10, y), (x+10,y)]
+        line2 = [(x, y-10),(x, y+10)]
+        lines = [line1, line2]
+        for line in lines:
+            PygameArtFxns.frame_draw_line(screen, line, color)
+        

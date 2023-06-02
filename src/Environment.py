@@ -39,7 +39,7 @@ class Environment:
 
     def __init__(
         self,
-        world_origin=(0, 0),
+        world_origin=(0, 0, 0),
         agent=None,  # single agent for backwards compatibility
         agents=None,  # dictionary of agents, accessible by their unique identifiers
         targets=None,  # list of targets in the world

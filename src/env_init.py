@@ -11,24 +11,26 @@ from SensingAgent import SensingAgent
 from Target import Target
 from Environment import Environment
 from StreamingObjectTrackManager import ObjectTrackManager
+from Detection import Position
 
 
 
-def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
+def init_agent_exoskeleton(origin=(0, 0, 0), sensing_agent=None):
     """
     Initializes an exoskeleton for an agent
     returns a rigid body
     """
-    ox, oy = origin
+    ox, oy, oz = origin
     scale = 2
     opts = [
-        (ox - 10 * scale, oy - 10 * scale),
-        (ox - 10 * scale, oy + 10 * scale),
-        (ox + 30 * scale, oy),
+        (ox - 10 * scale, oy - 10 * scale, oz),
+        (ox - 10 * scale, oy + 10 * scale, oz),
+        (ox + 30 * scale, oy, oz),
     ]
     # print(opts)
 
     mpt = gfn.get_midpoint(opts[0], opts[1])
+    print(mpt)
     mpt2 = gfn.get_midpoint(mpt, opts[2])
 
     ap = Polygon(opts)
@@ -71,7 +73,7 @@ def init_object_tracker(sensing_agent=None):
     return obj_tracker
 
 
-def init_sensing_agent(_id=0, origin=(0, 0), width=np.pi / 2, radius=200):
+def init_sensing_agent(_id=0, origin=(0, 0, 0), width=np.pi / 2, radius=200):
     """
     Standard initializer for sensing agent
     returns a sensing agent
@@ -83,7 +85,7 @@ def init_sensing_agent(_id=0, origin=(0, 0), width=np.pi / 2, radius=200):
     return sensing_agent
 
 
-def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None):
+def init_target(origin=(0, 0, 0), color=(255, 255, 255), _id=0, path=None):
     """
     standard initializer for target
     returns a Target
@@ -92,7 +94,7 @@ def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None):
     return target
 
 
-def init_environment(world_origin=(0, 0), sensing_agents=None, targets=None):
+def init_environment(world_origin=(0, 0, 0), sensing_agents=None, targets=None):
     """
     standard initializer for Environment
     returns an environment

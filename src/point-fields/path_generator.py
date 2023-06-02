@@ -70,13 +70,13 @@ def render_path(screen, paths, filename="out.json"):
         # time.sleep(0.02)
 
     f = open(filename, "w")
-    path = {"points": [{"x": p[0], "y": p[1]} for p in paths[0]]}
+    path = {"points": [{"x": p[0], "y": p[1], "z":p[2]} for p in paths[0]]}
     f.write(json.dumps(path, indent=2))
     f.close()
     sys.exit()
 
 
-def create_grid(origin=(0, 0), width=1000, height=1000, points=10):
+def create_grid(origin=(0, 0, 0), width=1000, height=1000, points=10):
     """
     Creates a grid of points
     returns a list of (x,y) points
@@ -101,7 +101,7 @@ def loop_line():
     Returns a list of (x,y) points
     """
     paths = []
-    origin = (500, 500)
+    origin = (500, 500, 0)
     circ = create_circle(origin, 100, 50)
     # circ.reverse()
     intersection_pt = mfn.pol2car(origin, 100, 0)
@@ -176,12 +176,12 @@ def main():
             paths = create_grid()
             render_path(screen, paths, f"grid_{MAGNITUDE}noise.json")
         elif f == "CIRCLE":
-            origin = (500, 500)
+            origin = (500, 500, 0)
             paths = create_circle(origin, 150, 50)
             render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
         elif "LERP":
-            origin = (800, 200)
-            dest = (400, 1000)
+            origin = (800, 200, 0)
+            dest = (400, 1000, 0)
             paths = get_lerp(origin, dest)
             render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         else:

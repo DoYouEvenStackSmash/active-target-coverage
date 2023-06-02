@@ -162,6 +162,20 @@ class SensingAgent:
         else:
             fov_width = self.centered_sensor.get_fov_width()
         return fov_width
+    
+    def get_fov_height(self, sensor_idx=-1):
+        """
+        Accessor for the width of the fov of the sensing agent
+        returns a scalar value
+        """
+        fov_height = 0
+        if sensor_idx != -1:
+            fov_height = self.sensors[sensor_idx].get_fov_height()
+        else:
+            fov_height = self.centered_sensor.get_fov_height()
+        return fov_height
+    
+    
 
     def get_fov_radius(self, sensor_idx=-1):
         """
@@ -300,11 +314,11 @@ class SensingAgent:
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
             # print(f"val {val}")
-            dc = self.transform_to_local_sensor_coord((0, 0), (val[0], val[1]))
+            dc = self.transform_to_local_sensor_coord((0, 0, 0), (val[0], val[1], val[2]))
             print(dc)
             bbox = [dc[0], dc[1], 1, 1]
             yb = sann.register_annotation(a.get_id(), bbox, curr_state)
-            posn = Position(val[0], val[1])
+            posn = Position(val[0], val[1], val[2])
             detections.append(Detection(posn, yb))
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
@@ -341,16 +355,17 @@ class SensingAgent:
         """
 
         theta, r = mfn.car2pol(origin, target_pt)
-
-        ratio = theta / self.get_fov_width()
-
-        x = Sensor.WINDOW_WIDTH * ratio + 50
+        phi, r = mfn.car2phi(origin, target_pt)
+        horiz_ratio = theta / self.get_fov_width()
+        vert_ratio = phi / self.get_fov_height()
+        x = Sensor.WINDOW_WIDTH * horiz_ratio + 50
         # print(x)
         y = r
+        z = Sensor.WINDOW_WIDTH * vert_ratio + 50
         w = 1
         h = 1
 
-        return (x, y)
+        return (x, y, z)
 
     def transform_to_local_detection_coord(self, target_pt):
         """
@@ -360,7 +375,7 @@ class SensingAgent:
         target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
         r = mfn.euclidean_dist(self.get_center(), target_pt)
 
-        local_pt = mfn.pol2car((0, 0), r, target_rotation)
+        local_pt = mfn.pol2car((0, 0, 0), r, target_rotation)
         return local_pt
 
     def transform_from_local_coord(self, x, y, w=1, h=1):
@@ -384,9 +399,9 @@ class SensingAgent:
         # pt1 = position.get_attr_coord()
 
         pt1 = target_pt
-        x, y = pt1
+        x, y, z = pt1
         # print(self.get_rel_theta())
-        theta2, r = mfn.car2pol(target_pt, (0, 0))
+        theta2, r = mfn.car2pol(target_pt, (0, 0, 0))
         theta2 = adjust_angle(theta2 + self.get_fov_theta() + np.pi)
 
         pt = mfn.pol2car(self.get_center(), r, theta2)

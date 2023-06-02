@@ -27,7 +27,7 @@ class Link:
     def __init__(
         self,
         point_set=None,
-        endpoint=(0, 0),  #
+        endpoint=(0, 0, 0),  #
         _prev=None,  #
         _next=None,  #
         theta=0,  #
@@ -134,13 +134,13 @@ class Link:
         Calculates coordinate axes x,y in R2
         Returns a pair of points representing axis unit endpoints
         """
-        ox, oy = self.get_origin()
+        ox, oy, oz = self.get_origin()
         theta = self.rel_theta
         xx, xy = Link.LINE_LEN * np.cos(theta), Link.LINE_LEN * np.sin(theta)
         yx, yy = Link.LINE_LEN * np.cos(theta + np.pi / 2), Link.LINE_LEN * np.sin(
             theta + np.pi / 2
         )
-        return ((xx + ox, xy + oy), (yx + ox, yy + oy))
+        return ((xx + ox, xy + oy), (yx + ox, yy + oy), oz)
 
     def get_relative_rotation(self, target_point):
         """

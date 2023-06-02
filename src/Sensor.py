@@ -20,7 +20,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.15
+    TOLERANCE = 0.35
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 
@@ -36,11 +36,13 @@ class Sensor:
         parent_agent=None,
         sensor_radius=300,
         sensor_width=np.pi / 4,
+        sensor_height=np.pi / 4,
         _id=None,
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius
         self.fov_width = sensor_width
+        self.fov_height = sensor_height
         self._id = _id
 
     def get_origin(self):
@@ -64,6 +66,13 @@ class Sensor:
         Accessor for fov_width of the sensor
         """
         return self.fov_width
+
+    def get_fov_height(self):
+        """
+        Accessor for fov_height of the sensor
+        """
+        return self.fov_height
+
 
     def get_fov_radius(self):
         """

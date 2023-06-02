@@ -43,7 +43,7 @@ class RigidBody:
         self,
         parent_agent=None,
         rigid_link=None,
-        ref_origin=(0, 0),
+        ref_origin=(0, 0, 0),
         endpoint=(0, 0, 0),
         ref_center=(0, 0, 0),
         point_set=None,
@@ -185,13 +185,13 @@ class RigidBody:
         Calculates coordinate axes x,y in R2
         Returns a pair of points representing axis unit endpoints
         """
-        ox, oy = self.get_center()
+        ox, oy, oz = self.get_center()
         theta = self.rel_theta
         xx, xy = RigidBody.LINE_LEN * np.cos(theta), RigidBody.LINE_LEN * np.sin(theta)
         yx, yy = RigidBody.LINE_LEN * np.cos(
             theta + np.pi / 2
         ), RigidBody.LINE_LEN * np.sin(theta + np.pi / 2)
-        return ((xx + ox, xy + oy), (yx + ox, yy + oy))
+        return ((xx + ox, xy + oy), (yx + ox, yy + oy), oz)
 
     def get_relative_rotation(self, target_point):
         """
@@ -205,6 +205,7 @@ class RigidBody:
 
         norm, dist = mfn.car2pol(self.get_center(), self.get_endpoint())
         rad, r = mfn.car2pol(self.get_center(), target_point)
+        phi, r = mfn.car2phi(self.get_center(), target_point)
 
         norm = mfn.correct_angle(norm)
         rad = mfn.correct_angle(rad)
@@ -235,14 +236,14 @@ class RigidBody:
         """
         theta, r = mfn.car2pol(self.get_center(), target_point)
         pt2 = mfn.pol2car(self.get_center(), r, theta)
-        cx, cy = self.get_center()
-
+        cx, cy, cz = self.get_center()
+        z_disp = pt2[2] - cz
         x_disp, y_disp = pt2[0] - cx, pt2[1] - cy
         self.endpoint = mfn.pol2car(self.endpoint, r, theta)
         self.origin = mfn.pol2car(self.origin, r, theta)
         self.ref_center = mfn.pol2car(self.ref_center, r, theta)
 
-        translate_polygon(self.body, x_disp, y_disp)
+        translate_polygon(self.body, x_disp, y_disp, z_disp)
         return (theta, r)
 
     def apply_rotation_to_body(self, rotation):
@@ -276,8 +277,8 @@ class RigidBody:
         self.origin = mfn.pol2car(
             self.get_origin(), translation_dist, self.get_rel_theta()
         )
-        x_disp, y_disp = mfn.pol2car((0, 0), translation_dist, self.get_rel_theta())
-        translate_polygon(self.body, x_disp, y_disp)
+        x_disp, y_disp, z_disp = mfn.pol2car((0, 0, 0), translation_dist, self.get_rel_theta())
+        translate_polygon(self.body, x_disp, y_disp, z_disp)
         return translation_dist
 
     def update_orientation(self, point_set, theta):

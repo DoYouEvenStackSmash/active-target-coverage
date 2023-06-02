@@ -165,10 +165,10 @@ def render_predictions(screen, sensing_agent):
         curr_pt = arr[0][0]
         pred_pt = arr[0][1]
     if len(pred_pt):
-        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
-        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
+        pafn.frame_draw_dot(screen, gfn.reduce_dimension(curr_pt), pafn.colors["tangerine"])
+        pafn.frame_draw_dot(screen, gfn.reduce_dimension(curr_pt), pafn.colors["yellow"])
         pafn.frame_draw_line(
-            screen, (curr_pt, pred_pt), pafn.colors["white"]
+            screen, (gfn.reduce_dimension(curr_pt), gfn.reduce_dimension(pred_pt)), pafn.colors["white"]
         )
 
 def render_path(screen, path, color):

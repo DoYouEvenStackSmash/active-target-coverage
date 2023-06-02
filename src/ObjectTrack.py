@@ -165,7 +165,7 @@ class ObjectTrack:
         )
 
         # map cartesian coordinates to sensor coordinates
-        pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), pt)
+        pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0, 0), pt)
 
         # update sensor yolobox coordinates
         yb = None
@@ -173,7 +173,7 @@ class ObjectTrack:
         bbox = [pt2[0], pt2[1], 1, 1]
         yb.bbox = bbox
 
-        det = Detection(Position(pt[0], pt[1]), yb)
+        det = Detection(Position(pt[0], pt[1], pt[2]), yb)
         return det
 
         pass

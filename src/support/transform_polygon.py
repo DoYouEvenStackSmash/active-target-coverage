@@ -55,10 +55,10 @@ def rotate_point(rotation_matrix, origin, point):
     Rotates point about some fixed origin by applying rotation matrix
     Returns the transformed point
     """
-    ox, oy = origin
-    px, py = point
+    ox, oy, oz = origin
+    px, py, pz = point
     step = np.matmul(rotation_matrix, np.array([[px - ox], [py - oy]]))
-    return [step[0][0] + ox, step[1][0] + oy]
+    return [step[0][0] + ox, step[1][0] + oy, oz + pz]
 
 
 def rotate_polygon(P, rotation_matrix, origin=None):
@@ -96,16 +96,16 @@ def gradually_translate_polygon(P, target_point, step_size=1, endpoint=None):
         translate_polygon(P, x_step, y_step)
 
 
-def translate_polygon(P, x_disp, y_disp):
+def translate_polygon(P, x_disp, y_disp, z_disp=0):
     """
     Transforms a polygon by applying a displacement to each of its vertices
     Does not return
     """
     h = P.get_front_edge()
-    px, py = h.source_vertex.get_point_coordinate()
-    h.source_vertex.set_point_coordinate([px + x_disp, py + y_disp])
+    px, py, pz = h.source_vertex.get_point_coordinate()
+    h.source_vertex.set_point_coordinate([px + x_disp, py + y_disp, pz + z_disp])
     h = h._next
     while h != P.get_front_edge():
-        px, py = h.source_vertex.get_point_coordinate()
-        h.source_vertex.set_point_coordinate([px + x_disp, py + y_disp])
+        px, py, pz = h.source_vertex.get_point_coordinate()
+        h.source_vertex.set_point_coordinate([px + x_disp, py + y_disp, pz + z_disp])
         h = h._next
