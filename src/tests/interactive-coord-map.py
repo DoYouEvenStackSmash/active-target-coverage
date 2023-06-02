@@ -22,17 +22,19 @@ def coord_map_sensing_agent(screen, sensing_agent):
                 draw_sensing_agent(screen, sensing_agent)
                 pt = pygame.mouse.get_pos()
                 pt = gfn.raise_dimension(pt)
+                p = Position()
+                p.set_by_triple(pt)
                 pafn.frame_draw_dot(screen, pt, pafn.colors["green"],0,6)
-                det_pt = sensing_agent.transform_to_local_detection_coord(pt)
-                sens_pt = sensing_agent.transform_to_local_sensor_coord((0,0,0),det_pt)
-                print(f"orig:\t{pt}\n\tdet: {det_pt}\n\tsen: {sens_pt}")
+                det_pt = sensing_agent.transform_to_local_detection_coord(p)
+                sens_pt = sensing_agent.transform_to_local_sensor_coord(Position(0,0,0),det_pt)
+                print(f"orig:\t{pt}\n\tdet: {det_pt.get_cartesian_coordinates()}\n\tsen: {sens_pt.get_cartesian_coordinates()}")
                 pygame.display.update()
 
 def main():
     pygame.init()
     screen = pafn.create_display(600, 600)
     pafn.clear_frame(screen)
-    origin = (300,300, 0)
+    origin = Position(300,300, 0)
     sa = init_sensing_agent(origin=origin,width=3 *np.pi / 5,radius=200)
     coord_map_sensing_agent(screen, sa)
 

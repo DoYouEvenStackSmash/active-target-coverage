@@ -143,6 +143,12 @@ class SensingAgent:
         origin = self.exoskeleton.get_center()
         return origin
 
+    def get_max_x(self):
+        return self.centered_sensor.get_max_x()
+    
+    def get_max_y(self):
+        return self.centered_sensor.get_max_y()
+    
     def get_fov_theta(self):
         """
         Accessor for the orientation of the sensing agent as the rigid body
@@ -174,8 +180,6 @@ class SensingAgent:
         else:
             fov_height = self.centered_sensor.get_fov_height()
         return fov_height
-    
-    
 
     def get_fov_radius(self, sensor_idx=-1):
         """
@@ -267,7 +271,7 @@ class SensingAgent:
         Returns true/false
         """
         rotation = self.exoskeleton.get_relative_rotation(target_pt)
-        theta, r = mfn.car2pol(self.exoskeleton.get_center(), target_pt)
+        theta, r = mfn.car2pol(self.exoskeleton.get_center().get_cartesian_coordinates(), target_pt.get_cartesian_coordinates())
         if abs(rotation) > self.get_fov_width() / 2:
             return False
         if r > self.get_fov_radius():
@@ -314,14 +318,95 @@ class SensingAgent:
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
             # print(f"val {val}")
-            dc = self.transform_to_local_sensor_coord((0, 0, 0), (val[0], val[1], val[2]))
+            dc = self.transform_to_local_sensor_coord(Position(0, 0, 0), val)
             print(dc)
-            bbox = [dc[0], dc[1], 1, 1]
+            x,y,z = dc.get_cartesian_coordinates()
+            bbox = [x, y, 1, 1]
             yb = sann.register_annotation(a.get_id(), bbox, curr_state)
-            posn = Position(val[0], val[1], val[2])
-            detections.append(Detection(posn, yb))
+            
+            detections.append(Detection(val, yb))
+        return detections
+    
+    def new_pov_detection_set(self, frame_id, detection_list):
+        """
+            Creates a detection when range is not present
+        """
+        detections = []
+        curr_state = self.exoskeleton.get_age()
+        for a in detection_list:
+            cls = a.get_id()
+            x,y,z = a.get_origin().get_cartesian_coordinates()
+            w,h = a.get_dims()
+            img_shape_x = self.get_max_x()
+            img_shape_y = self.get_max_y()
+            
+            x = x / img_shape_x
+            y = y / img_shape_y
+            sensor_fov_width = self.get_fov_width()
+            sensor_fov_height = self.get_fov_height()
+
+            det = create_detections_without_range(curr_state, cls, x, y, z, w, h, img_shape_x, img_shape_y, sensor_fov_width, sensor_fov_height)
+            detections.append(det)
+        return detections
+    
+    def load_detection_layer(self, detections):
+        """
+        wrapper for processing a new layer of detections
+        """
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
+
+    
+    def create_detections_without_range(self,
+                                    time_of_detection,
+                                    detection_cls,
+                                    x,
+                                    y,
+                                    w,
+                                    h,
+                                    img_shape_x,
+                                    img_shape_y,
+                                    sensor_fov_width,
+                                    sensor_fov_height):
+        """
+        wrapper for Yolo style detections
+        """
+        # calculate vector 1, agent pov on horizontal plane
+        """
+                      (0,0)
+                +-------+-------+
+                |       |       |
+                |       |       |
+                |       |       |
+        (0,0)   |__ B<--A_______| (100,0)
+                |   |   |       |
+                |   v   |       |
+                |   C   |       |
+                +-------+-------+
+                      (0,100)
+        Agent frame of reference
+        image_shape: 1000
+        sensor_fov_width: pi / 2
+        rel_x = 25
+        theta = -np.pi / 4
+        """
+        dist = 0
+        # normalize x between 0 and 100
+        rel_x = (x * img_shape_x - (img_shape_x / 2)) / img_shape_x * 100 + 50
+        # normalize theta in terms of agent pov
+        theta = (rel_x / 100) * sensor_fov_width - (sensor_fov_width / 2)
+        
+        # vertical component
+        rel_y = (y * img_shape_y - (img_shape_y / 2)) / img_shape_y * 100 + 50
+        phi = (rel_y / 100) * sensor_fov_height - (sensor_fov_height / 2)
+
+        # bbox normalized
+        bbox = [rel_x, rel_y, w, h]
+
+        posn = Position(dist, rel_x, rel_y, theta, phi)
+        yb = sann.register_annotation(detection_cls, [rel_x, rel_y, w, h], time_of_detection)
+        det = Detection(posn, yb)
+        return det
 
     def add_new_detection(self, frame_id, target_origin):
         """
@@ -353,7 +438,8 @@ class SensingAgent:
         """
         Transforms a point to local sensor curved coordinate frame
         """
-
+        target_pt = target_pt.get_cartesian_coordinates()
+        origin = origin.get_cartesian_coordinates()
         theta, r = mfn.car2pol(origin, target_pt)
         phi, r = mfn.car2phi(origin, target_pt)
         horiz_ratio = theta / self.get_fov_width()
@@ -365,7 +451,7 @@ class SensingAgent:
         w = 1
         h = 1
 
-        return (x, y, z)
+        return Position(x, y, z)
 
     def transform_to_local_detection_coord(self, target_pt):
         """
@@ -373,10 +459,11 @@ class SensingAgent:
         """
 
         target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
-        r = mfn.euclidean_dist(self.get_center(), target_pt)
+        r = mfn.euclidean_dist(self.get_center().get_cartesian_coordinates(), target_pt.get_cartesian_coordinates())
 
         local_pt = mfn.pol2car((0, 0, 0), r, target_rotation)
-        return local_pt
+        x,y,z = local_pt
+        return Position(x,y,z)
 
     def transform_from_local_coord(self, x, y, w=1, h=1):
         """
@@ -386,7 +473,7 @@ class SensingAgent:
         theta = (x - 50) / Sensor.WINDOW_WIDTH * self.get_fov_width()
         theta = adjust_angle(self.get_fov_theta() + theta)
         r = y
-        pt = mfn.pol2car(self.get_center(), r, theta)
+        pt = mfn.pol2car(self.get_center().get_cartesian_coordinates(), r, theta)
 
         return pt
 
@@ -398,13 +485,13 @@ class SensingAgent:
         # pt1 = self.get_relative_angle()
         # pt1 = position.get_attr_coord()
 
-        pt1 = target_pt
+        pt1 = target_pt.get_cartesian_coordinates()
         x, y, z = pt1
         # print(self.get_rel_theta())
-        theta2, r = mfn.car2pol(target_pt, (0, 0, 0))
+        theta2, r = mfn.car2pol(target_pt.get_cartesian_coordinates(), (0, 0, 0))
         theta2 = adjust_angle(theta2 + self.get_fov_theta() + np.pi)
 
-        pt = mfn.pol2car(self.get_center(), r, theta2)
+        pt = mfn.pol2car(self.get_center().get_cartesian_coordinates(), r, theta2)
         return pt
 
     def estimate_pose_update(self, priorities=0):

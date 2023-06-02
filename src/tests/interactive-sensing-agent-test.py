@@ -37,7 +37,9 @@ def mouse_test(screen, environment):
 
         draw_sensing_agent(screen, sensing_agent)
       pygame.display.update()
-      environment.targets[0].origin = gfn.raise_dimension(pt)
+      p = Position()
+      p.set_by_triple(gfn.raise_dimension(pt))
+      environment.targets[0].origin = p
       environment.visible_targets()
 
 
@@ -46,9 +48,10 @@ def main():
   screen = pafn.create_display(1000, 1000)
   pafn.clear_frame(screen)
   sensing_agents = {}
-  sa = init_sensing_agent(origin=(400,400,0))
+  sa = init_sensing_agent(origin=Position(400,400,0))
   sensing_agents[sa._id] = sa
   t = init_target()
+  print(t.get_origin())
   env = init_environment(sensing_agents=sensing_agents, targets=[t])
   mouse_test(screen, env)
 

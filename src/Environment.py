@@ -66,7 +66,7 @@ class Environment:
             # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
-                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_position())
+                d = mfn.euclidean_dist(self.agents[k].get_origin().get_cartesian_coordinates(), target.get_position().get_cartesian_coordinates())
                 pairs.append((self.agents[k]._id, target, d))
 
         pairs = sorted(pairs, key=sortkey)

@@ -3,6 +3,7 @@ import numpy as np
 from render_support import MathFxns as mfn
 from render_support import GeometryFxns as gfn
 from render_support import PygameArtFxns as pafn
+from Detection import Position
 
 
 def adjust_angle(theta):
@@ -44,6 +45,8 @@ class Sensor:
         self.fov_width = sensor_width
         self.fov_height = sensor_height
         self._id = _id
+        self.max_x = 1000
+        self.max_y = 1000
 
     def get_origin(self):
         """
@@ -73,7 +76,12 @@ class Sensor:
         """
         return self.fov_height
 
+    def get_max_x(self):
+        return self.max_x
 
+    def get_max_y(self):
+        return self.max_y
+    
     def get_fov_radius(self):
         """
         Accessor for scalar range
@@ -126,7 +134,7 @@ class Sensor:
         horizontal_axis = []
 
         for i in fov_offts:
-            horizontal_axis.append(mfn.pol2car(self.get_origin(), radius, i))
+            horizontal_axis.append(mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i))
         return horizontal_axis
 
     def get_tolerance_axis(self, radius):
@@ -151,7 +159,7 @@ class Sensor:
         horizontal_axis = []
 
         for i in fov_offts:
-            horizontal_axis.append(mfn.pol2car(self.get_origin(), radius, i))
+            horizontal_axis.append(mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i))
         return horizontal_axis
 
     def is_rel_detectable(self, target_pt):
@@ -162,8 +170,8 @@ class Sensor:
         # boundary conditions
         adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
         adj_rad_bnd = self.get_fov_radius()
-        target_x = target_pt[0]
-        target_y = target_pt[1]
+        target_x, target_y, target_z = target_pt.get_cartesian_coordinates()
+        
         flags = 0
 
         angle_flag = False

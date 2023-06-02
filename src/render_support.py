@@ -305,8 +305,6 @@ class PygameArtFxns:
         Returns nothing
         """
         s, e = point_set
-        s = GeometryFxns.reduce_dimension(s)
-        e = GeometryFxns.reduce_dimension(e)
         pygame.draw.aaline(screen, color, s, e)
 
     def frame_draw_bold_line(screen, point_set, color=(0, 0, 0)):

@@ -58,8 +58,10 @@ def draw_coordinate_frame(screen, sensor, levels=5):
     """
     coord_frame = sensor.get_visible_fov(levels)
     detect_frame = sensor.get_detectable_bounds(levels)
-
+    sensor_origin = gfn.reduce_dimension(sensor.get_origin().get_cartesian_coordinates())
     if OUTLINE:  # draw skeletal outline only
+        for i in range(len(coord_frame[-1])):
+            coord_frame[-1][i] = gfn.reduce_dimension(coord_frame[-1][i])
         for i in range(1, len(coord_frame[-1])):
             pafn.frame_draw_line(
                 screen,
@@ -68,6 +70,10 @@ def draw_coordinate_frame(screen, sensor, levels=5):
             )
     else:  # draw full sensor field of view
         for c in range(levels):
+            for i in range(len(coord_frame[c])):
+                coord_frame[c][i] = gfn.reduce_dimension(coord_frame[c][i])
+            print(coord_frame)
+            print("\n")
             for i in range(1, len(coord_frame[c])):
                 pafn.frame_draw_line(
                     screen,
@@ -76,17 +82,18 @@ def draw_coordinate_frame(screen, sensor, levels=5):
                 )
         for endpoint in coord_frame[-1]:
             pafn.frame_draw_line(
-                screen, (sensor.get_origin(), endpoint), pafn.colors["dimgray"]
+                screen, (sensor_origin, endpoint), pafn.colors["dimgray"]
             )
 
     # draw threshold regions
     for endpoint in detect_frame[-1][:2]:
+        print(endpoint)
         pafn.frame_draw_line(
-            screen, (sensor.get_origin(), endpoint), pafn.colors["tangerine"]
+            screen, (sensor_origin, gfn.reduce_dimension(endpoint)), pafn.colors["tangerine"]
         )
     for endpoint in detect_frame[-1][2:]:
         pafn.frame_draw_line(
-            screen, (sensor.get_origin(), endpoint), pafn.colors["cyan"]
+            screen, (sensor_origin, gfn.reduce_dimension(endpoint)), pafn.colors["cyan"]
         )
 
 
@@ -99,11 +106,12 @@ def draw_all_normals(screen, rigid_body):
         rigid_body (RigidBody): A rigid body class object
     """
     n = rigid_body.get_normals()
+    rbcenter = gfn.reduce_dimension(rigid_body.get_center().get_cartesian_coordinates())
     pafn.frame_draw_line(
-        screen, (rigid_body.get_center(), n[0]), pafn.colors["tangerine"]
+        screen, (rbcenter, n[0]), pafn.colors["tangerine"]
     )
-    pafn.frame_draw_line(screen, (rigid_body.get_center(), n[1]), pafn.colors["yellow"])
-    pafn.frame_draw_dot(screen, rigid_body.get_center(), pafn.colors["white"])
+    pafn.frame_draw_line(screen, (rbcenter, n[1]), pafn.colors["yellow"])
+    pafn.frame_draw_dot(screen, rbcenter, pafn.colors["white"])
 
 
 def draw_all_links(screen, link, color=None):
@@ -120,7 +128,7 @@ def draw_all_links(screen, link, color=None):
     points = link.get_points()
     pafn.frame_draw_filled_polygon(screen, points, color)
     pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
-    pafn.frame_draw_dot(screen, link.get_center(), pafn.colors["white"])
+    pafn.frame_draw_dot(screen, gfn.reduce_dimension(link.get_center().get_cartesian_coordinates()), pafn.colors["white"])
 
 
 def draw_rigid_body(screen, rigid_body):
@@ -130,7 +138,7 @@ def draw_rigid_body(screen, rigid_body):
         screen: a pygame screen object for drawing
         rigid_body (RigidBody): Abstraction containing attributes of angle and points
     """
-    draw_all_normals(screen, rigid_body)
+    # draw_all_normals(screen, rigid_body)
     draw_all_links(screen, rigid_body, rigid_body.color)
     draw_body_grid(screen, rigid_body)
     # pafn.frame_draw_bold_line(screen, rigid_body.get_horizontal_axis(), pafn.colors["black"])
@@ -140,6 +148,8 @@ def draw_rigid_body(screen, rigid_body):
 def draw_body_grid(screen, rigid_body):
     axes = rigid_body.get_grid()
     for ax in axes:
+        a,b = ax
+        ax = [gfn.reduce_dimension(a), gfn.reduce_dimension(b)]
         pafn.frame_draw_line(screen, ax, pafn.colors["black"])
 
 

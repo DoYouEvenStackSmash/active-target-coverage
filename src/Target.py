@@ -1,3 +1,5 @@
+from Detection import *
+
 class Target:
     """A class which models a Target which may or may not be covered
 
@@ -8,7 +10,7 @@ class Target:
 
     """
 
-    def __init__(self, origin, color=None, _id=0, path=None):
+    def __init__(self, origin = Position(), color=None, _id=0, path=None):
         self.origin = origin
         self.color = color
         self.attributes = None
@@ -39,10 +41,9 @@ class Target:
         Accessor for the position of the target
         Returns an (x,y) point
         """
-        if not len(self.path):
+        if self.path == None or not len(self.path):
             return self.get_origin()
         return self.path[self.idx]
-
 
     def get_attributes(self):
         """

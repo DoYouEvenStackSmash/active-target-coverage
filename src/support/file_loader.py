@@ -20,7 +20,7 @@ def json_point_unpack(json_point_list):
     """
     pts = []
     for p in json_point_list:
-        pts.append([p["x"], p["y"], p["z"]])
+        pts.append([p["x"], p["y"], p["z"], p["w"], p["h"]])
     return pts
 
 

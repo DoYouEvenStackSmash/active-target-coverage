@@ -202,10 +202,12 @@ class RigidBody:
 
         Returns a normalized angle theta
         """
-
-        norm, dist = mfn.car2pol(self.get_center(), self.get_endpoint())
-        rad, r = mfn.car2pol(self.get_center(), target_point)
-        phi, r = mfn.car2phi(self.get_center(), target_point)
+        center = self.get_center().get_cartesian_coordinates()
+        endpoint = self.get_endpoint().get_cartesian_coordinates()
+        target_point = target_point.get_cartesian_coordinates()
+        norm, dist = mfn.car2pol(center, endpoint)
+        rad, r = mfn.car2pol(endpoint, target_point)
+        phi, r = mfn.car2phi(endpoint, target_point)
 
         norm = mfn.correct_angle(norm)
         rad = mfn.correct_angle(rad)
@@ -224,7 +226,7 @@ class RigidBody:
         """
         Rotation for the rigid body
         """
-        rotation = self.get_relative_rotation(target_point)
+        rotation = self.get_relative_rotation(target_point.get_cartesian_coordinates())
         rotation = self.apply_rotation_to_body(rotation)
         self.rel_theta += rotation
         return rotation
@@ -302,14 +304,15 @@ class RigidBody:
         returns a List of (pt1, pt2) points
         """
         r = 300
+        center = self.get_center().get_cartesian_coordinates()
         tlpt = mfn.pol2car(
-            self.get_center(), r, adjust_angle(self.get_rel_theta() - np.pi / 4)
+            center, r, adjust_angle(self.get_rel_theta() - np.pi / 4)
         )
         trpt = mfn.pol2car(
-            self.get_center(), r, adjust_angle(self.get_rel_theta() + np.pi / 4)
+            center, r, adjust_angle(self.get_rel_theta() + np.pi / 4)
         )
         blpt = mfn.pol2car(
-            self.get_center(), r, adjust_angle(self.get_rel_theta() - 3 * np.pi / 4)
+            center, r, adjust_angle(self.get_rel_theta() - 3 * np.pi / 4)
         )
         horiz_theta, horiz_r = mfn.car2pol(tlpt, trpt)
         vert_theta, vert_r = mfn.car2pol(tlpt, blpt)

@@ -23,11 +23,14 @@ class Detection:
         """
         return self.position
 
-    def get_cartesian_coord(self):
+    def get_cartesian_coordinates(self):
         """
         Accessor for position's cartesian coordinates
         """
-        return self.position.get_center_coord()
+        return self.position.get_cartesian_coordinates()
+    
+    def get_angles(self):
+        return self.position.get_angles()
 
     def get_attr_coord(self):
         """
@@ -60,4 +63,27 @@ class Position:
         self.phi = phi
 
     def get_center_coord(self):
-        return (self.x, self.y, self.z)
+        """
+        Accessor for center of the position
+        """
+        return self.get_cartesian_coord()
+    
+    def get_cartesian_coordinates(self):
+        """
+        Accessor for position in cartesian coordinates
+        """
+        return [self.x, self.y, self.z]
+
+    def get_angles(self):
+        """
+        Accessor for angle components
+        """
+        return [self.theta, self.phi]
+
+    def set_by_triple(self, triple):
+        """
+        Convenience function for updating positions with 3-tuples
+        """
+        self.x = triple[0]
+        self.y = triple[1]
+        self.z = triple[2]
