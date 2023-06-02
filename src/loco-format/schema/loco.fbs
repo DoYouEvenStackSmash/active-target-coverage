@@ -26,25 +26,54 @@ struct Bbox {
   h:float;
 }
 
+// Annotation containing position of detection in the frame
 table Annotation {
+  // id of the annotation
   id:int;
+  // image in which the detection was present
   image_id:int;
+  // category of the detection
   category_id:int;
+  // bounding box of the detection
   bbox:Bbox;
+  // area of the bounding box
   area:float;
+  // semantic segmentation data
   segmentation:[ubyte];
+  // crowd information
   iscrowd:int;
+  // track id
   track_id:int;
+  // index of the track in global trackmap
   trackmap_index:int;
+  // id of the video
   vid_id:int;
+  /// color of the track for rendering
   track_color:[int];
+  // displacement flag
   displaced:bool;
+  // error between prediction and actual detection
   error:float;
+  // id for the agent state
   state_id:int;
 }
 
+table Position {
+  // x coord of the agent
+  x:float;
+  // y coord of the agent
+  y:float;
+  // z coord of the agent
+  z:float;
+  // azimuth angle of the agent
+  theta:float;
+  // elevation angle of the agent
+  phi:float;
+}
+
+// State of the agent at a point in time
 table State {
-  position:[float];
+  position:Position;
   orientation:float;
   time_stamp:int;
 }

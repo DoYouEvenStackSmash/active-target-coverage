@@ -39,9 +39,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 2,
+        "track_lifespan": 4,
         "default_avg_dist": 10,
-        "radial_exclusion": 150,
+        "radial_exclusion": 20,
     }
     display_constants = {"trail_len": 0}
 
@@ -245,7 +245,7 @@ class ObjectTrackManager:
         """
         link_counter = 0
         for k, v in self.global_track_store.items():
-            if v.get_step_count() < min_len:
+            if v.get_step_count() <= min_len:
                 continue
             link_counter += 1
             self.linked_tracks.append(k)
@@ -292,7 +292,7 @@ class ObjectTrackManager:
         for c in range(len(curr_layer)):
             for p in pred:
                 d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
-                print(d)
+                print(f"distance:{d}")
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

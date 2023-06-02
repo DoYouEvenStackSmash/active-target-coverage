@@ -12,7 +12,7 @@ import time
 import numpy as np
 import json
 
-MAGNITUDE = 0
+MAGNITUDE = 1000
 
 rng = np.random.default_rng(12345)
 
@@ -187,8 +187,8 @@ def main():
             paths = create_circle(origin, 150, 50)
             render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
         elif "LERP":
-            origin = (800, 200, 0)
-            dest = (400, 1000, 0)
+            origin = (1000, 500, 0)
+            dest = (0, 500, 0)
             paths = get_lerp(origin, dest)
             render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         else:

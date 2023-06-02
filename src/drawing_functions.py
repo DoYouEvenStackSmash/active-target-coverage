@@ -171,17 +171,20 @@ def render_predictions(screen, sensing_agent):
     """
     curr_pt, pred_pt = (),()
     arr = sensing_agent.estimate_next_detection()
-    if len(arr):
-        curr_pt = arr[0][0]
-        pred_pt = arr[0][1]
-    if len(pred_pt):
-        pred_pt = [pred_pt[1], pred_pt[2], 0]
-        curr_pt = [curr_pt[1], curr_pt[2], 0]
-        pafn.frame_draw_dot(screen, gfn.reduce_dimension(curr_pt), pafn.colors["tangerine"])
-        pafn.frame_draw_dot(screen, gfn.reduce_dimension(pred_pt), pafn.colors["yellow"])
-        pafn.frame_draw_line(
-            screen, (gfn.reduce_dimension(curr_pt), gfn.reduce_dimension(pred_pt)), pafn.colors["white"]
-        )
+    if not len(arr):
+        return
+    for i in range(len(arr)):
+        curr_pt, pred_pt = (),()
+        curr_pt = arr[i][0]
+        pred_pt = arr[i][1]
+        if len(pred_pt):
+            pred_pt = [pred_pt[1], pred_pt[2], 0]
+            curr_pt = [curr_pt[1], curr_pt[2], 0]
+            pafn.frame_draw_dot(screen, gfn.reduce_dimension(curr_pt), pafn.colors["tangerine"])
+            pafn.frame_draw_dot(screen, gfn.reduce_dimension(pred_pt), pafn.colors["yellow"])
+            pafn.frame_draw_line(
+                screen, (gfn.reduce_dimension(curr_pt), gfn.reduce_dimension(pred_pt)), pafn.colors["white"]
+            )
 
 def render_path(screen, path, color):
     """

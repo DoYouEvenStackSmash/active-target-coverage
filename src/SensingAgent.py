@@ -295,7 +295,7 @@ class SensingAgent:
         returns a LOCO formatted json object
         """
         self.obj_tracker.close_all_tracks()
-        self.obj_tracker.link_all_tracks(0)
+        self.obj_tracker.link_all_tracks()
         e = self.obj_tracker.export_loco_fmt()
         print(f"exporting states of {self}")
         e["states"] = [s.to_json() for s in self.exoskeleton.states]

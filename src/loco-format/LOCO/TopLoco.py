@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class TopLoco(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsTopLoco(cls, buf, offset):
@@ -27,10 +25,7 @@ class TopLoco(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(
-                flatbuffers.number_types.Uint8Flags,
-                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1),
-            )
+            return self._tab.Get(flatbuffers.number_types.Uint8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
         return 0
 
     # TopLoco
@@ -60,7 +55,6 @@ class TopLoco(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from LOCO.Category import Category
-
             obj = Category()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -83,10 +77,7 @@ class TopLoco(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(
-                flatbuffers.number_types.Int32Flags,
-                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
-            )
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
         return 0
 
     # TopLoco
@@ -116,7 +107,6 @@ class TopLoco(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from LOCO.Track import Track
-
             obj = Track()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -142,7 +132,6 @@ class TopLoco(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from LOCO.Image import Image
-
             obj = Image()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -168,7 +157,6 @@ class TopLoco(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from LOCO.Annotation import Annotation
-
             obj = Annotation()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -194,7 +182,6 @@ class TopLoco(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from LOCO.State import State
-
             obj = State()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -218,96 +205,28 @@ class TopLoco(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from LOCO.SensorParameters import SensorParameters
-
             obj = SensorParameters()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-
-def TopLocoStart(builder):
-    builder.StartObject(8)
-
-
-def TopLocoAddConstants(builder, constants):
-    builder.PrependUOffsetTRelativeSlot(
-        0, flatbuffers.number_types.UOffsetTFlags.py_type(constants), 0
-    )
-
-
-def TopLocoStartConstantsVector(builder, numElems):
-    return builder.StartVector(1, numElems, 1)
-
-
-def TopLocoAddCategories(builder, categories):
-    builder.PrependUOffsetTRelativeSlot(
-        1, flatbuffers.number_types.UOffsetTFlags.py_type(categories), 0
-    )
-
-
-def TopLocoStartCategoriesVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddTrackmap(builder, trackmap):
-    builder.PrependUOffsetTRelativeSlot(
-        2, flatbuffers.number_types.UOffsetTFlags.py_type(trackmap), 0
-    )
-
-
-def TopLocoStartTrackmapVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddLinkedTracks(builder, linkedTracks):
-    builder.PrependUOffsetTRelativeSlot(
-        3, flatbuffers.number_types.UOffsetTFlags.py_type(linkedTracks), 0
-    )
-
-
-def TopLocoStartLinkedTracksVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddImages(builder, images):
-    builder.PrependUOffsetTRelativeSlot(
-        4, flatbuffers.number_types.UOffsetTFlags.py_type(images), 0
-    )
-
-
-def TopLocoStartImagesVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddAnnotations(builder, annotations):
-    builder.PrependUOffsetTRelativeSlot(
-        5, flatbuffers.number_types.UOffsetTFlags.py_type(annotations), 0
-    )
-
-
-def TopLocoStartAnnotationsVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddStates(builder, states):
-    builder.PrependUOffsetTRelativeSlot(
-        6, flatbuffers.number_types.UOffsetTFlags.py_type(states), 0
-    )
-
-
-def TopLocoStartStatesVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TopLocoAddSensorParams(builder, sensorParams):
-    builder.PrependUOffsetTRelativeSlot(
-        7, flatbuffers.number_types.UOffsetTFlags.py_type(sensorParams), 0
-    )
-
-
-def TopLocoEnd(builder):
-    return builder.EndObject()
-
+def TopLocoStart(builder): builder.StartObject(8)
+def TopLocoAddConstants(builder, constants): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(constants), 0)
+def TopLocoStartConstantsVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def TopLocoAddCategories(builder, categories): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(categories), 0)
+def TopLocoStartCategoriesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddTrackmap(builder, trackmap): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(trackmap), 0)
+def TopLocoStartTrackmapVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddLinkedTracks(builder, linkedTracks): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(linkedTracks), 0)
+def TopLocoStartLinkedTracksVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddImages(builder, images): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(images), 0)
+def TopLocoStartImagesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddAnnotations(builder, annotations): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(annotations), 0)
+def TopLocoStartAnnotationsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddStates(builder, states): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(states), 0)
+def TopLocoStartStatesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TopLocoAddSensorParams(builder, sensorParams): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(sensorParams), 0)
+def TopLocoEnd(builder): return builder.EndObject()
 
 import LOCO.Annotation
 import LOCO.Category
@@ -315,14 +234,13 @@ import LOCO.Image
 import LOCO.SensorParameters
 import LOCO.State
 import LOCO.Track
-
 try:
     from typing import List, Optional
 except:
     pass
 
-
 class TopLocoT(object):
+
     # TopLocoT
     def __init__(self):
         self.constants = None  # type: List[int]
@@ -332,9 +250,7 @@ class TopLocoT(object):
         self.images = None  # type: List[LOCO.Image.ImageT]
         self.annotations = None  # type: List[LOCO.Annotation.AnnotationT]
         self.states = None  # type: List[LOCO.State.StateT]
-        self.sensorParams = (
-            None
-        )  # type: Optional[LOCO.SensorParameters.SensorParametersT]
+        self.sensorParams = None  # type: Optional[LOCO.SensorParameters.SensorParametersT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -365,9 +281,7 @@ class TopLocoT(object):
                 if topLoco.Categories(i) is None:
                     self.categories.append(None)
                 else:
-                    category_ = LOCO.Category.CategoryT.InitFromObj(
-                        topLoco.Categories(i)
-                    )
+                    category_ = LOCO.Category.CategoryT.InitFromObj(topLoco.Categories(i))
                     self.categories.append(category_)
         if not topLoco.TrackmapIsNone():
             if np is None:
@@ -398,9 +312,7 @@ class TopLocoT(object):
                 if topLoco.Annotations(i) is None:
                     self.annotations.append(None)
                 else:
-                    annotation_ = LOCO.Annotation.AnnotationT.InitFromObj(
-                        topLoco.Annotations(i)
-                    )
+                    annotation_ = LOCO.Annotation.AnnotationT.InitFromObj(topLoco.Annotations(i))
                     self.annotations.append(annotation_)
         if not topLoco.StatesIsNone():
             self.states = []
@@ -411,9 +323,7 @@ class TopLocoT(object):
                     state_ = LOCO.State.StateT.InitFromObj(topLoco.States(i))
                     self.states.append(state_)
         if topLoco.SensorParams() is not None:
-            self.sensorParams = LOCO.SensorParameters.SensorParametersT.InitFromObj(
-                topLoco.SensorParams()
-            )
+            self.sensorParams = LOCO.SensorParameters.SensorParametersT.InitFromObj(topLoco.SensorParams())
 
     # TopLocoT
     def Pack(self, builder):

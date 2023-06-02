@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class State(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsState(cls, buf, offset):
@@ -23,42 +21,21 @@ class State(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # State
-    def Position(self, j):
+    def Position(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags,
-                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
-            )
-        return 0
-
-    # State
-    def PositionAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Float32Flags, o)
-        return 0
-
-    # State
-    def PositionLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        if o != 0:
-            return self._tab.VectorLen(o)
-        return 0
-
-    # State
-    def PositionIsNone(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        return o == 0
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from LOCO.Position import Position
+            obj = Position()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # State
     def Orientation(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # State
@@ -68,43 +45,23 @@ class State(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
+def StateStart(builder): builder.StartObject(3)
+def StateAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def StateAddOrientation(builder, orientation): builder.PrependFloat32Slot(1, orientation, 0.0)
+def StateAddTimeStamp(builder, timeStamp): builder.PrependInt32Slot(2, timeStamp, 0)
+def StateEnd(builder): return builder.EndObject()
 
-def StateStart(builder):
-    builder.StartObject(3)
-
-
-def StateAddPosition(builder, position):
-    builder.PrependUOffsetTRelativeSlot(
-        0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0
-    )
-
-
-def StateStartPositionVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def StateAddOrientation(builder, orientation):
-    builder.PrependFloat32Slot(1, orientation, 0.0)
-
-
-def StateAddTimeStamp(builder, timeStamp):
-    builder.PrependInt32Slot(2, timeStamp, 0)
-
-
-def StateEnd(builder):
-    return builder.EndObject()
-
-
+import LOCO.Position
 try:
-    from typing import List
+    from typing import Optional
 except:
     pass
 
-
 class StateT(object):
+
     # StateT
     def __init__(self):
-        self.position = None  # type: List[float]
+        self.position = None  # type: Optional[LOCO.Position.PositionT]
         self.orientation = 0.0  # type: float
         self.timeStamp = 0  # type: int
 
@@ -124,26 +81,15 @@ class StateT(object):
     def _UnPack(self, state):
         if state is None:
             return
-        if not state.PositionIsNone():
-            if np is None:
-                self.position = []
-                for i in range(state.PositionLength()):
-                    self.position.append(state.Position(i))
-            else:
-                self.position = state.PositionAsNumpy()
+        if state.Position() is not None:
+            self.position = LOCO.Position.PositionT.InitFromObj(state.Position())
         self.orientation = state.Orientation()
         self.timeStamp = state.TimeStamp()
 
     # StateT
     def Pack(self, builder):
         if self.position is not None:
-            if np is not None and type(self.position) is np.ndarray:
-                position = builder.CreateNumpyVector(self.position)
-            else:
-                StateStartPositionVector(builder, len(self.position))
-                for i in reversed(range(len(self.position))):
-                    builder.PrependFloat32(self.position[i])
-                position = builder.EndVector(len(self.position))
+            position = self.position.Pack(builder)
         StateStart(builder)
         if self.position is not None:
             StateAddPosition(builder, position)
