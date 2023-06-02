@@ -327,25 +327,32 @@ class SensingAgent:
             detections.append(Detection(val, yb))
         return detections
     
-    def new_pov_detection_set(self, frame_id, detection_list):
+    def unpack_target_attributes(self, target_object):
+        """
+        Convenience functionn
+        """
+        curr_state = self.exoskeleton.get_age()
+        cls = target_object.get_id()
+        x,y,z = target_object.get_origin().get_cartesian_coordinates()
+        w,h = target_object.get_dims()
+        img_shape_x = self.get_max_x()
+        img_shape_y = self.get_max_y()
+        
+        # x = x / img_shape_x
+        # y = y / img_shape_y
+        sensor_fov_width = self.get_fov_width()
+        sensor_fov_height = self.get_fov_height()
+        return curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height
+
+    def create_pov_detection_set_from_targets(self, frame_id, target_detection_list):
         """
             Creates a detection when range is not present
         """
         detections = []
-        curr_state = self.exoskeleton.get_age()
-        for a in detection_list:
-            cls = a.get_id()
-            x,y,z = a.get_origin().get_cartesian_coordinates()
-            w,h = a.get_dims()
-            img_shape_x = self.get_max_x()
-            img_shape_y = self.get_max_y()
-            
-            x = x / img_shape_x
-            y = y / img_shape_y
-            sensor_fov_width = self.get_fov_width()
-            sensor_fov_height = self.get_fov_height()
-
-            det = create_detections_without_range(curr_state, cls, x, y, z, w, h, img_shape_x, img_shape_y, sensor_fov_width, sensor_fov_height)
+        
+        for a in target_detection_list:
+            curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height = self.unpack_target_attributes(a)
+            det = self.create_detections_without_range(curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height)
             detections.append(det)
         return detections
     
@@ -358,38 +365,38 @@ class SensingAgent:
 
     
     def create_detections_without_range(self,
-                                    time_of_detection,
-                                    detection_cls,
-                                    x,
-                                    y,
-                                    w,
-                                    h,
-                                    img_shape_x,
-                                    img_shape_y,
-                                    sensor_fov_width,
-                                    sensor_fov_height):
+                                time_of_detection,
+                                detection_cls,
+                                x,
+                                y,
+                                w,
+                                h,
+                                img_shape_x,
+                                img_shape_y,
+                                sensor_fov_width,
+                                sensor_fov_height):
         """
         wrapper for Yolo style detections
         """
         # calculate vector 1, agent pov on horizontal plane
-        """
-                      (0,0)
+        '''
+                    (0,0)
                 +-------+-------+
                 |       |       |
                 |       |       |
                 |       |       |
         (0,0)   |__ B<--A_______| (100,0)
-                |   |   |       |
-                |   v   |       |
+                |   |  /|       |
+                |   v / |       |
                 |   C   |       |
                 +-------+-------+
-                      (0,100)
+                    (0,100)
         Agent frame of reference
         image_shape: 1000
         sensor_fov_width: pi / 2
         rel_x = 25
-        theta = -np.pi / 4
-        """
+        theTa = -np.pi / 4
+        '''
         dist = 0
         # normalize x between 0 and 100
         rel_x = (x * img_shape_x - (img_shape_x / 2)) / img_shape_x * 100 + 50
@@ -408,50 +415,27 @@ class SensingAgent:
         det = Detection(posn, yb)
         return det
 
-    def add_new_detection(self, frame_id, target_origin):
-        """
-        Adds a single new detection to a layer
-        Does not return
-        """
-        dc = self.transform_to_local_bbox(target_origin)
-        yb = sann.register_annotation(0, dc, frame_id)
-        self.obj_tracker.add_new_element_to_layer(yb)
-
-    def transform_to_local_bbox(self, target_pt):
-        """
-        Calculates detection coordinates relative to Sensor
-        returns a Yolo Formatted bbox
-        """
-        target_rotation = self.exoskeleton.get_relative_rotation(target_pt)
-        ratio = target_rotation / self.get_fov_width()
-
-        r = mfn.euclidean_dist(self.get_center(), target_pt)
-
-        x = Sensor.WINDOW_WIDTH * ratio + 50
-        y = r
-        w = 1
-        h = 1
-
-        return [x, y, w, h]
-
-    def transform_to_local_sensor_coord(self, origin, target_pt, sensor_idx=-1):
+    def transform_to_local_frame_coord(self,target_point, sensor_idx=-1):
         """
         Transforms a point to local sensor curved coordinate frame
         """
-        target_pt = target_pt.get_cartesian_coordinates()
-        origin = origin.get_cartesian_coordinates()
-        theta, r = mfn.car2pol(origin, target_pt)
-        phi, r = mfn.car2phi(origin, target_pt)
-        horiz_ratio = theta / self.get_fov_width()
-        vert_ratio = phi / self.get_fov_height()
-        x = Sensor.WINDOW_WIDTH * horiz_ratio + 50
-        # print(x)
-        y = r
-        z = Sensor.WINDOW_WIDTH * vert_ratio + 50
-        w = 1
-        h = 1
 
-        return Position(x, y, z)
+        # target_pt = target_pt.ge
+        # origin = origin.get_cartesian_coordinates()
+        x,y,z = target_point
+        rel_x = x / self.get_max_x() * 100
+        rel_y = y / self.get_max_y() * 100
+
+        
+        theta = rel_x / 100 * self.get_fov_width() - (self.get_fov_width() / 2)
+        
+        phi = rel_y / 100 * self.get_fov_height() - (self.get_fov_height() / 2)
+
+        dist = 0
+        
+        posn = Position(dist, rel_x, rel_y, theta, phi)
+        print(f"frame_coords {posn.get_cartesian_coordinates()}")
+        return posn
 
     def transform_to_local_detection_coord(self, target_pt):
         """
@@ -477,6 +461,11 @@ class SensingAgent:
 
         return pt
 
+    def map_detection_back(self,angle, max_angle, max_coord = 1000):
+        ratio = angle / max_angle
+        val = ratio * max_coord + max_coord/2
+        return val
+
     def transform_to_global_coord(self, target_pt):
         """
         Transforms a position from agent local coords to world coords
@@ -485,14 +474,14 @@ class SensingAgent:
         # pt1 = self.get_relative_angle()
         # pt1 = position.get_attr_coord()
 
-        pt1 = target_pt.get_cartesian_coordinates()
-        x, y, z = pt1
-        # print(self.get_rel_theta())
-        theta2, r = mfn.car2pol(target_pt.get_cartesian_coordinates(), (0, 0, 0))
-        theta2 = adjust_angle(theta2 + self.get_fov_theta() + np.pi)
-
-        pt = mfn.pol2car(self.get_center().get_cartesian_coordinates(), r, theta2)
-        return pt
+        
+        x, y, z = target_pt.get_cartesian_coordinates()
+        theta, phi = target_pt.get_angles()
+        y = self.map_detection_back(theta, self.get_fov_width(), self.get_max_x())
+        z = self.map_detection_back(phi, self.get_fov_height(), self.get_max_y())
+        
+        
+        return [x,y,z]
 
     def estimate_pose_update(self, priorities=0):
         """
@@ -575,7 +564,7 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection(idx)
         abs_det = []
         for det in rel_det:
-            curr = self.transform_to_global_coord(det[0].get_cartesian_coord())
-            pred = self.transform_to_global_coord(det[1].get_cartesian_coord())
+            curr = self.transform_to_global_coord(det[0])
+            pred = self.transform_to_global_coord(det[1])
             abs_det.append((curr, pred))
         return abs_det

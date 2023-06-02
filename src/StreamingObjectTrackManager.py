@@ -286,12 +286,13 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.get_state_estimation().get_cartesian_coord()))
+            pred.append((t.track_id, t.get_state_estimation().get_cartesian_coordinates()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coord())
+                d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
+                print(d)
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance

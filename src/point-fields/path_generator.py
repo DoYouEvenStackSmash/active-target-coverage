@@ -12,7 +12,7 @@ import time
 import numpy as np
 import json
 
-MAGNITUDE = 6
+MAGNITUDE = 0
 
 rng = np.random.default_rng(12345)
 

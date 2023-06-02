@@ -53,8 +53,12 @@ class ObjectTrack:
         """
         self.r = 0
         self.theta = [0]
+        self.phi = [0]
         self.delta_theta = [0]
+        self.delta_phi = [0]
         self.delta_v = [0]
+        self.delta_y = [0]
+        self.delta_z = [0]
         self.v = [0]
         self.path = []
         self.predictions = [[]]
@@ -104,12 +108,17 @@ class ObjectTrack:
             Angular Acceleration
         """
         last_det = self.get_last_detection()
-        last_pt = last_det.get_cartesian_coord()
+        print(f"last_det {last_det.get_cartesian_coordinates()}")
+        
+        theta,phi = last_det.get_angles()
+        x,y,z = last_det.get_cartesian_coordinates()
 
-        curr_pt = det.get_cartesian_coord()
-
-        theta, distance = mfn.car2pol(last_pt, curr_pt)
-
+        
+        last_pt = self.parent_agent.transform_to_global_coord(last_det)
+        curr_pt = self.parent_agent.transform_to_global_coord(det)
+        lp,cp = [last_pt[1], last_pt[2], 0], [curr_pt[1],curr_pt[2], 0]
+        theta, distance = mfn.car2pol(lp, cp)
+        # theta = -theta
         if len(self.v) and distance != 0:
             self.delta_v.append(min(ACCELERATION_THRESHOLD, distance / self.v[-1]))
         delta_theta = 0
@@ -154,26 +163,31 @@ class ObjectTrack:
         # angular acceleration
         # angle_adjust = self.delta_theta[-1] * scale_factor
 
-        angle = self.theta[-1] + self.delta_theta[-1] * scale_factor
+        theta = self.theta[-1] + self.delta_theta[-1] * scale_factor
+        phi = self.phi[-1] + self.delta_phi[-1] * scale_factor
+        angle = theta
         # velocity
 
         velocity = self.v[-1] * scale_distance * scale_factor
+        lp = self.parent_agent.transform_to_global_coord(last_pos)
+        lp = [lp[1],lp[2], 0]
         pt = mfn.pol2car(
-            last_pos.get_cartesian_coord(),
+            lp,
             velocity,
             adjust_angle(angle),
         )
 
-        # map cartesian coordinates to sensor coordinates
-        pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0, 0), pt)
+        # map cartesian coordinates to frame coordinates
+        posn = self.parent_agent.transform_to_local_frame_coord(pt)
 
         # update sensor yolobox coordinates
         yb = None
         yb = last_pos.get_attributes()
-        bbox = [pt2[0], pt2[1], 1, 1]
+        pt2 = posn.get_cartesian_coordinates()
+        bbox = [pt2[1], pt2[2], yb.bbox[2], yb.bbox[3]]
         yb.bbox = bbox
 
-        det = Detection(Position(pt[0], pt[1], pt[2]), yb)
+        det = Detection(posn, yb)
         return det
 
         pass
@@ -273,7 +287,9 @@ class ObjectTrack:
         steps = steps if steps != None else []
 
         for i, det in enumerate(self.path):
+            # print(det)
             yb = det.get_attributes()
+            print(yb)
             fid = None
 
             fid = yb.img_filename

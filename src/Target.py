@@ -58,3 +58,6 @@ class Target:
         Returns an id
         """
         return self._id
+    
+    def get_dims(self):
+        return [0.1,0.1]

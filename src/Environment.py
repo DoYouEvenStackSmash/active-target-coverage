@@ -66,7 +66,7 @@ class Environment:
             # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
-                d = mfn.euclidean_dist(self.agents[k].get_origin().get_cartesian_coordinates(), target.get_position().get_cartesian_coordinates())
+                d = mfn.frobenius_dist(self.agents[k].get_origin().get_cartesian_coordinates(), target.get_position().get_cartesian_coordinates())
                 pairs.append((self.agents[k]._id, target, d))
 
         pairs = sorted(pairs, key=sortkey)
@@ -82,6 +82,28 @@ class Environment:
         # update the trackers of all agents
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
+
+    def visible_vertical_targets(self):
+        """
+        Convenience function for testing targets of single agent
+        """
+        frame_id = "frame_" + str(self.counter)
+        self.counter+= 1
+        updates = {}
+        for k in self.agents:
+            updates[k] = []
+        
+        for i,t in enumerate(self.targets):
+            for k in updates:
+                updates[k].append(self.targets[i])
+        
+        for k in updates:
+            detections = self.agents[k].create_pov_detection_set_from_targets(frame_id, updates[k])
+            print(detections[0])
+            self.agents[k].load_detection_layer(detections)
+        
+            
+
 
     def add_target(self, T):
         """

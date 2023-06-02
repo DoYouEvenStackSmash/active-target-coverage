@@ -87,3 +87,6 @@ class Position:
         self.x = triple[0]
         self.y = triple[1]
         self.z = triple[2]
+
+    def to_json(self):
+        return {"x":self.x, "y":self.y,"z":self.z, "theta":self.theta, "phi":self.phi}

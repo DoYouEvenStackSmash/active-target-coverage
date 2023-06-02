@@ -37,7 +37,7 @@ class State:
 
     def to_json(self):
         return {
-            "position": self.position,
+            "position": self.position.to_json(),
             "orientation": self.orientation,
             "time_stamp": self.time_stamp,
         }
