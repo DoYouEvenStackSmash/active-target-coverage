@@ -42,16 +42,19 @@ flag = True
 counter = 0
 while flag:
   flag = False
-  sa.heartbeat()
-  render_predictions(screen, sa)
+  for k in env.agents:
+    sa = env.agents[k]
+    sa.heartbeat()
+    render_predictions(screen, sa)
+    print(sa.get_clock())
   pygame.display.update()
   for i,t in enumerate(env.targets):
     flag = t.step() or flag
-    if i == 1 and counter:
+    if i == 1 and counter % 17:
       t.origin = zero_det
       t.path[t.idx] = zero_det
   
-  if not counter % 7:
+  if not counter % 4:
     env.visible_vertical_targets()
   print(sa.estimate_next_detection())
   counter += 1
