@@ -39,14 +39,16 @@ class Sensor:
         sensor_width=np.pi / 4,
         sensor_height=np.pi / 4,
         _id=None,
+        max_x = 1000,
+        max_y = 1000
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius
         self.fov_width = sensor_width
         self.fov_height = sensor_height
         self._id = _id
-        self.max_x = 1920
-        self.max_y = 1080
+        self.max_x = max_x
+        self.max_y = max_y
 
     def get_origin(self):
         """

@@ -350,10 +350,12 @@ class ObjectTrack:
 
         # x = x / 10
         x = self.parent_agent.map_detection_back(
-            theta, self.parent_agent.get_fov_width(), 1920
+            theta, self.parent_agent.get_fov_width(), 
+            self.parent_agent.get_max_x()
         )
         y = self.parent_agent.map_detection_back(
-            phi, self.parent_agent.get_fov_height(), 1080
+            phi, self.parent_agent.get_fov_height(), 
+            self.parent_agent.get_max_y()
         )
 
         last_pos = self.get_last_detection()

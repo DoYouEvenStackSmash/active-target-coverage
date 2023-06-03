@@ -247,7 +247,7 @@ class ObjectTrackManager:
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = mfn.spherical_distance(p[1], curr_layer[c])
+                d = mfn.spherical_dist(p[1], curr_layer[c])
                 # d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
                 # print(f"distance:{d}")
                 pairs.append((p[0], c, d))
