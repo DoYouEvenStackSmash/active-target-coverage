@@ -17,6 +17,7 @@ for filename in sys.argv[1:]:
   for i,pt in enumerate(p):
     x,y,z,w,h = pt
     posns.append(Detection(Position(x,y,z), YoloBox(0,[x,y,w,h],i)))  
+  # posns.reverse()
   point_lists.append(posns)
 # convert to detections
 
@@ -50,7 +51,7 @@ while flag:
       t.origin = zero_det
       t.path[t.idx] = zero_det
   
-  if not counter % 5:
+  if not counter % 7:
     env.visible_vertical_targets()
   print(sa.estimate_next_detection())
   counter += 1

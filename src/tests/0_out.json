@@ -1,0 +1,1451 @@
+{
+  "constants": {
+    "avg_tolerance": 10,
+    "track_lifespan": 4,
+    "default_avg_dist": 10,
+    "radial_exclusion": 70
+  },
+  "categories": [
+    {
+      "id": 0,
+      "name": "fish",
+      "supercategory": "None"
+    },
+    {
+      "id": 1,
+      "name": "atlantic spadefish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 2,
+      "name": "queen triggerfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 3,
+      "name": "undocumented",
+      "supercategory": "fish"
+    }
+  ],
+  "trackmap": [
+    0
+  ],
+  "linked_tracks": [
+    {
+      "track_id": 0,
+      "category_id": 0,
+      "track_len": 20,
+      "steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  ],
+  "images": [],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 1,
+      "category_id": 0,
+      "bbox": [
+        98.7856384379399,
+        48.014518611515726,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": 1
+    },
+    {
+      "id": 1,
+      "image_id": 5,
+      "category_id": 0,
+      "bbox": [
+        83.63199018750174,
+        30.934139190407624,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 7.944763623527748,
+      "state_id": 5
+    },
+    {
+      "id": 2,
+      "image_id": 9,
+      "category_id": 0,
+      "bbox": [
+        84.71804882747047,
+        36.93358016931742,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 9.724078231562126,
+      "state_id": 9
+    },
+    {
+      "id": 3,
+      "image_id": 13,
+      "category_id": 0,
+      "bbox": [
+        77.88998181909015,
+        40.711741218001436,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.3483647870146918,
+      "state_id": 13
+    },
+    {
+      "id": 4,
+      "image_id": 17,
+      "category_id": 0,
+      "bbox": [
+        69.0621282649579,
+        50.733759818748304,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.8839136428358714,
+      "state_id": 17
+    },
+    {
+      "id": 5,
+      "image_id": 21,
+      "category_id": 0,
+      "bbox": [
+        63.22462559380861,
+        63.32703787255961,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 4.850023832198587,
+      "state_id": 21
+    },
+    {
+      "id": 6,
+      "image_id": 25,
+      "category_id": 0,
+      "bbox": [
+        63.573033719074814,
+        63.37175828829885,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 7.582376898491211,
+      "state_id": 25
+    },
+    {
+      "id": 7,
+      "image_id": 29,
+      "category_id": 0,
+      "bbox": [
+        61.54340904817297,
+        61.836471488206804,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 2.6711095444436177,
+      "state_id": 29
+    },
+    {
+      "id": 8,
+      "image_id": 33,
+      "category_id": 0,
+      "bbox": [
+        53.65645152491435,
+        58.90232447651328,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.4569915846791655,
+      "state_id": 33
+    },
+    {
+      "id": 9,
+      "image_id": 37,
+      "category_id": 0,
+      "bbox": [
+        45.737038610184456,
+        49.201770126911526,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.3618032397726134,
+      "state_id": 37
+    },
+    {
+      "id": 10,
+      "image_id": 41,
+      "category_id": 0,
+      "bbox": [
+        39.51120288303324,
+        36.19303384931637,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.2657033120994376,
+      "state_id": 41
+    },
+    {
+      "id": 11,
+      "image_id": 45,
+      "category_id": 0,
+      "bbox": [
+        39.55024035763326,
+        36.73602505925624,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 7.09279549999114,
+      "state_id": 45
+    },
+    {
+      "id": 12,
+      "image_id": 49,
+      "category_id": 0,
+      "bbox": [
+        37.058022030306965,
+        38.15207536508311,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 2.6651946136035902,
+      "state_id": 49
+    },
+    {
+      "id": 13,
+      "image_id": 53,
+      "category_id": 0,
+      "bbox": [
+        29.292504877593988,
+        40.04953501347783,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.8196527901290676,
+      "state_id": 53
+    },
+    {
+      "id": 14,
+      "image_id": 57,
+      "category_id": 0,
+      "bbox": [
+        19.57863408902869,
+        49.39912044436547,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 4.464283649908042,
+      "state_id": 57
+    },
+    {
+      "id": 15,
+      "image_id": 61,
+      "category_id": 0,
+      "bbox": [
+        13.681238059252133,
+        62.426744875283205,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 4.977094394189387,
+      "state_id": 61
+    },
+    {
+      "id": 16,
+      "image_id": 65,
+      "category_id": 0,
+      "bbox": [
+        14.11857047249781,
+        62.77015549534441,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 6.5827498735736585,
+      "state_id": 65
+    },
+    {
+      "id": 17,
+      "image_id": 69,
+      "category_id": 0,
+      "bbox": [
+        12.118207590262848,
+        61.5355615945985,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 2.027459922848645,
+      "state_id": 69
+    },
+    {
+      "id": 18,
+      "image_id": 73,
+      "category_id": 0,
+      "bbox": [
+        4.369295572361988,
+        58.765926496041,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.834656505627985,
+      "state_id": 73
+    },
+    {
+      "id": 19,
+      "image_id": 77,
+      "category_id": 0,
+      "bbox": [
+        -0.957724317365308,
+        50.72643872374184,
+        0.1,
+        0.1
+      ],
+      "area": 0.010000000000000002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        0,
+        100,
+        0
+      ],
+      "displaced": false,
+      "error": 3.318603298374075,
+      "state_id": 77
+    }
+  ],
+  "states": [
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 1
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 2
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 3
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 4
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 5
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 6
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 7
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 8
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 9
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 10
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 11
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 12
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 13
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 14
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 15
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 16
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 17
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 18
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 19
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 20
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 21
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 22
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 23
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 24
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 25
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 26
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 27
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 28
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 29
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 30
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 31
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 32
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 33
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 34
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 35
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 36
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 37
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 38
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 39
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 40
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 41
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 42
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 43
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 44
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 45
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 46
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 47
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 48
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 49
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 50
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 51
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 52
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 53
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 54
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 55
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 56
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 57
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 58
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 59
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 60
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 61
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 62
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 63
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 64
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 65
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 66
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 67
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 68
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 69
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 70
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 71
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 72
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 73
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 74
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 75
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 76
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 77
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 78
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 79
+    },
+    {
+      "position": {
+        "x": 520.0,
+        "y": 500.0,
+        "z": 0,
+        "theta": 0,
+        "phi": 0
+      },
+      "orientation": 0,
+      "time_stamp": 80
+    }
+  ],
+  "sensor_params": {
+    "fov_radius": 200,
+    "fov_width": 1.5707963267948966
+  }
+}
