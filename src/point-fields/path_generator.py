@@ -12,7 +12,7 @@ import time
 import numpy as np
 import json
 
-MAGNITUDE = 1000
+MAGNITUDE = 1
 
 rng = np.random.default_rng(12345)
 
@@ -186,11 +186,17 @@ def main():
             origin = (500, 500, 0)
             paths = create_circle(origin, 150, 50)
             render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
-        elif "LERP":
+        elif f == "LERP":
             origin = (1000, 500, 0)
             dest = (0, 500, 0)
             paths = get_lerp(origin, dest)
             render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
+        elif f == "LINE":
+            origin = (500, 0, 0)
+            dest = (800, 1000, 0)
+            paths = create_line(origin, dest)
+            print(paths)#create_line
+            render_path(screen, [paths], f"line_{MAGNITUDE}noise.json")
         else:
             print(f"options: {opts}")
             sys.exit()

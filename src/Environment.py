@@ -103,8 +103,6 @@ class Environment:
             self.agents[k].load_detection_layer(detections)
         
             
-
-
     def add_target(self, T):
         """
         Add a target to the world

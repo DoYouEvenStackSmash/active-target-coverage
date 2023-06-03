@@ -41,7 +41,7 @@ class ObjectTrackManager:
         "avg_tolerance": 10,
         "track_lifespan": 4,
         "default_avg_dist": 10,
-        "radial_exclusion": 20,
+        "radial_exclusion": 200,
     }
     display_constants = {"trail_len": 0}
 
@@ -286,12 +286,13 @@ class ObjectTrackManager:
 
         # gather predictions from track heads
         for t in self.active_tracks:
-            pred.append((t.track_id, t.get_state_estimation().get_cartesian_coordinates()))
+            pred.append((t.track_id, t.get_state_estimation()))
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
-                d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
+                d = mfn.spherical_distance(p[1], curr_layer[c])
+                # d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
                 print(f"distance:{d}")
                 pairs.append((p[0], c, d))
 

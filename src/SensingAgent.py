@@ -41,6 +41,7 @@ def adjust_angle(theta):
 
 
 class SensingAgent:
+    DEFAULT_RANGE = 10
     """A class representing a sensing agent.
 
     Attributes:
@@ -397,7 +398,7 @@ class SensingAgent:
         rel_x = 25
         theTa = -np.pi / 4
         '''
-        dist = 0
+        dist = SensingAgent.DEFAULT_RANGE
         # normalize x between 0 and 100
         rel_x = (x * img_shape_x - (img_shape_x / 2)) / img_shape_x * 100 + 50
         # normalize theta in terms of agent pov
@@ -431,10 +432,10 @@ class SensingAgent:
         
         phi = rel_y / 100 * self.get_fov_height() - (self.get_fov_height() / 2)
 
-        dist = 0
+        dist = x
         
         posn = Position(dist, rel_x, rel_y, theta, phi)
-        print(f"frame_coords {posn.get_cartesian_coordinates()}")
+        #print(f"frame_coords {posn.get_cartesian_coordinates()}")
         return posn
 
     def transform_to_local_detection_coord(self, target_pt):

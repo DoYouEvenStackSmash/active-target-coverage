@@ -26,10 +26,11 @@ struct Bbox {
   h:float;
 }
 
-// Annotation containing position of detection in the frame
+//Annotation containing position of detection in the frame
 table Annotation {
   // id of the annotation
-  id:int;
+  id:int; 
+  
   // image in which the detection was present
   image_id:int;
   // category of the detection
@@ -93,4 +94,5 @@ table TopLoco {
   states:[State];
   sensor_params:SensorParameters;
 }
+
 root_type TopLoco;

@@ -2,7 +2,7 @@
 import numpy as np
 import pygame
 import time
-
+from Detection import *
 
 class TransformFxns:
     """
@@ -109,6 +109,19 @@ class MathFxns:
         Calculates frobenius norm between two cylindrical points
         """
         return np.sqrt(np.square(p1[0] - p2[0]) + np.square(p1[1] - p2[1]) + np.square(p1[2] - p2[2]))
+
+    def spherical_distance(posn1, posn2):
+        """
+        Calculates distance between two vectors in spherical coordinates
+        """
+        r1,y1,z1 = posn1.get_cartesian_coordinates()
+        theta1, phi1 = posn1.get_angles()
+        r2,y2,z2 = posn2.get_cartesian_coordinates()
+        theta2, phi2 = posn2.get_angles()
+        trig_eval = (np.sin(theta1) * np.sin(theta2))*np.cos(phi1 - phi2) * np.cos(theta1) * np.cos(theta2)
+        return np.sqrt(np.square(r1) + np.square(r2) + - 2 * r1 * r2 * trig_eval)
+
+
 
     def car2pol(origin, pt):
         """

@@ -54,7 +54,7 @@ while flag:
       t.origin = zero_det
       t.path[t.idx] = zero_det
   
-  if not counter % 4:
+  if not counter % 7:
     env.visible_vertical_targets()
   print(sa.estimate_next_detection())
   counter += 1
