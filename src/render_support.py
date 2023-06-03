@@ -115,7 +115,7 @@ class MathFxns:
             + np.square(p1[2] - p2[2])
         )
 
-    def spherical_distance(posn1, posn2):
+    def spherical_dist(posn1, posn2):
         """
         Calculates distance between two vectors in spherical coordinates
         """
