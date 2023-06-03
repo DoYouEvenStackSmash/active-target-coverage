@@ -99,7 +99,7 @@ class Environment:
         
         for k in updates:
             detections = self.agents[k].create_pov_detection_set_from_targets(frame_id, updates[k])
-            print(detections[0])
+            # print(detections[0])
             self.agents[k].load_detection_layer(detections)
         
             

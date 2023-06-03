@@ -35,8 +35,9 @@ for posns in point_lists:
   targets.append(t)
 
 sensing_agents = {}
-sa = init_sensing_agent(origin=Position(500,500,0))
+sa = init_sensing_agent(origin=Position(0,0,0))
 sensing_agents[sa._id] = sa
+sa.heartbeat()
 env = init_environment(sensing_agents=sensing_agents, targets=targets)
 flag = True
 counter = 0
@@ -54,8 +55,9 @@ while flag:
       t.origin = zero_det
       t.path[t.idx] = zero_det
   
-  if not counter % 7:
+  if not counter % 6:
     env.visible_vertical_targets()
+  
   print(sa.estimate_next_detection())
   counter += 1
   time.sleep(0.08)

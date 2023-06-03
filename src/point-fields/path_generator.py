@@ -128,7 +128,7 @@ def loop_line():
 
 
 def get_lerp(origin, p):
-    segment = 4
+    segment = 6
     pts = []
     if segment > 0:
         spts = []
@@ -187,8 +187,8 @@ def main():
             paths = create_circle(origin, 150, 50)
             render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
         elif f == "LERP":
-            origin = (1000, 500, 0)
-            dest = (0, 500, 0)
+            origin = (0, 500, 0)
+            dest = (1000, 500, 0)
             paths = get_lerp(origin, dest)
             render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         elif f == "LINE":

@@ -41,7 +41,7 @@ def adjust_angle(theta):
 
 
 class SensingAgent:
-    DEFAULT_RANGE = 10
+    DEFAULT_RANGE = 1
     """A class representing a sensing agent.
 
     Attributes:
@@ -463,6 +463,9 @@ class SensingAgent:
         return pt
 
     def map_detection_back(self,angle, max_angle, max_coord = 1000):
+        """
+        maps an angle back to a scalar
+        """
         ratio = angle / max_angle
         val = ratio * max_coord + max_coord/2
         return val
