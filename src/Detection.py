@@ -28,16 +28,19 @@ class Detection:
         Accessor for position's cartesian coordinates
         """
         return self.position.get_cartesian_coordinates()
-    
+
     def get_angles(self):
+        """
+        Accessor for positions detection coordinates
+        """
         return self.position.get_angles()
 
     def get_attr_coord(self):
         """
         Accessor for the center coordinate of attributes
         """
-        x,y = self.attributes.get_center_coord()
-        return (x,y,0)
+        x, y = self.attributes.get_center_coord()
+        return (x, y, 0)
 
     def set_attributes(self, attr):
         """
@@ -67,7 +70,7 @@ class Position:
         Accessor for center of the position
         """
         return self.get_cartesian_coord()
-    
+
     def get_cartesian_coordinates(self):
         """
         Accessor for position in cartesian coordinates
@@ -89,4 +92,13 @@ class Position:
         self.z = triple[2]
 
     def to_json(self):
-        return {"x":self.x, "y":self.y,"z":self.z, "theta":self.theta, "phi":self.phi}
+        """
+        to_json method for detections
+        """
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "theta": self.theta,
+            "phi": self.phi,
+        }

@@ -4,10 +4,12 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
+
 np = import_numpy()
 
+
 class Image(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsImage(cls, buf, offset):
@@ -48,16 +50,34 @@ class Image(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-def ImageStart(builder): builder.StartObject(4)
-def ImageAddId(builder, id): builder.PrependInt32Slot(0, id, 0)
-def ImageAddFileName(builder, fileName): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(fileName), 0)
-def ImageAddHeight(builder, height): builder.PrependInt32Slot(2, height, 0)
-def ImageAddWidth(builder, width): builder.PrependInt32Slot(3, width, 0)
-def ImageEnd(builder): return builder.EndObject()
+
+def ImageStart(builder):
+    builder.StartObject(4)
+
+
+def ImageAddId(builder, id):
+    builder.PrependInt32Slot(0, id, 0)
+
+
+def ImageAddFileName(builder, fileName):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(fileName), 0
+    )
+
+
+def ImageAddHeight(builder, height):
+    builder.PrependInt32Slot(2, height, 0)
+
+
+def ImageAddWidth(builder, width):
+    builder.PrependInt32Slot(3, width, 0)
+
+
+def ImageEnd(builder):
+    return builder.EndObject()
 
 
 class ImageT(object):
-
     # ImageT
     def __init__(self):
         self.id = 0  # type: int

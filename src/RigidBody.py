@@ -279,7 +279,9 @@ class RigidBody:
         self.origin = mfn.pol2car(
             self.get_origin(), translation_dist, self.get_rel_theta()
         )
-        x_disp, y_disp, z_disp = mfn.pol2car((0, 0, 0), translation_dist, self.get_rel_theta())
+        x_disp, y_disp, z_disp = mfn.pol2car(
+            (0, 0, 0), translation_dist, self.get_rel_theta()
+        )
         translate_polygon(self.body, x_disp, y_disp, z_disp)
         return translation_dist
 
@@ -305,12 +307,8 @@ class RigidBody:
         """
         r = 300
         center = self.get_center().get_cartesian_coordinates()
-        tlpt = mfn.pol2car(
-            center, r, adjust_angle(self.get_rel_theta() - np.pi / 4)
-        )
-        trpt = mfn.pol2car(
-            center, r, adjust_angle(self.get_rel_theta() + np.pi / 4)
-        )
+        tlpt = mfn.pol2car(center, r, adjust_angle(self.get_rel_theta() - np.pi / 4))
+        trpt = mfn.pol2car(center, r, adjust_angle(self.get_rel_theta() + np.pi / 4))
         blpt = mfn.pol2car(
             center, r, adjust_angle(self.get_rel_theta() - 3 * np.pi / 4)
         )

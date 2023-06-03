@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+
 sys.path.append("../")
 sys.path.append(".")
 from render_support import MathFxns as mfn
@@ -73,9 +74,20 @@ def render_path(screen, paths, filename="out.json", YOLO=True):
     max_width = 1000
     max_height = 1000
     if YOLO:
-        path = {"points": [{"x": p[0]/max_width, "y": p[1]/max_height, "z": 0, "w":0.1, "h":0.1} for p in paths[0]]}
+        path = {
+            "points": [
+                {
+                    "x": p[0] / max_width,
+                    "y": p[1] / max_height,
+                    "z": 0,
+                    "w": 0.1,
+                    "h": 0.1,
+                }
+                for p in paths[0]
+            ]
+        }
     else:
-        path = {"points": [{"x": p[0], "y": p[1], "z":p[2]} for p in paths[0]]}
+        path = {"points": [{"x": p[0], "y": p[1], "z": p[2]} for p in paths[0]]}
 
     f = open(filename, "w")
     f.write(json.dumps(path, indent=2))
@@ -195,7 +207,7 @@ def main():
             origin = (500, 0, 0)
             dest = (800, 1000, 0)
             paths = create_line(origin, dest)
-            print(paths)#create_line
+            print(paths)  # create_line
             render_path(screen, [paths], f"line_{MAGNITUDE}noise.json")
         else:
             print(f"options: {opts}")

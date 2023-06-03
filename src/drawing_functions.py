@@ -58,7 +58,9 @@ def draw_coordinate_frame(screen, sensor, levels=5):
     """
     coord_frame = sensor.get_visible_fov(levels)
     detect_frame = sensor.get_detectable_bounds(levels)
-    sensor_origin = gfn.reduce_dimension(sensor.get_origin().get_cartesian_coordinates())
+    sensor_origin = gfn.reduce_dimension(
+        sensor.get_origin().get_cartesian_coordinates()
+    )
     if OUTLINE:  # draw skeletal outline only
         for i in range(len(coord_frame[-1])):
             coord_frame[-1][i] = gfn.reduce_dimension(coord_frame[-1][i])
@@ -89,7 +91,9 @@ def draw_coordinate_frame(screen, sensor, levels=5):
     for endpoint in detect_frame[-1][:2]:
         print(endpoint)
         pafn.frame_draw_line(
-            screen, (sensor_origin, gfn.reduce_dimension(endpoint)), pafn.colors["tangerine"]
+            screen,
+            (sensor_origin, gfn.reduce_dimension(endpoint)),
+            pafn.colors["tangerine"],
         )
     for endpoint in detect_frame[-1][2:]:
         pafn.frame_draw_line(
@@ -107,9 +111,7 @@ def draw_all_normals(screen, rigid_body):
     """
     n = rigid_body.get_normals()
     rbcenter = gfn.reduce_dimension(rigid_body.get_center().get_cartesian_coordinates())
-    pafn.frame_draw_line(
-        screen, (rbcenter, n[0]), pafn.colors["tangerine"]
-    )
+    pafn.frame_draw_line(screen, (rbcenter, n[0]), pafn.colors["tangerine"])
     pafn.frame_draw_line(screen, (rbcenter, n[1]), pafn.colors["yellow"])
     pafn.frame_draw_dot(screen, rbcenter, pafn.colors["white"])
 
@@ -128,7 +130,11 @@ def draw_all_links(screen, link, color=None):
     points = link.get_points()
     pafn.frame_draw_filled_polygon(screen, points, color)
     pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
-    pafn.frame_draw_dot(screen, gfn.reduce_dimension(link.get_center().get_cartesian_coordinates()), pafn.colors["white"])
+    pafn.frame_draw_dot(
+        screen,
+        gfn.reduce_dimension(link.get_center().get_cartesian_coordinates()),
+        pafn.colors["white"],
+    )
 
 
 def draw_rigid_body(screen, rigid_body):
@@ -148,7 +154,7 @@ def draw_rigid_body(screen, rigid_body):
 def draw_body_grid(screen, rigid_body):
     axes = rigid_body.get_grid()
     for ax in axes:
-        a,b = ax
+        a, b = ax
         ax = [gfn.reduce_dimension(a), gfn.reduce_dimension(b)]
         pafn.frame_draw_line(screen, ax, pafn.colors["black"])
 
@@ -165,26 +171,34 @@ def draw_sensing_agent(screen, sensing_agent):
     # draw_body_coordinate_frame(screen, exoskeleton)
     draw_rigid_body(screen, exoskeleton)
 
+
 def render_predictions(screen, sensing_agent):
     """
     renders an agents predictions if applicable
     """
-    curr_pt, pred_pt = (),()
+    curr_pt, pred_pt = (), ()
     arr = sensing_agent.estimate_next_detection()
     if not len(arr):
         return
     for i in range(len(arr)):
-        curr_pt, pred_pt = (),()
+        curr_pt, pred_pt = (), ()
         curr_pt = arr[i][0]
         pred_pt = arr[i][1]
         if len(pred_pt):
             pred_pt = [pred_pt[1], pred_pt[2], 0]
             curr_pt = [curr_pt[1], curr_pt[2], 0]
-            pafn.frame_draw_dot(screen, gfn.reduce_dimension(curr_pt), pafn.colors["tangerine"])
-            pafn.frame_draw_dot(screen, gfn.reduce_dimension(pred_pt), pafn.colors["yellow"])
-            pafn.frame_draw_line(
-                screen, (gfn.reduce_dimension(curr_pt), gfn.reduce_dimension(pred_pt)), pafn.colors["white"]
+            pafn.frame_draw_dot(
+                screen, gfn.reduce_dimension(curr_pt), pafn.colors["tangerine"]
             )
+            pafn.frame_draw_dot(
+                screen, gfn.reduce_dimension(pred_pt), pafn.colors["yellow"]
+            )
+            pafn.frame_draw_line(
+                screen,
+                (gfn.reduce_dimension(curr_pt), gfn.reduce_dimension(pred_pt)),
+                pafn.colors["white"],
+            )
+
 
 def render_path(screen, path, color):
     """
@@ -192,6 +206,7 @@ def render_path(screen, path, color):
     """
     for i in range(1, len(path)):
         pafn.frame_draw_bold_line(screen, (path[i - 1], path[i]), color)
+
 
 def import_agent_record(screen, agent_record):
     """

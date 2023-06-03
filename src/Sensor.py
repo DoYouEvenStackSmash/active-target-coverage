@@ -21,7 +21,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.35
+    TOLERANCE = 0.1
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 
@@ -45,8 +45,8 @@ class Sensor:
         self.fov_width = sensor_width
         self.fov_height = sensor_height
         self._id = _id
-        self.max_x = 1000
-        self.max_y = 1000
+        self.max_x = 1920
+        self.max_y = 1080
 
     def get_origin(self):
         """
@@ -81,7 +81,7 @@ class Sensor:
 
     def get_max_y(self):
         return self.max_y
-    
+
     def get_fov_radius(self):
         """
         Accessor for scalar range
@@ -134,7 +134,9 @@ class Sensor:
         horizontal_axis = []
 
         for i in fov_offts:
-            horizontal_axis.append(mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i))
+            horizontal_axis.append(
+                mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i)
+            )
         return horizontal_axis
 
     def get_tolerance_axis(self, radius):
@@ -159,7 +161,9 @@ class Sensor:
         horizontal_axis = []
 
         for i in fov_offts:
-            horizontal_axis.append(mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i))
+            horizontal_axis.append(
+                mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i)
+            )
         return horizontal_axis
 
     def is_rel_detectable(self, target_pt):
@@ -171,7 +175,7 @@ class Sensor:
         adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
         adj_rad_bnd = self.get_fov_radius()
         target_x, target_y, target_z = target_pt.get_cartesian_coordinates()
-        
+
         flags = 0
 
         angle_flag = False

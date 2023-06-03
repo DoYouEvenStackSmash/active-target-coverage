@@ -36,6 +36,9 @@ class State:
         return self.time_stamp
 
     def to_json(self):
+        """
+        Serialization class for state
+        """
         return {
             "position": self.position.to_json(),
             "orientation": self.orientation,

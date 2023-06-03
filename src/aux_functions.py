@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-# import magic
+import magic
 import re
 
 # STANDARD_COLORS = [

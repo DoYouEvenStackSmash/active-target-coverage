@@ -12,6 +12,8 @@ from ObjectTrack import ObjectTrack
 from categories import CATEGORIES
 from StreamingAnnotations import StreamingAnnotations as sann
 import numpy as np
+import cv2
+from aux_functions import *
 
 """
   Global scope data structure for processing a set of images
@@ -31,7 +33,7 @@ def adjust_angle(theta):
     return theta
 
 
-LABELS = True
+LABELS = False
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
 
@@ -39,11 +41,11 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 2,
+        "track_lifespan": 6,
         "default_avg_dist": 10,
-        "radial_exclusion": 40,
+        "radial_exclusion": 60,
     }
-    display_constants = {"trail_len": 0}
+    display_constants = {"trail_len": 6}
 
     def __init__(
         self,
@@ -247,7 +249,7 @@ class ObjectTrackManager:
             for p in pred:
                 d = mfn.spherical_distance(p[1], curr_layer[c])
                 # d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
-                print(f"distance:{d}")
+                # print(f"distance:{d}")
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance
@@ -316,9 +318,28 @@ class ObjectTrackManager:
         Export active tracks and associated metadata to loco format
         """
         # construct filename lookup dictionary
-        fdict = None
+        fdict = {}
         # construct "images" : []
         imgs = []
+        for i,f in enumerate(self.filenames):
+            fdict[f'{f[:-3]}png'] = i
+        # construct "images" : []
+        imgs = []
+        for k,v in fdict.items():
+            half_h = 540
+            half_w = 960
+            # if imported, adjust angles
+            if self.imported:
+                #if rotaged about the center, swap height and width
+                if angle != 0:
+                    half_h, half_w = self.img_centers[v]
+                else:
+                    half_w, half_h = self.img_centers[v]
+            
+            h,w = half_h * 2, half_w * 2
+            imgs.append({"id":v, "file_name": k, "height": h, "width": w})
+
+
         # construct "annotations" : []
         steps = self.export_linked_loco_tracks(fdict)
 
@@ -380,3 +401,130 @@ class ObjectTrackManager:
         for i in range(len(track_steps)):
             track_steps[i]["id"] = i
         return track_steps
+
+    def draw_ybbox_data_on_images(self):
+        '''
+        Draws YoloBox information on the corresponding images
+        '''
+        for layer_idx in range(len(self.layers)):
+            img1 = cv2.imread(f"{self.filenames[layer_idx][:-3]}png")
+            
+            self.draw_trail(self.layers, layer_idx, img1)
+            self.draw_track(self.layers, layer_idx, img1)
+            cv2.imwrite(f"{layer_idx}.png",img1)
+        # im.save(f"{layer_idx}.jpg")
+
+
+    def draw_track(self,layer_list, layer_idx, img1,TEXT = False):
+        '''
+        Draw a disappearing track on an image
+
+        "why is it written so inefficiently to iterate over the layers, if there is
+        a linked list under the hood?"
+        Because we want to write to each picture, layer by layer.
+        '''
+        start = max(layer_idx- ObjectTrackManager.display_constants["trail_len"],0)
+        stop = max(start + 1,layer_idx)
+        for trail_idx in range(start,stop):
+            layer = layer_list[trail_idx]
+            for ybbox in layer:
+                color = (255,0,0)
+                offt = 4
+                if ybbox.parent_track != None:  # ybbox is part of a track
+                    color = self.get_track(ybbox.parent_track).color
+                elif ybbox.next != None: # bbox is orphaned
+                    print("ERROR, Parent is not linked but track is not over.")
+                else: # ybbox is last in the track
+                    offt = 50
+                    print("what")
+                # color = self.get_track(ybbox.parent_track).color
+                ArtFxns.draw_line(img1,ybbox,color)
+            
+        # add identifier to the entity
+        last_layer = layer_list[max(0, layer_idx - 1)]
+        
+        for ybbox in last_layer:
+            color = (255,0,255)
+            
+            if ybbox.parent_track != None:
+                color = self.get_track(ybbox.parent_track).color
+            
+            # label the entities with their id
+            if IDENTIFIERS:
+                ArtFxns.draw_text(img1, ybbox, color)
+            
+            # label the entities with category
+            label = "unlabeled"
+            if len(self.categories) > 0:
+                label = self.get_category_string(int(ybbox.class_id))
+            if LABELS:
+                ArtFxns.draw_label(img1, ybbox, label, color)
+
+    def draw_trail(self, layer_list, layer_idx, img1):
+        '''
+        Helper function for drawing an individual trail
+        '''
+        # draw tracks from all images before
+        if layer_idx == 0:
+            print("zero")
+        start = max(0, layer_idx - 1)
+        stop = max(start + 1, layer_idx)
+        for trail_idx in range(start, stop):
+            layer = layer_list[trail_idx]
+            for ybbox in layer:
+                if layer_idx == 0:
+                    print(ybbox.get_corner_coords())
+                color = (255,0,255)
+                offt = 4
+                if ybbox.parent_track != None:  # ybbox is part of a track
+                    color = self.get_track(ybbox.parent_track).color
+                elif ybbox.next != None: # bbox is orphaned
+                    print("ERROR, Parent is not linked but track is not over.")
+                # else: # ybbox is last in the track
+                    offt = 4
+                    print("last")
+
+                if BOXES:
+                    ArtFxns.draw_rectangle(img1, ybbox, color)
+
+    def import_loco_fmt(self, s, sys_path):
+        # set up trackmap for accessing tracks
+        self.imported = True
+        trackmap = s['trackmap']
+        lt = s['linked_tracks']
+        for i,track_id in enumerate(trackmap):
+            if track_id not in self.global_track_store or track_id == -1:
+                self.global_track_store[track_id] = ObjectTrack(track_id, lt[i]['category_id'])
+                self.global_track_store[track_id].class_id = lt[i]['category_id']
+            else: #already present
+                continue
+        
+        # load image filenames
+        images = s['images']
+        # construct file dict for accessing file ids
+        # construct sys_paths list for convenience
+        # initialize layers to populate with YoloBoxes
+        for i,imf in enumerate(images):
+            self.filenames.append(imf['file_name'])
+            self.sys_paths.append(sys_path)
+            self.fdict[imf['file_name']] = i
+            self.layers.append([])
+            self.img_centers.append(tuple((int(imf['width']/2), int(imf['height']/2))))
+            
+        # load annotations
+        steps = s['annotations']
+        for st in steps:
+        # skip step if track is invalid
+            if trackmap[st['trackmap_index']] == -1:
+                continue
+            track = self.get_track(trackmap[st['trackmap_index']])
+            print(st["image_id"])
+            yb = YoloBox( track.class_id, 
+                            st['bbox'], 
+                            f'{st["image_id"][:-3]}txt',
+                            (1920,1080))
+            # print(self.filenames)
+            # add YoloBox to the appropriate layer based on the image filename
+            self.layers[self.fdict[f"{st['image_id'][:-3]}png"]].append(yb)
+            # add the yolobox to the correct track
+            track.add_new_step(yb,0)

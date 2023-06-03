@@ -88,7 +88,7 @@ class TransformFxns:
         x_step = step_dist * np.cos(theta)
         y_step = step_dist * np.sin(theta)
         z_step = step_dist * np.sin(theta)
-        val = (x_step, y_step,z_step)
+        val = (x_step, y_step, z_step)
         return val
 
 
@@ -108,7 +108,11 @@ class MathFxns:
         """
         Calculates frobenius norm between two cylindrical points
         """
-        return np.sqrt(np.square(p1[0] - p2[0]) + np.square(p1[1] - p2[1]) + np.square(p1[2] - p2[2]))
+        return np.sqrt(
+            np.square(p1[0] - p2[0])
+            + np.square(p1[1] - p2[1])
+            + np.square(p1[2] - p2[2])
+        )
 
     def car2pol(origin, pt):
         """
@@ -123,9 +127,9 @@ class MathFxns:
 
     def car2phi(origin, pt):
         x, y, z = pt
-        return MathFxns.car2pol(origin, (x,z,y))
+        return MathFxns.car2pol(origin, (x, z, y))
 
-    def pol2car(pt, r, theta,phi=0):
+    def pol2car(pt, r, theta, phi=0):
         """
         Convert polar coordinate to cartesian
         Returns a point
@@ -150,12 +154,13 @@ class GeometryFxns:
     """
     Geometry helper functions
     """
+
     def reduce_dimension(pt):
         return (pt[0], pt[1])
-    
+
     def raise_dimension(pt):
         return (pt[0], pt[1], 0)
-    
+
     def get_equilateral_vertex(pt1, pt2, sign=1):
         """
         Calculates the vertex of an equilateral triangle
@@ -297,7 +302,12 @@ class PygameArtFxns:
         Draws a polygon of specified color
         Returns nothing
         """
-        pygame.draw.polygon(screen, color, [GeometryFxns.reduce_dimension(i) for i in point_set], width=2)
+        pygame.draw.polygon(
+            screen,
+            color,
+            [GeometryFxns.reduce_dimension(i) for i in point_set],
+            width=2,
+        )
 
     def frame_draw_line(screen, point_set, color=(0, 0, 0)):
         """
@@ -322,7 +332,9 @@ class PygameArtFxns:
         Draws a single dot given a point (x, y)
         Returns nothing
         """
-        pygame.draw.circle(screen, color, GeometryFxns.reduce_dimension(point), thickness, width)
+        pygame.draw.circle(
+            screen, color, GeometryFxns.reduce_dimension(point), thickness, width
+        )
 
     def clear_frame(screen, color=(255, 255, 255)):
         """
@@ -355,15 +367,14 @@ class PygameArtFxns:
         Does not return
         """
         pygame.gfxdraw.filled_polygon(screen, pts, color)
-    
-    def frame_draw_cross(screen, origin, color = (255,255,255), size=10, vertical=True):
+
+    def frame_draw_cross(screen, origin, color=(255, 255, 255), size=10, vertical=True):
         """
         draws a cross at a point
         """
-        x,y,z = origin
-        line1 = [(x-10, y), (x+10,y)]
-        line2 = [(x, y-10),(x, y+10)]
+        x, y, z = origin
+        line1 = [(x - 10, y), (x + 10, y)]
+        line2 = [(x, y - 10), (x, y + 10)]
         lines = [line1, line2]
         for line in lines:
             PygameArtFxns.frame_draw_line(screen, line, color)
-        

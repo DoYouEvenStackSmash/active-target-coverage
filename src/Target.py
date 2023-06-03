@@ -1,5 +1,6 @@
 from Detection import *
 
+
 class Target:
     """A class which models a Target which may or may not be covered
 
@@ -10,7 +11,7 @@ class Target:
 
     """
 
-    def __init__(self, origin = Position(), color=None, _id=0, path=None):
+    def __init__(self, origin=Position(), color=None, _id=0, path=None):
         self.origin = origin
         self.color = color
         self.attributes = None
@@ -35,7 +36,7 @@ class Target:
         Returns an (x,y) point
         """
         return self.origin
-    
+
     def get_position(self):
         """
         Accessor for the position of the target
@@ -58,6 +59,6 @@ class Target:
         Returns an id
         """
         return self._id
-    
+
     def get_dims(self):
-        return [0.1,0.1]
+        return [0.1, 0.1]

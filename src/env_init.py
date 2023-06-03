@@ -14,6 +14,12 @@ from StreamingObjectTrackManager import ObjectTrackManager
 from Detection import *
 
 
+def init_detection(origin=Position(0,0,0), attributes=None):
+    """
+    Initializes a detection with attributes
+    """
+    det = Detection(position, attributes)
+    return det
 
 def init_agent_exoskeleton(origin=Position(0, 0, 0), sensing_agent=None):
     """
@@ -38,13 +44,11 @@ def init_agent_exoskeleton(origin=Position(0, 0, 0), sensing_agent=None):
     mp_center = Position()
     mp_center.set_by_triple(mpt2)
 
-    
-    
     ap = Polygon(opts)
-    
+
     mp_endpoint = Position()
     mp_endpoint.set_by_triple(opts[2])
-    
+
     rb = RigidBody(
         parent_agent=None,
         ref_origin=mp_origin,
@@ -95,7 +99,7 @@ def init_sensing_agent(_id=0, origin=Position(0, 0, 0), width=np.pi / 2, radius=
     return sensing_agent
 
 
-def init_target(origin=Position(0,0,0), color=(255, 255, 255), _id=0, path=None):
+def init_target(origin=Position(0, 0, 0), color=(255, 255, 255), _id=0, path=None):
     """
     standard initializer for target
     returns a Target

@@ -18,8 +18,8 @@ def adjust_angle(theta):
     return theta
 
 
-ACCELERATION_THRESHOLD = 1.2
-MAX_SCALE_FACTOR = 1.6
+ACCELERATION_THRESHOLD = 1
+MAX_SCALE_FACTOR = 1
 
 
 class ObjectTrack:
@@ -44,46 +44,40 @@ class ObjectTrack:
         clock (int): Counter.
     """
 
-    def __init__(self, track_id,
-                        class_id,
-                        r = 0,
-                                
-                        # initial values
-                        theta_naught = None,
-                        phi_naught = None,
-                        r_naught = None,
-                        # velocities
-                        delta_theta = None,
-                        delta_phi = None,
-                        delta_r = None,
-                                
-                        # accelerations
-                        accel_theta = None,
-                        accel_phi = None,
-                        accel_r = None,
-
-                        # impulse
-                        jolt_theta = None,
-                        jolt_phi = None,
-                        jolt_r = None,
-
-                        # timekeeping
-                        clock = 0,
-                        detection_idx = None,
-                        detection_time = 1,
-                        avg_detection_time = 1,
-                                
-                        # metrics
-                        error_over_time = None,
-                                
-                        parent_agent = None,
-                                
-                        path = None,
-                        predictions = None,
-                                
-                        color = rand_color(),
-                        last_frame = -1
-        ):
+    def __init__(
+        self,
+        track_id,
+        class_id,
+        r=0,
+        # initial values
+        theta_naught=None,
+        phi_naught=None,
+        r_naught=None,
+        # velocities
+        delta_theta=None,
+        delta_phi=None,
+        delta_r=None,
+        # accelerations
+        accel_theta=None,
+        accel_phi=None,
+        accel_r=None,
+        # impulse
+        jolt_theta=None,
+        jolt_phi=None,
+        jolt_r=None,
+        # timekeeping
+        clock=0,
+        detection_idx=None,
+        detection_time=1,
+        avg_detection_time=1,
+        # metrics
+        error_over_time=None,
+        parent_agent=None,
+        path=None,
+        predictions=None,
+        color=rand_color(),
+        last_frame=-1,
+    ):
         """Initializes an ObjectTrack instance.
 
         Args:
@@ -94,7 +88,7 @@ class ObjectTrack:
         self.class_id = class_id
 
         self.r = r
-        
+
         # initial values
         self.theta_naught = theta_naught if theta_naught != None else [0]
         self.phi_naught = phi_naught if phi_naught != None else [0]
@@ -104,7 +98,7 @@ class ObjectTrack:
         self.delta_theta = delta_theta if delta_theta != None else [0]
         self.delta_phi = delta_phi if delta_phi != None else [0]
         self.delta_r = delta_r if delta_r != None else [0]
-        
+
         # accelerations
         self.accel_theta = accel_theta if accel_theta != None else [0]
         self.accel_phi = accel_phi if accel_phi != None else [0]
@@ -119,18 +113,17 @@ class ObjectTrack:
         self.detection_idx = detection_idx if detection_idx != None else [0]
         self.detection_time = detection_time
         self.avg_detection_time = avg_detection_time
-        
+
         # metrics
         self.error_over_time = error_over_time if error_over_time != None else []
-        
+
         self.parent_agent = None
-        
+
         self.path = path if path != None else []
         self.predictions = predictions if predictions != None else []
-        
+
         self.color = color
         self.last_frame = last_frame
-        
 
     def heartbeat(self):
         """
@@ -156,16 +149,24 @@ class ObjectTrack:
             self.update_track_trajectory(detection)
         else:
             # handle initial condition
-            r,y,z = detection.get_cartesian_coordinates()
-            theta,phi = detection.get_angles()
+            r, y, z = detection.get_cartesian_coordinates()
+            theta, phi = detection.get_angles()
             self.r_naught.append(r)
-            self.theta_naught.append(self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width()))
-            self.phi_naught.append(self.parent_agent.map_detection_back(phi, self.parent_agent.get_fov_height()))
-            
+            self.theta_naught.append(
+                self.parent_agent.map_detection_back(
+                    theta, self.parent_agent.get_fov_width(), self.parent_agent.get_max_x()
+                )
+            )
+            self.phi_naught.append(
+                self.parent_agent.map_detection_back(
+                    phi, self.parent_agent.get_fov_height(),self.parent_agent.get_max_y()
+                )
+            )
+
         self.error_over_time.append(error)
         self.path.append(detection)
 
-    def update_track_trajectory(self, detection, time_interval=None ,displacement=None):
+    def update_track_trajectory(self, detection, time_interval=None, displacement=None):
         """
         Updates the track trajectory components using cartesian coordinates
         """
@@ -173,15 +174,14 @@ class ObjectTrack:
             time_interval = max(1, self.detection_idx[-1] - self.detection_idx[-2])
 
         theta, phi = detection.get_angles()
-        r,y,z = detection.get_cartesian_coordinates()
-        
+        r, y, z = detection.get_cartesian_coordinates()
+
         # change in position is velocity
         # change in velocity is acceleration
         # change in acceleration is jolt
         self.update_track_r(r, time_interval)
         self.update_track_theta(theta, time_interval)
         self.update_track_phi(phi, time_interval)
-
 
     def update_track_r(self, r, time_interval=1):
         """
@@ -199,7 +199,7 @@ class ObjectTrack:
         self.delta_r.append(delta_r)
         self.accel_r.append(accel_r)
         self.jolt_r.append(jolt_r)
-        
+
     def update_track_theta(self, theta, time_interval=1):
         """
         Modifier for updating theta element
@@ -207,15 +207,19 @@ class ObjectTrack:
         theta_0 = self.theta_naught[-1]
         delta_theta_0 = self.delta_theta[-1]
         accel_theta_0 = self.accel_theta[-1]
-        
+
         max_theta = self.parent_agent.get_fov_width()
-        
+
         # theta = (theta + max_theta / 2) / max_theta
-        theta = self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width())
+        theta = self.parent_agent.map_detection_back(
+            theta, self.parent_agent.get_fov_width(), self.parent_agent.get_max_x()
+        )
         delta_theta = (theta - theta_0) / time_interval
-        accel_theta = min(ACCELERATION_THRESHOLD, (delta_theta - delta_theta_0) / time_interval)
+        accel_theta = min(
+            ACCELERATION_THRESHOLD, (delta_theta - delta_theta_0) / time_interval
+        )
         jolt_theta = (accel_theta - accel_theta_0) / time_interval
-        
+
         self.theta_naught.append(theta)
         self.delta_theta.append(delta_theta)
         self.accel_theta.append(accel_theta)
@@ -228,19 +232,22 @@ class ObjectTrack:
         phi_0 = self.phi_naught[-1]
         delta_phi_0 = self.delta_phi[-1]
         accel_phi_0 = self.accel_phi[-1]
-        
+
         max_phi = self.parent_agent.get_fov_height()
         # phi = (phi + max_phi / 2) / max_phi
-        phi = self.parent_agent.map_detection_back(phi, self.parent_agent.get_fov_height())
+        phi = self.parent_agent.map_detection_back(
+            phi, self.parent_agent.get_fov_height(), self.parent_agent.get_max_y()
+        )
         delta_phi = (phi - phi_0) / time_interval
-        accel_phi = min(ACCELERATION_THRESHOLD, (delta_phi - delta_phi_0) / time_interval)
+        accel_phi = min(
+            ACCELERATION_THRESHOLD, (delta_phi - delta_phi_0) / time_interval
+        )
         jolt_phi = (accel_phi - accel_phi_0) / time_interval
-        
+
         self.phi_naught.append(phi)
         self.delta_phi.append(delta_phi)
         self.accel_phi.append(accel_phi)
         self.jolt_phi.append(jolt_phi)
-
 
     def add_new_prediction(self, pred):
         """
@@ -257,11 +264,18 @@ class ObjectTrack:
         accel_r = self.accel_r[-1]
         jolt_r = self.jolt_r[-1]
 
-        r = r_0 + delta_r * self.avg_detection_time * scale_factor \
-            + (1 / 2) * accel_r * np.square(self.avg_detection_time * scale_factor) \
-            + (1 / 6) * jolt_r * np.power(self.avg_detection_time * scale_factor, 3) * scale_factor * scale_factor
+        r = (
+            r_0
+            + delta_r * self.avg_detection_time * scale_factor
+            + (1 / 2) * accel_r * np.square(self.avg_detection_time * scale_factor)
+            + (1 / 6)
+            * jolt_r
+            * np.power(self.avg_detection_time * scale_factor, 3)
+            * scale_factor
+            * scale_factor
+        )
         return r
-    
+
     def predict_theta(self, scale_factor=1):
         """
         Wrapper for theta query
@@ -270,11 +284,21 @@ class ObjectTrack:
         delta_theta = self.delta_theta[-1]
         accel_theta = self.accel_theta[-1]
         jolt_theta = self.jolt_theta[-1]
-        
-        theta = theta_0 + delta_theta * self.avg_detection_time * scale_factor \
-                + (1 / 2) * accel_theta * np.square(self.avg_detection_time * scale_factor) * scale_factor \
-                + (1/6) * jolt_theta * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
-        
+
+        theta = (
+            theta_0
+            + delta_theta * self.avg_detection_time * scale_factor
+            + (1 / 2)
+            * accel_theta
+            * np.square(self.avg_detection_time * scale_factor)
+            * scale_factor
+            + (1 / 6)
+            * jolt_theta
+            * np.power(self.avg_detection_time * scale_factor, 3)
+            * scale_factor
+            * scale_factor
+        )
+
         return theta
 
     def predict_phi(self, scale_factor=1):
@@ -285,10 +309,20 @@ class ObjectTrack:
         delta_phi = self.delta_phi[-1]
         accel_phi = self.accel_phi[-1]
         jolt_phi = self.jolt_phi[-1]
-        
-        phi =   phi_0 + delta_phi * self.avg_detection_time * scale_factor \
-                + (1 / 2) * accel_phi * np.square(self.avg_detection_time * scale_factor) * scale_factor \
-                + (1/6) * jolt_phi * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
+
+        phi = (
+            phi_0
+            + delta_phi * self.avg_detection_time * scale_factor
+            + (1 / 2)
+            * accel_phi
+            * np.square(self.avg_detection_time * scale_factor)
+            * scale_factor
+            + (1 / 6)
+            * jolt_phi
+            * np.power(self.avg_detection_time * scale_factor, 3)
+            * scale_factor
+            * scale_factor
+        )
 
         return phi
 
@@ -299,31 +333,38 @@ class ObjectTrack:
         """
         # predict range
         r = self.predict_range(scale_factor)
-        
+
         # predict theta
         theta = self.predict_theta(scale_factor)
         theta = theta / self.parent_agent.get_max_x()
-        theta = theta * self.parent_agent.get_fov_width() - (self.parent_agent.get_fov_width() / 2)
-        
+        theta = theta * self.parent_agent.get_fov_width() - (
+            self.parent_agent.get_fov_width() / 2
+        )
+
         # predict phi
         phi = self.predict_phi(scale_factor)
         phi = phi / self.parent_agent.get_max_y()
-        phi = phi * self.parent_agent.get_fov_height() - (self.parent_agent.get_fov_height() / 2)
-        
+        phi = phi * self.parent_agent.get_fov_height() - (
+            self.parent_agent.get_fov_height() / 2
+        )
+
         # x = x / 10
-        x = self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width())
-        y = self.parent_agent.map_detection_back(phi, self.parent_agent.get_fov_height()) 
-        
+        x = self.parent_agent.map_detection_back(
+            theta, self.parent_agent.get_fov_width(), 1920
+        )
+        y = self.parent_agent.map_detection_back(
+            phi, self.parent_agent.get_fov_height(), 1080
+        )
+
         last_pos = self.get_last_detection()
         xmax = self.parent_agent.get_max_x()
         ymax = self.parent_agent.get_max_y()
         # some sanity mappping
-        x = ((x/xmax) * xmax - xmax/2) / xmax * 100 + 50
-        y = ((y/ymax) * ymax - ymax/2) / ymax * 100 + 50
+        x = ((x / xmax) * xmax - xmax / 2) / xmax * 100 + 50
+        y = ((y / ymax) * ymax - ymax / 2) / ymax * 100 + 50
 
         return Detection(Position(r, x, y, theta, phi), last_pos.get_attributes())
 
-    
     def predict_next_state(self, steps=1):
         """
         Predict an intermediate position of the target using its
@@ -345,7 +386,7 @@ class ObjectTrack:
         """
         if len(self.path):
             return self.predict_next_state()
-        
+
         return self.get_last_detection()
         # pass
 
@@ -419,10 +460,24 @@ class ObjectTrack:
 
         for i, det in enumerate(self.path):
             yb = det.get_attributes()
-            fid = None
+            
+            # fid = None
 
             fid = yb.img_filename
             yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
             yb_json["track_id"] = self.track_id
             steps.append(yb_json)
         return steps
+    
+    def add_new_step(self, yb, frame_id):
+        ''' 
+        Add a new bounding box to the object track
+        '''
+        # update velocity  
+        if len(self.path) > 0:
+            pass
+            # self.update_track_vector(yb.get_center_coord())
+    
+        self.last_frame = frame_id
+        yb.parent_track = self.track_id
+        self.path.append(yb)
