@@ -39,9 +39,10 @@ def adjust_angle(theta):
 
     return theta
 
+DEFAULT_RANGE = 10
 
 class SensingAgent:
-    DEFAULT_RANGE = 1
+    
     """A class representing a sensing agent.
 
     Attributes:
@@ -335,6 +336,7 @@ class SensingAgent:
         curr_state = self.exoskeleton.get_age()
         cls = target_object.get_id()
         x,y,z = target_object.get_origin().get_cartesian_coordinates()
+        z = z * 40
         w,h = target_object.get_dims()
         img_shape_x = self.get_max_x()
         img_shape_y = self.get_max_y()
@@ -343,7 +345,7 @@ class SensingAgent:
         # y = y / img_shape_y
         sensor_fov_width = self.get_fov_width()
         sensor_fov_height = self.get_fov_height()
-        return curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height
+        return curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height,z
 
     def create_pov_detection_set_from_targets(self, frame_id, target_detection_list):
         """
@@ -352,8 +354,8 @@ class SensingAgent:
         detections = []
         
         for a in target_detection_list:
-            curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height = self.unpack_target_attributes(a)
-            det = self.create_detections_without_range(curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height)
+            curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height,z = self.unpack_target_attributes(a)
+            det = self.create_detections_without_range(curr_state,cls,x,y,w,h,img_shape_x,img_shape_y,sensor_fov_width,sensor_fov_height,z)
             detections.append(det)
         return detections
     
@@ -375,7 +377,8 @@ class SensingAgent:
                                 img_shape_x,
                                 img_shape_y,
                                 sensor_fov_width,
-                                sensor_fov_height):
+                                sensor_fov_height,
+                                dist=DEFAULT_RANGE):
         """
         wrapper for Yolo style detections
         """
@@ -398,7 +401,7 @@ class SensingAgent:
         rel_x = 25
         theTa = -np.pi / 4
         '''
-        dist = SensingAgent.DEFAULT_RANGE
+        dist = dist
         # normalize x between 0 and 100
         rel_x = (x * img_shape_x - (img_shape_x / 2)) / img_shape_x * 100 + 50
         # normalize theta in terms of agent pov

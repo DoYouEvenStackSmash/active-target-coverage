@@ -121,8 +121,6 @@ class MathFxns:
         trig_eval = (np.sin(theta1) * np.sin(theta2))*np.cos(phi1 - phi2) * np.cos(theta1) * np.cos(theta2)
         return np.sqrt(np.square(r1) + np.square(r2) + - 2 * r1 * r2 * trig_eval)
 
-
-
     def car2pol(origin, pt):
         """
         Converts a pair of points into a vector

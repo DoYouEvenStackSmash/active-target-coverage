@@ -142,8 +142,6 @@ class ObjectTrack:
         """
         Add a new bounding box to the object track
         """
-        print(f"-------ADDING NEW DETECTION----------\n\t{frame_id}")
-        print(detection.get_cartesian_coordinates())
         self.last_frame = frame_id
         detection.parent_track = self.track_id
 
@@ -157,12 +155,11 @@ class ObjectTrack:
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
         else:
+            # handle initial condition
             r,y,z = detection.get_cartesian_coordinates()
             theta,phi = detection.get_angles()
             self.r_naught.append(r)
-
             self.theta_naught.append(self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width()))
-            
             self.phi_naught.append(self.parent_agent.map_detection_back(phi, self.parent_agent.get_fov_height()))
             
         self.error_over_time.append(error)
@@ -239,7 +236,6 @@ class ObjectTrack:
         accel_phi = min(ACCELERATION_THRESHOLD, (delta_phi - delta_phi_0) / time_interval)
         jolt_phi = (accel_phi - accel_phi_0) / time_interval
         
-        
         self.phi_naught.append(phi)
         self.delta_phi.append(delta_phi)
         self.accel_phi.append(accel_phi)
@@ -252,7 +248,6 @@ class ObjectTrack:
         """
         pass
 
-
     def predict_range(self, scale_factor=1):
         """
         Wrapper for range query
@@ -262,7 +257,9 @@ class ObjectTrack:
         accel_r = self.accel_r[-1]
         jolt_r = self.jolt_r[-1]
 
-        r = r_0 + delta_r * self.avg_detection_time * scale_factor + (1 / 2) * accel_r * np.square(self.avg_detection_time * scale_factor)
+        r = r_0 + delta_r * self.avg_detection_time * scale_factor \
+            + (1 / 2) * accel_r * np.square(self.avg_detection_time * scale_factor) \
+            + (1 / 6) * jolt_r * np.power(self.avg_detection_time * scale_factor, 3) * scale_factor * scale_factor
         return r
     
     def predict_theta(self, scale_factor=1):
@@ -274,24 +271,25 @@ class ObjectTrack:
         accel_theta = self.accel_theta[-1]
         jolt_theta = self.jolt_theta[-1]
         
-        
-        theta = theta_0 + delta_theta * self.avg_detection_time * scale_factor + (1 / 2) * accel_theta * np.square(self.avg_detection_time * scale_factor) * scale_factor + (1/6) * jolt_theta * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
-        # theta = theta_0 + (delta_theta * self.avg_detection_time + (1 / 2) * accel_theta * np.square(self.avg_detection_time) + (1/6) * jolt_theta * np.power(self.avg_detection_time,3)) * scale_factor
+        theta = theta_0 + delta_theta * self.avg_detection_time * scale_factor \
+                + (1 / 2) * accel_theta * np.square(self.avg_detection_time * scale_factor) * scale_factor \
+                + (1/6) * jolt_theta * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
         
         return theta
 
     def predict_phi(self, scale_factor=1):
         """
-        Wrapper for theta query
+        Wrapper for phi query
         """
         phi_0 = self.phi_naught[-1]
         delta_phi = self.delta_phi[-1]
         accel_phi = self.accel_phi[-1]
         jolt_phi = self.jolt_phi[-1]
         
-        phi = phi_0 + delta_phi * self.avg_detection_time * scale_factor + (1 / 2) * accel_phi * np.square(self.avg_detection_time * scale_factor) * scale_factor + (1/6) * jolt_phi * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
-        # phi = phi_0 + (delta_phi * self.avg_detection_time + (1 / 2) * accel_phi * np.square(self.avg_detection_time) + (1/6) * jolt_phi * np.power(self.avg_detection_time,3)) * scale_factor
-        
+        phi =   phi_0 + delta_phi * self.avg_detection_time * scale_factor \
+                + (1 / 2) * accel_phi * np.square(self.avg_detection_time * scale_factor) * scale_factor \
+                + (1/6) * jolt_phi * np.power(self.avg_detection_time * scale_factor,3) * scale_factor * scale_factor
+
         return phi
 
     def estimate_next_position(self, scale_factor=1):
@@ -299,40 +297,33 @@ class ObjectTrack:
         Estimate position of next detection using trajectory components
         Returns a Detection
         """
+        # predict range
         r = self.predict_range(scale_factor)
         
+        # predict theta
         theta = self.predict_theta(scale_factor)
-        
-        
         theta = theta / self.parent_agent.get_max_x()
         theta = theta * self.parent_agent.get_fov_width() - (self.parent_agent.get_fov_width() / 2)
         
-        print(f"theta: {theta}")
+        # predict phi
         phi = self.predict_phi(scale_factor)
-        
         phi = phi / self.parent_agent.get_max_y()
         phi = phi * self.parent_agent.get_fov_height() - (self.parent_agent.get_fov_height() / 2)
         
-        print(f"phi: {phi}")
-        x = self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width())
         # x = x / 10
-
+        x = self.parent_agent.map_detection_back(theta, self.parent_agent.get_fov_width())
         y = self.parent_agent.map_detection_back(phi, self.parent_agent.get_fov_height()) 
+        
         last_pos = self.get_last_detection()
-        
+        xmax = self.parent_agent.get_max_x()
+        ymax = self.parent_agent.get_max_y()
+        # some sanity mappping
+        x = ((x/xmax) * xmax - xmax/2) / xmax * 100 + 50
+        y = ((y/ymax) * ymax - ymax/2) / ymax * 100 + 50
 
-        x = ((x/1000) * 1000 - 500) / 1000 * 100 + 50
-        y = ((y/1000) * 1000 - 500) / 1000 * 100 + 50
-        # print(r)
-        
-        
-        print(x,y)
-        # sys.exit()
         return Detection(Position(r, x, y, theta, phi), last_pos.get_attributes())
 
-        
-        pass
-
+    
     def predict_next_state(self, steps=1):
         """
         Predict an intermediate position of the target using its

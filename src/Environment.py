@@ -108,38 +108,3 @@ class Environment:
         Add a target to the world
         """
         self.targets.append(T)
-
-    def transform_from_local_coord(self, x, y, w=1, h=1):
-        """
-        Transforms a bbox from Sensor local coordinates to world coordinates
-        returns a Point
-        Args:
-            x(float) : x coordinate
-            y(float) : y coordinate
-            w(float) : width of the bounding box
-            h(float) : height of the bounding box
-        """
-        org_theta = mfn.correct_angle(self.agent.fov_theta)
-
-        rh = org_theta - self.agent.sensor.fov_width / 2
-        lh = org_theta + self.agent.sensor.fov_width / 2
-        theta = (x / Sensor.WINDOW_WIDTH) * self.agent.sensor.fov_width
-        # print(f"is_not_visible: {lh}:{theta}:{rh}")
-        ratio = theta - 0.5
-        theta = lh - theta
-        theta = mfn.correct_angle(theta)
-
-        r = y
-        return mfn.pol2car(self.agent.get_origin(), r, theta)
-    
-    def serialize_agent_tracks(self):
-        """
-        export tracks of all agents
-        """
-        for k in self.agents:
-            sensing_agent = self.agents[k]
-            e = sensing_agent.export_tracks()
-            f = open(f"{sensing_agent._id}_out.json", "w")
-
-            f.write(json.dumps(e, indent=2))
-            f.close()

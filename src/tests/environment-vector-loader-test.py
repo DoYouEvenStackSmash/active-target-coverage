@@ -26,7 +26,7 @@ for filename in sys.argv[1:]:
 # init window for viewing  
 pygame.init()
 screen = pafn.create_display(1000,1000)
-zero_det = Detection(Position(0,0,0), YoloBox(0,[-1,-1,-1,-1],i))
+zero_det = Detection(Position(-1,-1,-1), YoloBox(0,[-1,-1,-1,-1],i))
 # init targets
 targets = []
 for posns in point_lists:
@@ -45,6 +45,7 @@ while flag:
   flag = False
   for k in env.agents:
     sa = env.agents[k]
+    # for n in range(5):
     sa.heartbeat()
     render_predictions(screen, sa)
     print(sa.get_clock())
@@ -55,7 +56,7 @@ while flag:
       t.origin = zero_det
       t.path[t.idx] = zero_det
   
-  if not counter % 6:
+  if not counter % 3 or not counter % 7:
     env.visible_vertical_targets()
   
   print(sa.estimate_next_detection())

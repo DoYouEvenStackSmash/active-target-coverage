@@ -188,7 +188,7 @@ def main():
             render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
         elif f == "LERP":
             origin = (0, 500, 0)
-            dest = (1000, 500, 0)
+            dest = (1000, 500, 100)
             paths = get_lerp(origin, dest)
             render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
         elif f == "LINE":
