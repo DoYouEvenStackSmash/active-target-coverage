@@ -36,11 +36,11 @@ class Sensor:
         self,
         parent_agent=None,
         sensor_radius=300,
-        sensor_width=np.pi / 4,
-        sensor_height=np.pi / 4,
+        sensor_width=np.pi,
+        sensor_height=np.pi,
         _id=None,
-        max_x = 1000,
-        max_y = 1000
+        max_x = 1920,
+        max_y = 1080
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius

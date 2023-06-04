@@ -41,9 +41,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 6,
+        "track_lifespan": 8,
         "default_avg_dist": 10,
-        "radial_exclusion": 60,
+        "radial_exclusion": 30,
     }
     display_constants = {"trail_len": 6}
 
@@ -247,9 +247,10 @@ class ObjectTrackManager:
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
             for p in pred:
+                print(curr_layer[c].get_cartesian_coordinates())
                 d = mfn.spherical_dist(p[1], curr_layer[c])
                 # d = mfn.frobenius_dist(p[1], curr_layer[c].get_cartesian_coordinates())
-                # print(f"distance:{d}")
+                print(f"distance:{d}")
                 pairs.append((p[0], c, d))
 
         # sort the list of pairs by euclidean distance
@@ -274,7 +275,9 @@ class ObjectTrackManager:
             # do not increment pair count for radial exclusion in case this is a new track
             if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
                 tc -= 1
+                # pc += 1
                 break
+                # continue
 
             # add entity to nearest track
             T = self.global_track_store[elem[0]]

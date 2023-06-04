@@ -347,12 +347,19 @@ class ObjectTrack:
         phi = phi * self.parent_agent.get_fov_height() - (
             self.parent_agent.get_fov_height() / 2
         )
-
+        
+        # phi = min(phi, self.parent_agent.get_fov_height())
+        # phi = max(phi, -self.parent_agent.get_fov_height())
+                
+        # theta = min(theta, self.parent_agent.get_fov_height())
+        # theta = max(theta, -self.parent_agent.get_fov_height())
         # x = x / 10
         x = self.parent_agent.map_detection_back(
             theta, self.parent_agent.get_fov_width(), 
             self.parent_agent.get_max_x()
         )
+
+
         y = self.parent_agent.map_detection_back(
             phi, self.parent_agent.get_fov_height(), 
             self.parent_agent.get_max_y()
@@ -364,7 +371,7 @@ class ObjectTrack:
         # some sanity mappping
         x = ((x / xmax) * xmax - xmax / 2) / xmax * 100 + 50
         y = ((y / ymax) * ymax - ymax / 2) / ymax * 100 + 50
-
+        print(x,y)
         return Detection(Position(r, x, y, theta, phi), last_pos.get_attributes())
 
     def predict_next_state(self, steps=1):

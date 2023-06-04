@@ -80,41 +80,20 @@ def load_layers(files, sensing_agent):
   yolo_layer_list = []
   for i in range(len(files)):
     yolo_layer_list.append(al.load_yolofmt_layer(files[i]))
-  detection_layer_list = []
+  
   counter = sensing_agent.get_clock()
-  for layer in yolo_layer_list:
-    detection_layer = []
-    for yolobox in layer:
-      bbox = yolobox.bbox
-      x,y,w,h = bbox
-      # print(bbox)
-      img_shape_x = 1920
-      img_shape_y = 1080
-      detection_cls = yolobox.class_id
-      sensor_fov_width =  np.pi / 4
-      sensor_fov_height = np.pi / 4
-      
-      dist = 3
-      # normalize x between 0 and 100
-      rel_x = ((w/2 + x) - (img_shape_x / 2)) / img_shape_x * 100 + 50
-      
-      # normalize theta in terms of agent pov
-      theta = (rel_x / 100) * sensor_fov_width - (sensor_fov_width / 2)
-      # print(theta)
-
-      # vertical component
-      rel_y = ((h/2 + y) - (img_shape_y / 2)) / img_shape_y * 100 + 50
-      phi = (rel_y / 100) * sensor_fov_height - (sensor_fov_height / 2)
-      # print(rel_y)
-      # bbox normalized
-
-      posn = Position(dist, rel_x, rel_y, theta, phi)
-      det = Detection(posn, yolobox)
-      detection_layer.append(det)
+  detection_layer_list = []
+  for i, layer in enumerate(yolo_layer_list):
     
-    detection_layer_list.append(detection_layer)
-  print(len(detection_layer_list))
-  return detection_layer_list
+    sensing_agent.heartbeat()
+    det_layer = sensing_agent.create_detection_layer_from_yoloboxes(layer, True)
+    sensing_agent.load_detection_layer(det_layer)
+    sensing_agent.obj_tracker.process_layer(-1)
+    # else:
+    #   sensing_agent.heartbeat()
+    
+    
+  # return detection_layer_list
 
 
 def import_tracks(an_json, sys_path="."):
@@ -138,11 +117,11 @@ def build_tracks(files,layer_list, sensing_agent):
   Returns a newly created ObjectTrackManager containing tracks through layer_list
   '''
   sensing_agent.obj_tracker.filenames = files
-  sensing_agent.obj_tracker.layers = layer_list
+  # sensing_agent.obj_tracker.layers = layer_list
   # otm = ObjectTrackManager(filenames=files,layers=layer_list)
   # otm.initialize_tracks()
-  sensing_agent.obj_tracker.initialize_tracks()
-  sensing_agent.obj_tracker.process_all_layers()
+  # sensing_agent.obj_tracker.initialize_tracks()
+  # sensing_agent.obj_tracker.process_all_layers()
   # otm.process_all_layers()
   return sensing_agent.obj_tracker
 

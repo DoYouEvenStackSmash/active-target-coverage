@@ -123,6 +123,7 @@ class MathFxns:
         r1, y1, z1 = posn1.get_cartesian_coordinates()
         theta1, phi1 = posn1.get_angles()
         r2, y2, z2 = posn2.get_cartesian_coordinates()
+        # return MathFxns.euclidean_dist((y1,z1,r1), (y2,z2,r2))
         return MathFxns.frobenius_dist((y1,z1,r1), (y2,z2,r2))
         theta2, phi2 = posn2.get_angles()
         trig_eval = (

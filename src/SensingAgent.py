@@ -340,71 +340,6 @@ class SensingAgent:
             detections.append(Detection(val, yb))
         return detections
 
-    def unpack_target_attributes(self, target_object):
-        """
-        Convenience functionn
-        """
-        curr_state = self.exoskeleton.get_age()
-        cls = target_object.get_id()
-        x, y, z = target_object.get_origin().get_cartesian_coordinates()
-        z = z * 40
-        w, h = target_object.get_dims()
-        img_shape_x = self.get_max_x()
-        img_shape_y = self.get_max_y()
-
-        # x = x / img_shape_x
-        # y = y / img_shape_y
-        sensor_fov_width = self.get_fov_width()
-        sensor_fov_height = self.get_fov_height()
-        return (
-            curr_state,
-            cls,
-            x,
-            y,
-            w,
-            h,
-            img_shape_x,
-            img_shape_y,
-            sensor_fov_width,
-            sensor_fov_height,
-            z,
-        )
-
-    def create_pov_detection_set_from_targets(self, frame_id, target_detection_list):
-        """
-        Creates a detection when range is not present
-        """
-        detections = []
-
-        for a in target_detection_list:
-            (
-                curr_state,
-                cls,
-                x,
-                y,
-                w,
-                h,
-                img_shape_x,
-                img_shape_y,
-                sensor_fov_width,
-                sensor_fov_height,
-                z,
-            ) = self.unpack_target_attributes(a)
-            det = self.create_detections_without_range(
-                curr_state,
-                cls,
-                x,
-                y,
-                w,
-                h,
-                img_shape_x,
-                img_shape_y,
-                sensor_fov_width,
-                sensor_fov_height,
-                z,
-            )
-            detections.append(det)
-        return detections
 
     def load_detection_layer(self, detections):
         """
@@ -413,61 +348,71 @@ class SensingAgent:
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
-    def create_detections_without_range(
-        self,
-        time_of_detection,
-        detection_cls,
-        x,
-        y,
-        w,
-        h,
-        img_shape_x,
-        img_shape_y,
-        sensor_fov_width,
-        sensor_fov_height,
-        dist=DEFAULT_RANGE,
-    ):
+
+    def create_detection_layer_from_yoloboxes(self, yolobox_layer, SCALE_FLAG=False):
+        """
+        Create a detection layer from yoloboxes
+        """
+        curr_state = self.get_clock()
+        detection_layer = []
+        for i in range(len(yolobox_layer)):
+            yb = yolobox_layer[i]
+            detection_layer.append(self.create_detection(yb,30, SCALE_FLAG))
+        
+        return detection_layer
+
+    def create_detection(self, yb, distance=1, SCALE_FLAG=False):
+        """
+        Wrapper for create detection
+        """
+        det_cls = yb.class_id
+        x,y,w,h = yb.bbox
+        
+        if SCALE_FLAG:
+            x,w = x / self.get_max_x(), w / self.get_max_x()
+            y,h = y / self.get_max_y(), h / self.get_max_y()
+        
+        posn = self.create_position(det_cls, x,y,w,h, distance)
+        det = Detection(posn, yb)
+        return det
+
+    
+    def create_position(self, detection_cls, x, y, w, h, distance=0):
         """
         wrapper for Yolo style detections
-        """
+        
         # calculate vector 1, agent pov on horizontal plane
-        """
+        
                     (0,0)
                 +-------+-------+
                 |       |       |
                 |       |       |
                 |       |       |
-        (0,0)   |__ B<--A_______| (100,0)
+        (0,0)   |__ B<--A_______| (100,0) * theta
                 |   |  /|       |
                 |   v / |       |
                 |   C   |       |
                 +-------+-------+
-                    (0,100)
+                    (0,100) * phi
         Agent frame of reference
         image_shape: 1000
         sensor_fov_width: pi / 2
         rel_x = 25
         theTa = -np.pi / 4
         """
-        dist = dist
+        dist = distance
         # normalize x between 0 and 100
-        rel_x = (x * img_shape_x - (img_shape_x / 2)) / img_shape_x * 100 + 50
+        rel_x = (x * self.get_max_x() - (self.get_max_x() / 2)) / self.get_max_x() * 100 + 50
         # normalize theta in terms of agent pov
-        theta = (rel_x / 100) * sensor_fov_width - (sensor_fov_width / 2)
+        theta = (rel_x / 100) * self.get_fov_width() - (self.get_fov_width() / 2)
 
         # vertical component
-        rel_y = (y * img_shape_y - (img_shape_y / 2)) / img_shape_y * 100 + 50
-        phi = (rel_y / 100) * sensor_fov_height - (sensor_fov_height / 2)
-
-        # bbox normalized
-        bbox = [rel_x, rel_y, w, h]
-
+        rel_y = (y * self.get_max_y() - (self.get_max_y() / 2)) / self.get_max_y() * 100 + 50
+        phi = (rel_y / 100) * self.get_fov_height() - (self.get_fov_height() / 2)
+        
         posn = Position(dist, rel_x, rel_y, theta, phi)
-        yb = sann.register_annotation(
-            detection_cls, [rel_x, rel_y, w, h], time_of_detection
-        )
-        det = Detection(posn, yb)
-        return det
+        return posn
+
 
     def transform_to_local_frame_coord(self, target_point, sensor_idx=-1):
         """
@@ -594,6 +539,9 @@ class SensingAgent:
             return (partial_rotation, offset)
 
     def get_predictions(self, idx=-1):
+        """
+        Accessor for object tracker predictions
+        """
         pred = []
         if idx != -1:
             pred = self.obj_tracker.get_predictions(pred)
