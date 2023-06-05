@@ -28,7 +28,7 @@ import pygame
 import time
 
 
-class Environment:
+class SimulationEnvironment:
     """A class for simulating the environment in which the agents operate
     Attributes:
         Agent (Agent): legacy Agent attribute
@@ -116,20 +116,76 @@ class Environment:
         """
         self.targets.append(T)
 
-    def conv_grid_pt_to_flat_position(self, pt):
-        """
-        Convenience function for rendering a point
-        """
-        return Position(pt[0], pt[1], 0)
 
-    def convert_to_agent_coord(self, pt, agent_id=None):
-        pt = self.conv_grid_pt_to_flat_position(pt)
+    def get_agent(self,_id):
+        """
+        Accessor for an agent by id
+        """
+        return self.agents[_id]
+
+    def check_grid_visibility(self, agent_id, global_target_posn):
+        """
+        Hidden simulation visibility check 
+        """
+        GLOBAL_ORIGIN = Position(0,0,0)
+        new_posn = self.convert_to_agent_coordinates(agent_id, global_target_posn)
+        theta, radius = mfn.car2pol(GLOBAL_ORIGIN.get_cartesian_coordinates(), new_posn.get_cartesian_coordinates())
+        phi = 0
         
-        agent_coords = []
-        for k in self.agents:
-            sa = self.agents[k]
-            theta, radius = mfn.car2pol(sa.get_origin().get_cartesian_coordinates(), pt.get_cartesian_coordinates())
-            x1,y1,z1 = mfn.pol2car(GLOBAL_ORIGIN, radius, theta)
-            new_pt = Position(x1,y1,z1)
-            agent_coords.append(new_pt)
-        return agent_coords
+        sensing_agent = self.get_agent(agent_id)
+        
+        if sensing_agent.is_visible_fov(theta, phi, radius):
+            return True
+        return False
+
+    def create_agent_yolobox(self, agent_id, global_target_posn):
+        """
+        Hidden function for generating valid detections
+        """
+        DEFAULT_CLASS = 0
+        DEFAULT_WIDTH=1
+        DEFAULT_HEIGHT=1
+
+        agent_target_posn = self.convert_to_agent_coordinates(agent_id, global_target_posn)
+        sensor_target_posn = self.convert_to_sensor_frame_coordinates(agent_id, agent_target_posn)
+        
+        x,y,z = sensor_target_posn.get_cartesian_coordinates()
+        yb = sann.register_annotation(DEFAULT_CLASS,[y,z,DEFAULT_WIDTH,DEFAULT_HEIGHT],distance=x)
+        return yb
+
+    def generate_yolo_bbox(self):
+        """
+        Hidden function for populating yolobox data
+        """
+        DEFAULT_CLASS = 0
+        DEFAULT_WIDTH=1
+        DEFAULT_HEIGHT=1
+        pass
+
+    def convert_to_agent_coordinates(self, agent_id, target_posn):
+        """
+        Hidden simulation coordinate transformation
+        """
+        GLOBAL_ORIGIN = Position(0,0,0)
+        sensing_agent = self.get_agent(agent_id)
+        theta, radius = mfn.car2pol(sensing_agent.get_origin().get_cartesian_coordinates(), target_posn.get_cartesian_coordinates())
+        x1,y1,z1 = mfn.pol2car(GLOBAL_ORIGIN.get_cartesian_coordinates(), radius, theta)
+        new_posn = Position(x1,y1,z1)
+        return new_posn
+
+    def convert_to_sensor_frame_coordinates(self, agent_id, agent_target_posn):
+        """
+        Hidden function for converting to an agent's SENSOR frame of reference
+        """
+        GLOBAL_ORIGIN = Position(0,0,0)
+
+        sa = self.get_agent(agent_id)
+
+        theta, radius = mfn.car2pol(GLOBAL_ORIGIN.get_cartesian_coordinates(), agent_target_posn.get_cartesian_coordinates())
+        phi = 0
+
+        x = radius
+        y = theta / sa.get_fov_width() * sa.get_max_x() + sa.get_max_x() / 2
+        z = phi / sa.get_fov_height() * sa.get_max_y() + sa.get_max_y() / 2
+        new_posn = Position(x,y,z)
+        return new_posn

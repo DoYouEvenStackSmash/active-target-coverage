@@ -9,7 +9,7 @@ from Sensor import Sensor
 from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Target import Target
-from Environment import Environment
+from SimulationEnvironment import SimulationEnvironment
 from StreamingObjectTrackManager import ObjectTrackManager
 from Detection import *
 
@@ -108,12 +108,12 @@ def init_target(origin=Position(0, 0, 0), color=(255, 255, 255), _id=0, path=Non
     return target
 
 
-def init_environment(world_origin=Position(0, 0, 0), sensing_agents=None, targets=None):
+def init_sim_environment(world_origin=Position(0, 0, 0), sensing_agents=None, targets=None):
     """
     standard initializer for Environment
     returns an environment
     """
     sensing_agents = sensing_agents if sensing_agents != None else {}
     targets = targets if targets != None else {}
-    env = Environment(world_origin=world_origin, agents=sensing_agents, targets=targets)
-    return env
+    sim_env = SimulationEnvironment(world_origin=world_origin, agents=sensing_agents, targets=targets)
+    return sim_env

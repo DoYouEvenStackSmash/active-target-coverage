@@ -22,7 +22,7 @@ from RigidBody import RigidBody
 from SensingAgent import SensingAgent
 from Sensor import Sensor
 from Target import Target
-from Environment import Environment
+from SimulationEnvironment import SimulationEnvironment
 import sys
 import json
 import pygame
