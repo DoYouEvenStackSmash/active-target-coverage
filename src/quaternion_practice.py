@@ -1,59 +1,77 @@
 #!/usr/bin/python3
 import numpy as np
 class Quaternion:
-  def __init__ (self, a=0,b=0,c=0,d=0):
+  def __init__ (self,w=0,x=0,y=0,z=0):
     """
     Initializer for quaternion
     """
-    self.a = a
-    self.b = b
-    self.c = c
-    self.d = d
+    self.w = w
+    self.x = x
+    self.y = y
+    self.z = z
 
   def multiply(self, q):
     """
     Multiply quaternions
     """
-    a1,b1,c1,d1 = self.get_components()
-    a2,b2,c2,d2 = q.get_components()
+    w1,x1,y1,z1 = self.get_components()
+    w2,x2,y2,z2 = q.get_components()
     
-    a3 = a1*a2 - b1*b2 - c1*c2 - d1*d2 
-    b3 = a1*b2 + a2*b1 + c1*d2 - c2*d1
-    c3 = a1*c2 + a2*c1 + b2*d1 - b1*d2
-    d3 = a1*d2 + a2*d1 + b1*c2 - b2*c1
+    w3 =w1*w2 - x1*x2 - y1*y2 - z1*z2 
+    x3 =w1*x2 +w2*x1 + y1*z2 - y2*z1
+    y3 =w1*y2 +w2*y1 + x2*z1 - x1*z2
+    z3 =w1*z2 +w2*z1 + x1*y2 - x2*y1
     
-    return Quaternion(a3,b3,c3,d3)
+    return Quaternion(w3,x3,y3,z3)
   
   def get_components(self):
     """
     Get quaternion components
     """
-    return [self.a,self.b,self.c,self.d]
+    return [self.w,self.x,self.y,self.z]
   
   def get_angle_axis(self):
     """
-    Get angle axis representation of quaternion
+    Get anglewxis representation of quaternion
     """
-    a,b,c,d = self.get_components()
-    denom = np.sqrt(np.square(b) + np.square(c) + np.square(d))
-    b = b / denom
-    c = c / denom
-    d = d / denom
-    theta = 2 * np.arctan2(denom, a)
-    return b,c,d,theta
+    w,x,y,z = self.get_components()
+    denom = np.sqrt(np.square(x) + np.square(y) + np.square(z))
+    x = np.divide(x,denom)
+    y = np.divide(y,denom)
+    z = np.divide(z,denom)
+    theta = 2 * np.arctan2(denom,w)
+    return theta,x,y,z
+
+  def to_json(self):
+    w,x,y,z = self.get_components()
+
+    return {"w":w,"x":x,"y":y,"z":z}
 
 def q_test():
-  q1 = Quaternion(1,0,0,0.7)
-  q2 = Quaternion(1,0,0,0.7)
-  q3 = q2.multiply(q1)
-  q4 = Quaternion(1,0,0,-4.7)
-  q3 = q3.multiply(q4)
+  q0 = Quaternion(0,0,0,1)
+  print(f"0: {q0.get_angle_axis()}")
+  # q2 = Quaternion(np.pi/2,1,1,0)
+  q1 = q0.multiply(q0)
+  print(f"1: {q1.get_angle_axis()}")
+  q2 = q1.multiply(q0)
+  print(f"2: {q2.get_angle_axis()}")
+  q3 = q2.multiply(q0)
+  print(f"3: {q3.get_angle_axis()}")
+  q4 = q3.multiply(q0)
+  print(f"4: {q4.get_angle_axis()}")
+  print("\nrotating again")
+  q5 = q4.multiply(q0)
+  print(f"5: {q5.get_angle_axis()}")
+  q6 = q5.multiply(q0)
+  print(f"6: {q6.get_angle_axis()}")
+  q7 = q6.multiply(q0)
+  print(f"7: {q7.get_angle_axis()}")
+  q8 = q7.multiply(q0)
+  print(f"8: {q8.get_angle_axis()}")
+  print(f"0: {q0.get_angle_axis()}")
 
-  b,c,d,theta = q3.get_angle_axis()
-  print(b)
-  print(c)
-  print(d)
-  print(theta)
+def main():
+  q_test()
 
-
-  
+if __name__ == '__main__':
+  main()

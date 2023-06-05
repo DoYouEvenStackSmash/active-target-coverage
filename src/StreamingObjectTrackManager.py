@@ -41,9 +41,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 8,
+        "track_lifespan": 15,
         "default_avg_dist": 10,
-        "radial_exclusion": 30,
+        "radial_exclusion": 10,
     }
     display_constants = {"trail_len": 6}
 

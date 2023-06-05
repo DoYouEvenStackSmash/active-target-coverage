@@ -23,7 +23,7 @@ class YoloBox:
         img_filename,
         center_xy=None,
         confidence=None,
-        distance=None,
+        distance=1,
     ):
         self.class_id = class_id
         self.bbox = bbox
@@ -91,4 +91,5 @@ class YoloBox:
             "displaced": self.displaced,
             "error": error,
             "state_id": sid,
+            "distance": self.distance,
         }

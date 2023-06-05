@@ -8,7 +8,7 @@ table Category {
 
 table Track {
   track_id:int;
-  category_id:int;
+  category_id:float;
   track_len:int;
   steps:[int];
 }
@@ -32,9 +32,9 @@ table Annotation {
   id:int; 
   
   // image in which the detection was present
-  image_id:int;
+  image_id:float;
   // category of the detection
-  category_id:int;
+  category_id:float;
   // bounding box of the detection
   bbox:Bbox;
   // area of the bounding box

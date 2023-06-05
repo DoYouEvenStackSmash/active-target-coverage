@@ -91,6 +91,82 @@ class SensingAgent:
 
         return self.exoskeleton.time_stamp
 
+    def heartbeat(self):
+        """
+        Exoskeleton heartbeat
+        Does not return
+        """
+        self.exoskeleton.heartbeat()
+
+    def get_origin(self):
+        """
+        Accessor for the origin of the sensing agent in rigid body
+        returns a Position()
+        """
+        origin = self.exoskeleton.get_center()
+        return origin
+
+    def get_components(self):
+        """
+        Returns the attributes of an agent
+        """
+        return (self.exoskeleton, self.centered_sensor)
+
+    def estimate_pose_update(self, priorities=0):
+        """
+        Uses past information to predict the next rotation if it exists
+        Returns () or the tuple containing the partial rotation
+        """
+
+        rel_det = self.estimate_rel_next_detection()
+
+        if not len(rel_det):
+            print("empty")
+            return (None, None)
+
+        curr_det, pred_det = rel_det[0]
+        if pred_det == None:
+            return (None, None)
+        pred_pt = pred_det.get_attr_coord()
+        curr_pt = curr_det.get_attr_coord()
+        print(pred_pt)
+        # if no estimate available
+        if not len(pred_pt):
+            return (None, None)
+
+        # if first element in track, therefore duplicate
+        # if curr_pt == pred_pt:
+        #     return (None, None)
+
+        status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
+
+        # if predicted point is detectable from pov of SensingAgent
+        if status:
+            return (None, None)
+
+        # if predicted point is out of coverage by range
+        if flag == Sensor.RANGE:
+            pred_pt = pred_det.get_attr_coord()
+            print(f"pred_pt {pred_pt}")
+            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
+            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
+                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+            return (None, offset)
+
+        # if predicted point is out of coverage by angle
+        if flag == Sensor.ANGULAR:
+            pred_pt = pred_det.get_attr_coord()
+            partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
+            return (partial_rotation, None)
+
+        # if predicted point is out of coverage by both angle and range
+        if flag == Sensor.BOTH:
+            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
+            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
+                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+            partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
+            return (partial_rotation, offset)
+    
     def tracker_query(self):
         """
         Wrapper function for querying the tracker
@@ -98,27 +174,6 @@ class SensingAgent:
         """
         est_rotation, est_translation = self.estimate_pose_update()
         return (est_rotation, est_translation)
-
-    def reposition(self, est_rotation=None, est_translation=None):
-        """
-        Wrapper function to trigger a pose update for target coverage
-        Returns a tuple of the expected rotation and translation
-        """
-        rotation, translation = 0, 0
-
-        # perform rotation
-        if est_rotation != None:
-            rotation = self.apply_rotation_to_agent(est_rotation)
-
-        # perform translation
-        if est_translation != None:
-            print(f"est_translation:{est_translation}")
-            translation = self.apply_translation_to_agent(est_translation)
-
-        # update tracker
-        self.tracker_update(rotation, translation)
-
-        return (rotation, translation)
 
     def tracker_update(self, body_rotation=0, body_translation=0):
         """
@@ -132,20 +187,68 @@ class SensingAgent:
         if body_translation != 0:
             self.obj_tracker.add_linear_displacement(-body_translation, -body_rotation)
 
-    def heartbeat(self):
+    # sensor functions
+    def get_sensor(self, sensor_idx=-1):
         """
-        Exoskeleton heartbeat
-        Does not return
+        Accessor for the agent's sensor
         """
-        self.exoskeleton.heartbeat()
+        if sensor_idx != -1:
+            return self.sensors[sensor_idx]
+        else:
+            return self.centered_sensor
+    
+    def is_visible(self, target_posn):
+        """
+        Determines whether a target point is in the Sensor's sensor fov
+        Returns true/false
+        """
+        rotation = self.exoskeleton.get_relative_rotation(target_posn)
+        print(rotation)
+        theta, r = mfn.car2pol(
+            self.exoskeleton.get_center().get_cartesian_coordinates(),
+            target_posn.get_cartesian_coordinates(),
+        )
+        if abs(rotation) > self.get_fov_width() / 2:
+            return False
+        if r > self.get_fov_radius():
+            return False
+        return True
 
-    def get_origin(self):
+    def is_visible_fov(self, theta, phi, dist):
         """
-        Accessor for the origin of the sensing agent in rigid body
-        returns an (x,y) point
+        Determines whether target angle and range will be in sensor fov
         """
-        origin = self.exoskeleton.get_center()
-        return origin
+        if abs(theta) > self.get_fov_width() / 2:
+            return False
+        if abs(phi) > self.get_fov_height() / 2:
+            return False
+        if dist > self.get_fov_radius():
+            return False
+        return True
+
+
+    def is_detectable(self, target_pt, sensor_id=-1):
+        """
+        Indicates whether a target point is detectable (within tolerance)
+        Returns a boolean indicator and a type identifier
+        """
+        # boundary conditions
+        if sensor_id == -1:
+            return self.centered_sensor.is_rel_detectable(target_pt)
+        else:
+            return self.sensors[sensor_id].is_rel_detectable(target_pt)
+
+    def is_detectable_fov(self, target_posn, sensor_id=-1):
+        """
+        Indicates whether a target point is detectable (within tolerance)
+        Returns a boolean indicator and a type identifier
+        """
+        # boundary conditions
+        if sensor_id == -1:
+            return self.centered_sensor.is_rel_detectable_fov(target_posn)
+        else:
+            return self.sensors[sensor_id].is_rel_detectable_fov(target_posn)
+
 
     def get_max_x(self):
         """
@@ -203,11 +306,7 @@ class SensingAgent:
             fov_radius = self.centered_sensor.get_fov_radius()
         return fov_radius
 
-    def get_components(self):
-        """
-        Returns the attributes of an agent
-        """
-        return (self.exoskeleton, self.centered_sensor)
+    # exoskeleton functions 
 
     def get_center(self):
         """
@@ -215,20 +314,26 @@ class SensingAgent:
         """
         return self.exoskeleton.get_center()
 
-    def get_sensor(self, sensor_idx=-1):
+    def reposition(self, est_rotation=None, est_translation=None):
         """
-        Accessor for the agent's sensor
+        Wrapper function to trigger a pose update for target coverage
+        Returns a tuple of the expected rotation and translation
         """
-        if sensor_idx != -1:
-            return self.sensors[sensor_idx]
-        else:
-            return self.centered_sensor
+        rotation, translation = 0, 0
 
-    def get_object_tracker(self):
-        """
-        Accessor for the agent's object tracker
-        """
-        return self.obj_tracker
+        # perform rotation
+        if est_rotation != None:
+            rotation = self.apply_rotation_to_agent(est_rotation)
+
+        # perform translation
+        if est_translation != None:
+            print(f"est_translation:{est_translation}")
+            translation = self.apply_translation_to_agent(est_translation)
+
+        # update tracker
+        self.tracker_update(rotation, translation)
+
+        return (rotation, translation)
 
     def translate_agent(self, target_pt):
         """
@@ -275,49 +380,50 @@ class SensingAgent:
         translation_dist = self.exoskeleton.apply_translation_to_body(translation_dist)
         return translation_dist
 
-    def is_visible(self, target_pt):
-        """
-        Determines whether a target point is in the Sensor's sensor fov
-        Returns true/false
-        """
-        rotation = self.exoskeleton.get_relative_rotation(target_pt)
-        theta, r = mfn.car2pol(
-            self.exoskeleton.get_center().get_cartesian_coordinates(),
-            target_pt.get_cartesian_coordinates(),
-        )
-        if abs(rotation) > self.get_fov_width() / 2:
-            return False
-        if r > self.get_fov_radius():
-            return False
-        return True
+    # Tracker functions
 
-    def is_detectable(self, target_pt, sensor_id=-1):
+    def get_object_tracker(self):
         """
-        Indicates whether a target point is detectable (within tolerance)
-        Returns a boolean indicator and a type identifier
+        Accessor for the agent's object tracker
         """
-        # boundary conditions
-        if sensor_id == -1:
-            return self.centered_sensor.is_rel_detectable(target_pt)
+        return self.obj_tracker
+    
+    
+    def get_predictions(self, idx=-1):
+        """
+        Accessor for object tracker predictions
+        """
+        pred = []
+        if idx != -1:
+            pred = self.obj_tracker.get_predictions(pred)
         else:
-            return self.sensors[sensor_id].is_rel_detectable(target_pt)
+            pred = self.obj_tracker.get_predictions(pred)
+        return pred
 
-    def export_tracks(self):
+    def estimate_rel_next_detection(self, idx=0):
         """
-        Exports the recorded tracks from the agent's object tracker
-        returns a LOCO formatted json object
+        Estimates next detection in local coordinate system
+        returns a pair of Positions
         """
-        self.obj_tracker.close_all_tracks()
-        self.obj_tracker.link_all_tracks()
-        e = self.obj_tracker.export_loco_fmt()
-        print(f"exporting states of {self}")
-        e["states"] = [s.to_json() for s in self.exoskeleton.states]
-        e["sensor_params"] = {
-            "fov_radius": self.get_fov_radius(),
-            "fov_width": self.get_fov_width(),
-        }
-        return e
+        pred = self.get_predictions()
 
+        return pred
+
+    def estimate_next_detection(self, idx=0):
+        """
+        Estimates next detection in external coordinate system
+        returns a pair of points
+        """
+
+        rel_det = self.estimate_rel_next_detection(idx)
+        abs_det = []
+        for det in rel_det:
+            curr = self.transform_to_global_coord(det[0])
+            pred = self.transform_to_global_coord(det[1])
+            abs_det.append((curr, pred))
+        return abs_det
+
+    # legacy ingest for detections
     def new_detection_set(self, frame_id, detection_list):
         """
         Ingest for a new layer of detections from the outside world.
@@ -340,44 +446,50 @@ class SensingAgent:
             detections.append(Detection(val, yb))
         return detections
 
-
-    def load_detection_layer(self, detections):
+    # ingest
+    def ingest_new_yolobox_layer(self, yolobox_layer = None, SCALE_FLAG=False):
         """
         wrapper for processing a new layer of detections
         """
+        yolobox_layer = yolobox_layer if yolobox_layer != None else []
+
+        detections = self.create_detection_layer_from_yoloboxes(yolobox_layer, SCALE_FLAG)
+
+        self.heartbeat()
+
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
-
-    def create_detection_layer_from_yoloboxes(self, yolobox_layer, SCALE_FLAG=False):
+    def create_detection_layer_from_yoloboxes(self, yolobox_layer = None, SCALE_FLAG=False):
         """
         Create a detection layer from yoloboxes
         """
+        yolobox_layer = yolobox_layer if yolobox_layer != None else []
+
         curr_state = self.get_clock()
         detection_layer = []
         for i in range(len(yolobox_layer)):
             yb = yolobox_layer[i]
-            detection_layer.append(self.create_detection(yb,30, SCALE_FLAG))
+            detection_layer.append(self.create_detection(yb, SCALE_FLAG))
         
         return detection_layer
 
-    def create_detection(self, yb, distance=1, SCALE_FLAG=False):
+    def create_detection(self, yb, SCALE_FLAG=False):
         """
         Wrapper for create detection
         """
-        det_cls = yb.class_id
         x,y,w,h = yb.bbox
-        
+        distance = yb.distance
+
         if SCALE_FLAG:
             x,w = x / self.get_max_x(), w / self.get_max_x()
             y,h = y / self.get_max_y(), h / self.get_max_y()
         
-        posn = self.create_position(det_cls, x,y,w,h, distance)
+        posn = self.create_position(x,y,w,h, distance)
         det = Detection(posn, yb)
         return det
-
-    
-    def create_position(self, detection_cls, x, y, w, h, distance=0):
+  
+    def create_position(self, x, y, w, h, distance=0):
         """
         wrapper for Yolo style detections
         
@@ -413,7 +525,7 @@ class SensingAgent:
         posn = Position(dist, rel_x, rel_y, theta, phi)
         return posn
 
-
+    # legacy coordinate transform
     def transform_to_local_frame_coord(self, target_point, sensor_idx=-1):
         """
         Transforms a point to local sensor curved coordinate frame
@@ -434,7 +546,8 @@ class SensingAgent:
         posn = Position(dist, rel_x, rel_y, theta, phi)
         # print(f"frame_coords {posn.get_cartesian_coordinates()}")
         return posn
-
+    
+    # legacy detection transform
     def transform_to_local_detection_coord(self, target_pt):
         """
         transforms a target point to local rectangular coordinates
@@ -450,6 +563,7 @@ class SensingAgent:
         x, y, z = local_pt
         return Position(x, y, z)
 
+    # legacy bbox transform back to global coordinate
     def transform_from_local_coord(self, x, y, w=1, h=1):
         """
         Transforms a bbox from sensor local coords to world coords
@@ -475,7 +589,6 @@ class SensingAgent:
         Transforms a position from agent local coords to world coords
         returns a point
         """
-
         x, y, z = target_pt.get_cartesian_coordinates()
         theta, phi = target_pt.get_angles()
         y = self.map_detection_back(theta, self.get_fov_width(), self.get_max_x())
@@ -483,91 +596,19 @@ class SensingAgent:
 
         return [x, y, z]
 
-    def estimate_pose_update(self, priorities=0):
+
+    def export_tracks(self):
         """
-        Uses past information to predict the next rotation if it exists
-        Returns () or the tuple containing the partial rotation
+        Exports the recorded tracks from the agent's object tracker
+        returns a LOCO formatted json object
         """
-
-        rel_det = self.estimate_rel_next_detection()
-
-        if not len(rel_det):
-            print("empty")
-            return (None, None)
-
-        curr_det, pred_det = rel_det[0]
-        if pred_det == None:
-            return (None, None)
-        pred_pt = pred_det.get_attr_coord()
-        curr_pt = curr_det.get_attr_coord()
-        print(pred_pt)
-        # if no estimate available
-        if not len(pred_pt):
-            return (None, None)
-
-        # if first element in track, therefore duplicate
-        # if curr_pt == pred_pt:
-        #     return (None, None)
-
-        status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
-
-        # if predicted point is detectable from pov of SensingAgent
-        if status:
-            return (None, None)
-
-        # if predicted point is out of coverage by range
-        if flag == Sensor.RANGE:
-            pred_pt = pred_det.get_attr_coord()
-            print(f"pred_pt {pred_pt}")
-            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
-            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
-                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
-            return (None, offset)
-
-        # if predicted point is out of coverage by angle
-        if flag == Sensor.ANGULAR:
-            pred_pt = pred_det.get_attr_coord()
-            partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
-            return (partial_rotation, None)
-
-        # if predicted point is out of coverage by both angle and range
-        if flag == Sensor.BOTH:
-            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
-            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
-                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
-            partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
-            return (partial_rotation, offset)
-
-    def get_predictions(self, idx=-1):
-        """
-        Accessor for object tracker predictions
-        """
-        pred = []
-        if idx != -1:
-            pred = self.obj_tracker.get_predictions(pred)
-        else:
-            pred = self.obj_tracker.get_predictions(pred)
-        return pred
-
-    def estimate_rel_next_detection(self, idx=0):
-        """
-        Estimates next detection in local coordinate system
-        returns a pair of Positions
-        """
-        pred = self.get_predictions()
-
-        return pred
-
-    def estimate_next_detection(self, idx=0):
-        """
-        Estimates next detection in external coordinate system
-        returns a pair of points
-        """
-
-        rel_det = self.estimate_rel_next_detection(idx)
-        abs_det = []
-        for det in rel_det:
-            curr = self.transform_to_global_coord(det[0])
-            pred = self.transform_to_global_coord(det[1])
-            abs_det.append((curr, pred))
-        return abs_det
+        self.obj_tracker.close_all_tracks()
+        self.obj_tracker.link_all_tracks()
+        e = self.obj_tracker.export_loco_fmt()
+        print(f"exporting states of {self}")
+        e["states"] = [s.to_json() for s in self.exoskeleton.states]
+        e["sensor_params"] = {
+            "fov_radius": self.get_fov_radius(),
+            "fov_width": self.get_fov_width(),
+        }
+        return e

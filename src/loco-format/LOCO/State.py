@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class State(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsState(cls, buf, offset):
@@ -28,7 +26,6 @@ class State(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from LOCO.Position import Position
-
             obj = Position()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -38,9 +35,7 @@ class State(object):
     def Orientation(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # State
@@ -50,38 +45,20 @@ class State(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-
-def StateStart(builder):
-    builder.StartObject(3)
-
-
-def StateAddPosition(builder, position):
-    builder.PrependUOffsetTRelativeSlot(
-        0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0
-    )
-
-
-def StateAddOrientation(builder, orientation):
-    builder.PrependFloat32Slot(1, orientation, 0.0)
-
-
-def StateAddTimeStamp(builder, timeStamp):
-    builder.PrependInt32Slot(2, timeStamp, 0)
-
-
-def StateEnd(builder):
-    return builder.EndObject()
-
+def StateStart(builder): builder.StartObject(3)
+def StateAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def StateAddOrientation(builder, orientation): builder.PrependFloat32Slot(1, orientation, 0.0)
+def StateAddTimeStamp(builder, timeStamp): builder.PrependInt32Slot(2, timeStamp, 0)
+def StateEnd(builder): return builder.EndObject()
 
 import LOCO.Position
-
 try:
     from typing import Optional
 except:
     pass
 
-
 class StateT(object):
+
     # StateT
     def __init__(self):
         self.position = None  # type: Optional[LOCO.Position.PositionT]

@@ -16,6 +16,7 @@ from ObjectTrack import ObjectTrack
 from AnnotationLoader import AnnotationLoader as al
 from StreamingAnnotations import StreamingAnnotations as sann
 
+from Detection import *
 import json
 
 import sys
@@ -39,7 +40,7 @@ class Environment:
 
     def __init__(
         self,
-        world_origin=(0, 0, 0),
+        world_origin=Position(0, 0, 0),
         agent=None,  # single agent for backwards compatibility
         agents=None,  # dictionary of agents, accessible by their unique identifiers
         targets=None,  # list of targets in the world
@@ -114,3 +115,21 @@ class Environment:
         Add a target to the world
         """
         self.targets.append(T)
+
+    def conv_grid_pt_to_flat_position(self, pt):
+        """
+        Convenience function for rendering a point
+        """
+        return Position(pt[0], pt[1], 0)
+
+    def convert_to_agent_coord(self, pt, agent_id=None):
+        pt = self.conv_grid_pt_to_flat_position(pt)
+        
+        agent_coords = []
+        for k in self.agents:
+            sa = self.agents[k]
+            theta, radius = mfn.car2pol(sa.get_origin().get_cartesian_coordinates(), pt.get_cartesian_coordinates())
+            x1,y1,z1 = mfn.pol2car(GLOBAL_ORIGIN, radius, theta)
+            new_pt = Position(x1,y1,z1)
+            agent_coords.append(new_pt)
+        return agent_coords

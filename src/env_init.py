@@ -63,12 +63,12 @@ def init_agent_exoskeleton(origin=Position(0, 0, 0), sensing_agent=None):
     return rb
 
 
-def init_sensor(width=np.pi / 2, radius=200, sensing_agent=None):
+def init_sensor(width=np.pi / 2, height=np.pi/2, radius=200, max_x=100 , max_y=100, sensing_agent=None):
     """
     Initializes a sensor for a sensing agent
     returns a sensor
     """
-    sensor = Sensor(sensor_width=width, sensor_radius=radius)
+    sensor = Sensor(sensor_width=width, sensor_height=height, sensor_radius=radius,max_x=max_x,max_y=max_y)
     if sensing_agent != None:
         sensing_agent.centered_sensor = sensor
         sensor.parent_agent = sensing_agent
@@ -87,14 +87,14 @@ def init_object_tracker(sensing_agent=None):
     return obj_tracker
 
 
-def init_sensing_agent(_id=0, origin=Position(0, 0, 0), width=np.pi / 2, radius=200):
+def init_sensing_agent(_id=0, origin=Position(0, 0, 0), width=np.pi / 2, height=np.pi/2,max_x=100,max_y=100, radius=200):
     """
     Standard initializer for sensing agent
     returns a sensing agent
     """
     sensing_agent = SensingAgent()
     exoskeleton = init_agent_exoskeleton(origin, sensing_agent)
-    sensor = init_sensor(width, radius, sensing_agent)
+    sensor = init_sensor(width, height, radius, max_x,max_y,sensing_agent)
     obj_tracker = init_object_tracker(sensing_agent)
     return sensing_agent
 

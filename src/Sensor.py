@@ -36,8 +36,8 @@ class Sensor:
         self,
         parent_agent=None,
         sensor_radius=300,
-        sensor_width=np.pi,
-        sensor_height=np.pi,
+        sensor_width=np.pi/2,
+        sensor_height=np.pi/2,
         _id=None,
         max_x = 1920,
         max_y = 1080
@@ -197,3 +197,36 @@ class Sensor:
             return False, flags
 
         return True, Sensor.VALID
+
+    def is_rel_detectable_fov(self, target_posn):
+        """
+        Indicates whether target with characteristics theta, phi, dist is detectable
+        """
+        adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
+        adj_rad_bnd = self.get_fov_radius()
+        # print(adj_win_bnd)
+        dist, target_horiz, target_vert = target_posn.get_cartesian_coordinates()
+        print(target_horiz)
+        
+        flags = 0
+
+        angle_flag = False
+
+        # if range out of bounds
+        if (
+            dist > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE
+            or dist < 0 + adj_rad_bnd * Sensor.TOLERANCE
+        ):
+            flags += Sensor.RANGE
+
+        # if angle out of bounds
+        # print(target_x)
+        if target_horiz < 0 + adj_win_bnd or target_horiz > Sensor.WINDOW_WIDTH - adj_win_bnd:
+            flags += Sensor.ANGULAR
+        print(flags)
+        if flags > 0:
+            return False, flags
+
+        return True, Sensor.VALID
+
+

@@ -23,7 +23,7 @@ import sys
 import os
 import json
 
-CUTOFF = 1
+CUTOFF =2
 # loader
 LOAD_CUTOFF = 1
 
@@ -84,13 +84,17 @@ def load_layers(files, sensing_agent):
   counter = sensing_agent.get_clock()
   detection_layer_list = []
   for i, layer in enumerate(yolo_layer_list):
-    if not i % 4:
-      sensing_agent.heartbeat()
-      det_layer = sensing_agent.create_detection_layer_from_yoloboxes(layer, True)
-      sensing_agent.load_detection_layer(det_layer)
-      sensing_agent.obj_tracker.process_layer(-1)
-    else:
-      sensing_agent.heartbeat()
+    yblayer = []
+    for j, yb in enumerate(layer):
+      if i * j % 2:
+        yblayer.append(yb)
+
+    sensing_agent.heartbeat()
+    det_layer = sensing_agent.ingest_new_yolobox_layer(yblayer, True)
+    # sensing_agent.load_detection_layer(det_layer)
+    # sensing_agent.obj_tracker.process_layer(-1)
+    # else:
+    #   sensing_agent.heartbeat()
     
     
   # return detection_layer_list

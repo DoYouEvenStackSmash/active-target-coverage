@@ -74,8 +74,6 @@ def draw_coordinate_frame(screen, sensor, levels=5):
         for c in range(levels):
             for i in range(len(coord_frame[c])):
                 coord_frame[c][i] = gfn.reduce_dimension(coord_frame[c][i])
-            print(coord_frame)
-            print("\n")
             for i in range(1, len(coord_frame[c])):
                 pafn.frame_draw_line(
                     screen,
@@ -89,7 +87,6 @@ def draw_coordinate_frame(screen, sensor, levels=5):
 
     # draw threshold regions
     for endpoint in detect_frame[-1][:2]:
-        print(endpoint)
         pafn.frame_draw_line(
             screen,
             (sensor_origin, gfn.reduce_dimension(endpoint)),

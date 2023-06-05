@@ -1,0 +1,3270 @@
+{
+  "constants": {
+    "avg_tolerance": 10,
+    "track_lifespan": 15,
+    "default_avg_dist": 10,
+    "radial_exclusion": 10
+  },
+  "categories": [
+    {
+      "id": 0,
+      "name": "fish",
+      "supercategory": "None"
+    },
+    {
+      "id": 1,
+      "name": "atlantic spadefish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 2,
+      "name": "queen triggerfish",
+      "supercategory": "fish"
+    },
+    {
+      "id": 3,
+      "name": "undocumented",
+      "supercategory": "fish"
+    }
+  ],
+  "trackmap": [
+    0,
+    2,
+    3,
+    5,
+    6,
+    8,
+    9,
+    11,
+    14,
+    16,
+    17
+  ],
+  "linked_tracks": [
+    {
+      "track_id": 0,
+      "category_id": 0.0,
+      "track_len": 3,
+      "steps": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "track_id": 2,
+      "category_id": 0.0,
+      "track_len": 8,
+      "steps": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "track_id": 3,
+      "category_id": 0.0,
+      "track_len": 4,
+      "steps": [
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "track_id": 5,
+      "category_id": 0.0,
+      "track_len": 13,
+      "steps": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "track_id": 6,
+      "category_id": 0.0,
+      "track_len": 24,
+      "steps": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ]
+    },
+    {
+      "track_id": 8,
+      "category_id": 0.0,
+      "track_len": 11,
+      "steps": [
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+      ]
+    },
+    {
+      "track_id": 9,
+      "category_id": 0.0,
+      "track_len": 6,
+      "steps": [
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "track_id": 11,
+      "category_id": 0.0,
+      "track_len": 6,
+      "steps": [
+        69,
+        70,
+        71,
+        72,
+        73,
+        74
+      ]
+    },
+    {
+      "track_id": 14,
+      "category_id": 0.0,
+      "track_len": 5,
+      "steps": [
+        75,
+        76,
+        77,
+        78,
+        79
+      ]
+    },
+    {
+      "track_id": 16,
+      "category_id": 0.0,
+      "track_len": 8,
+      "steps": [
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87
+      ]
+    },
+    {
+      "track_id": 17,
+      "category_id": 0.0,
+      "track_len": 4,
+      "steps": [
+        88,
+        89,
+        90,
+        91
+      ]
+    }
+  ],
+  "images": [
+    {
+      "id": 0,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000166.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 1,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000167.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 2,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000168.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 3,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000169.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 4,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000170.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 5,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000171.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 6,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000172.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 7,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000173.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 8,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000174.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 9,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000175.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 10,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000176.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 11,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000177.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 12,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000178.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 13,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000179.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 14,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000180.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 15,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000181.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 16,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000182.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 17,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000183.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 18,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000184.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 19,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000185.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 20,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000186.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 21,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000187.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 22,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000188.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 23,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000189.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 24,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000190.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 25,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000191.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 26,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000192.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 27,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000193.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 28,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000194.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 29,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000195.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 30,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000196.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 31,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000197.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 32,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000198.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 33,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000199.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 34,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000200.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 35,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000201.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 36,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000202.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 37,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000203.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 38,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000204.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 39,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000205.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 40,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000206.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 41,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000207.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 42,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000208.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 43,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000209.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 44,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000210.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 45,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000211.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 46,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000212.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 47,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000213.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 48,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000214.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 49,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 50,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000216.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 51,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000217.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 52,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000218.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 53,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 54,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000220.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 55,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 56,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000222.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 57,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 58,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000224.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 59,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 60,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000226.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 61,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000227.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 62,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000228.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 63,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 64,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000230.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 65,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 66,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000232.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 67,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000233.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 68,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000234.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 69,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000235.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 70,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000236.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 71,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000237.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 72,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000238.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 73,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000239.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 74,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000240.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 75,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000241.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 76,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000242.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 77,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000243.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 78,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000244.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 79,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000245.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 80,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000246.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 81,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000247.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 82,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000248.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 83,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000249.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 84,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000250.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 85,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000251.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 86,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000252.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 87,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000253.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 88,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000254.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 89,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000255.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 90,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000256.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 91,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000257.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 92,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000258.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 93,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000259.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 94,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000260.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 95,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000261.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 96,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000262.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 97,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000263.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 98,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000264.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 99,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000265.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 100,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000266.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 101,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000267.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 102,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000268.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 103,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000269.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 104,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000270.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 105,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000271.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 106,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000272.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 107,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000273.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 108,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000274.png",
+      "height": 1080,
+      "width": 1920
+    },
+    {
+      "id": 109,
+      "file_name": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000275.png",
+      "height": 1080,
+      "width": 1920
+    }
+  ],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000167.txt",
+      "category_id": 0.0,
+      "bbox": [
+        999.7151999999999,
+        706.0294799999999,
+        233.41056,
+        112.25952
+      ],
+      "area": 26202.5574285312,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000167.txt",
+      "distance": 1
+    },
+    {
+      "id": 1,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000171.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1003.1808,
+        694.7748,
+        234.86016,
+        109.32948
+      ],
+      "area": 25677.1391655168,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.057616499493073,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000171.txt",
+      "distance": 1
+    },
+    {
+      "id": 2,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000183.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1061.66976,
+        737.10972,
+        1620.56064,
+        599.7801599999999
+      ],
+      "area": 971980.1199489022,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 0,
+      "trackmap_index": 0,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 5.299695903113519,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000183.txt",
+      "distance": 1
+    },
+    {
+      "id": 3,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000169.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1698.81408,
+        372.41964,
+        152.26944,
+        53.57988
+      ],
+      "area": 8158.578322867201,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000169.txt",
+      "distance": 1
+    },
+    {
+      "id": 4,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000171.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1690.35456,
+        367.18488,
+        152.26944,
+        53.57016
+      ],
+      "area": 8157.0982639104,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.6550285871624323,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000171.txt",
+      "distance": 1
+    },
+    {
+      "id": 5,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000173.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1681.8950399999999,
+        361.95012,
+        152.26944,
+        53.57988
+      ],
+      "area": 8158.578322867201,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.317342649818358,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000173.txt",
+      "distance": 1
+    },
+    {
+      "id": 6,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000175.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1673.43552,
+        356.70996,
+        152.26944,
+        53.57988
+      ],
+      "area": 8158.578322867201,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3063753446053816,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000175.txt",
+      "distance": 1
+    },
+    {
+      "id": 7,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000185.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1630.1644800000001,
+        340.05528,
+        147.07008,
+        41.49036
+      ],
+      "area": 6101.9905644288,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.3183691074585493,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000185.txt",
+      "distance": 1
+    },
+    {
+      "id": 8,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000187.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1613.3241600000001,
+        343.52964000000003,
+        161.7504,
+        49.940279999999994
+      ],
+      "area": 8077.860266111999,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.7492383001417492,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000187.txt",
+      "distance": 1
+    },
+    {
+      "id": 9,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000189.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1607.5948799999999,
+        341.55972,
+        148.01088000000001,
+        44.28
+      ],
+      "area": 6553.921766400001,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.117179278337055,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000189.txt",
+      "distance": 1
+    },
+    {
+      "id": 10,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000201.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1534.17984,
+        352.22472,
+        152.72064,
+        70.00992000000001
+      ],
+      "area": 10691.959788748802,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 2,
+      "trackmap_index": 1,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 4.727906319233626,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000201.txt",
+      "distance": 1
+    },
+    {
+      "id": 11,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000173.txt",
+      "category_id": 0.0,
+      "bbox": [
+        426.97536,
+        613.2952799999999,
+        571.88928,
+        237.17015999999998
+      ],
+      "area": 135635.07203988478,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 3,
+      "trackmap_index": 2,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000173.txt",
+      "distance": 1
+    },
+    {
+      "id": 12,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000175.txt",
+      "category_id": 0.0,
+      "bbox": [
+        464.10432,
+        598.73472,
+        561.9897599999999,
+        234.52955999999998
+      ],
+      "area": 131803.21113730557,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 3,
+      "trackmap_index": 2,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.3573768642285367,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000175.txt",
+      "distance": 1
+    },
+    {
+      "id": 13,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000179.txt",
+      "category_id": 0.0,
+      "bbox": [
+        532.46016,
+        572.02524,
+        561.79968,
+        225.52992
+      ],
+      "area": 126702.6368864256,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 3,
+      "trackmap_index": 2,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 3.2095864113095742,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000179.txt",
+      "distance": 1
+    },
+    {
+      "id": 14,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000181.txt",
+      "category_id": 0.0,
+      "bbox": [
+        571.40544,
+        559.1646000000001,
+        571.4304,
+        221.40972
+      ],
+      "area": 126520.24486348798,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 3,
+      "trackmap_index": 2,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.7010707296055075,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000181.txt",
+      "distance": 1
+    },
+    {
+      "id": 15,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000191.txt",
+      "category_id": 0.0,
+      "bbox": [
+        792.4492799999999,
+        512.77536,
+        436.74048,
+        197.72964
+      ],
+      "area": 86356.53788382719,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000191.txt",
+      "distance": 1
+    },
+    {
+      "id": 16,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000197.txt",
+      "category_id": 0.0,
+      "bbox": [
+        839.24544,
+        503.11044,
+        546.28992,
+        201.88008000000002
+      ],
+      "area": 110285.05275279362,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.5963969842841967,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000197.txt",
+      "distance": 1
+    },
+    {
+      "id": 17,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000199.txt",
+      "category_id": 0.0,
+      "bbox": [
+        869.83488,
+        489.66984,
+        562.45056,
+        229.42008
+      ],
+      "area": 129037.4524712448,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.102494930314684,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000199.txt",
+      "distance": 1
+    },
+    {
+      "id": 18,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000211.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1061.37408,
+        470.64995999999996,
+        559.7702400000001,
+        203.35968
+      ],
+      "area": 113834.69687992321,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 7.745092611167649,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000211.txt",
+      "distance": 1
+    },
+    {
+      "id": 19,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000217.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1156.87488,
+        498.42972,
+        556.73088,
+        260.55972
+      ],
+      "area": 145061.64220815361,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 3.1007992362511687,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000217.txt",
+      "distance": 1
+    },
+    {
+      "id": 20,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1187.76,
+        508.05467999999996,
+        551.9808,
+        263.47032
+      ],
+      "area": 145430.55800985603,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.07406303487548196,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "distance": 1
+    },
+    {
+      "id": 21,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1216.84992,
+        482.09472,
+        570.39936,
+        210.21012000000002
+      ],
+      "area": 119903.71791352321,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 3.290091356050748,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "distance": 1
+    },
+    {
+      "id": 22,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1244.8992,
+        488.0304,
+        576.63936,
+        218.3004
+      ],
+      "area": 125880.602943744,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 3.9703058764946926,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "distance": 1
+    },
+    {
+      "id": 23,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1288.3392,
+        486.98496,
+        558.60096,
+        219.66984
+      ],
+      "area": 122707.78350704639,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.534852416857695,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "distance": 1
+    },
+    {
+      "id": 24,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000227.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1324.56,
+        485.36496,
+        557.28,
+        225.34956
+      ],
+      "area": 125582.8027968,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.7034842393754236,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000227.txt",
+      "distance": 1
+    },
+    {
+      "id": 25,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000237.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1510.36032,
+        490.68504,
+        482.88,
+        222.05016
+      ],
+      "area": 107223.5812608,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 7.969297947109816,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000237.txt",
+      "distance": 1
+    },
+    {
+      "id": 26,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000239.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1545.68064,
+        487.20528,
+        484.56000000000006,
+        232.00992
+      ],
+      "area": 112422.72683520001,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.44622107015109624,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000239.txt",
+      "distance": 1
+    },
+    {
+      "id": 27,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000241.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1535.3702400000002,
+        486.80028,
+        554.45952,
+        238.56012
+      ],
+      "area": 132271.9296263424,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 5,
+      "trackmap_index": 3,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.383160167901484,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000241.txt",
+      "distance": 1
+    },
+    {
+      "id": 28,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000191.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1031.22048,
+        642.92508,
+        190.3392,
+        70.49051999999999
+      ],
+      "area": 13417.109184383999,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000191.txt",
+      "distance": 1
+    },
+    {
+      "id": 29,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000195.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1014.29952,
+        640.81044,
+        224.1792,
+        66.26016
+      ],
+      "area": 14854.149660672001,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.9027886408235276,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000195.txt",
+      "distance": 1
+    },
+    {
+      "id": 30,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000197.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1003.6108800000001,
+        650.95488,
+        255.03936000000002,
+        100.02959999999999
+      ],
+      "area": 25511.485165055998,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.0400550426743949,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000197.txt",
+      "distance": 1
+    },
+    {
+      "id": 31,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000199.txt",
+      "category_id": 0.0,
+      "bbox": [
+        997.4553599999999,
+        644.09472,
+        262.0704,
+        92.42964
+      ],
+      "area": 24223.072726656002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.8448485492406812,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000199.txt",
+      "distance": 1
+    },
+    {
+      "id": 32,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000203.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1003.97568,
+        637.3695600000001,
+        267.93024,
+        80.68032000000001
+      ],
+      "area": 21616.697500876806,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.8990888594826895,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000203.txt",
+      "distance": 1
+    },
+    {
+      "id": 33,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000205.txt",
+      "category_id": 0.0,
+      "bbox": [
+        986.8607999999999,
+        639.52524,
+        261.93984,
+        77.41008000000001
+      ],
+      "area": 20276.783969587203,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.2171134845193001,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000205.txt",
+      "distance": 1
+    },
+    {
+      "id": 34,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000207.txt",
+      "category_id": 0.0,
+      "bbox": [
+        981.06432,
+        642.09456,
+        256.12991999999997,
+        81.20952
+      ],
+      "area": 20800.187860838396,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.3309414877272314,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000207.txt",
+      "distance": 1
+    },
+    {
+      "id": 35,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000209.txt",
+      "category_id": 0.0,
+      "bbox": [
+        976.7059199999999,
+        643.95972,
+        246.30912,
+        84.08016
+      ],
+      "area": 20709.7102190592,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4697138407347321,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000209.txt",
+      "distance": 1
+    },
+    {
+      "id": 36,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000213.txt",
+      "category_id": 0.0,
+      "bbox": [
+        963.0143999999999,
+        641.7694799999999,
+        242.50944,
+        86.28012
+      ],
+      "area": 20923.7435843328,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.5373046891172526,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000213.txt",
+      "distance": 1
+    },
+    {
+      "id": 37,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "category_id": 0.0,
+      "bbox": [
+        954.17472,
+        644.5051199999999,
+        249.25055999999998,
+        97.03044000000001
+      ],
+      "area": 24184.891507046403,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4254709106712264,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "distance": 1
+    },
+    {
+      "id": 38,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "category_id": 0.0,
+      "bbox": [
+        942.77568,
+        647.20512,
+        248.60927999999998,
+        119.07000000000001
+      ],
+      "area": 29601.9069696,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.36530392025459124,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "distance": 1
+    },
+    {
+      "id": 39,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "category_id": 0.0,
+      "bbox": [
+        937.99488,
+        649.96992,
+        242.98944,
+        120.53988
+      ],
+      "area": 29289.9179388672,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.1827789175397923,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "distance": 1
+    },
+    {
+      "id": 40,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "category_id": 0.0,
+      "bbox": [
+        918.3052799999999,
+        641.29968,
+        233.24928,
+        138.50028
+      ],
+      "area": 32305.0905897984,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.4578196634269196,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "distance": 1
+    },
+    {
+      "id": 41,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000235.txt",
+      "category_id": 0.0,
+      "bbox": [
+        895.3804799999999,
+        637.35984,
+        238.89983999999998,
+        107.84016
+      ],
+      "area": 25762.996969574397,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.9028945407532705,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000235.txt",
+      "distance": 1
+    },
+    {
+      "id": 42,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000239.txt",
+      "category_id": 0.0,
+      "bbox": [
+        875.90016,
+        639.2498400000001,
+        239.7792,
+        84.0402
+      ],
+      "area": 20151.09192384,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4603964304515225,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000239.txt",
+      "distance": 1
+    },
+    {
+      "id": 43,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000243.txt",
+      "category_id": 0.0,
+      "bbox": [
+        861.7843200000001,
+        632.0646,
+        237.79008,
+        81.62964
+      ],
+      "area": 19410.718625971196,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.9990932671350393,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000243.txt",
+      "distance": 1
+    },
+    {
+      "id": 44,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000245.txt",
+      "category_id": 0.0,
+      "bbox": [
+        857.86944,
+        632.95452,
+        245.0592,
+        83.70971999999999
+      ],
+      "area": 20513.837015423996,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.5146019972674836,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000245.txt",
+      "distance": 1
+    },
+    {
+      "id": 45,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000249.txt",
+      "category_id": 0.0,
+      "bbox": [
+        842.4556799999999,
+        626.4248399999999,
+        251.80991999999998,
+        97.6698
+      ],
+      "area": 24594.224524415997,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.7307339430841742,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000249.txt",
+      "distance": 1
+    },
+    {
+      "id": 46,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000253.txt",
+      "category_id": 0.0,
+      "bbox": [
+        842.4,
+        643.5396000000001,
+        249.13919999999996,
+        78.03972
+      ],
+      "area": 19442.753409023997,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.5930608133384334,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000253.txt",
+      "distance": 1
+    },
+    {
+      "id": 47,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000257.txt",
+      "category_id": 0.0,
+      "bbox": [
+        851.67552,
+        647.57016,
+        242.94912000000002,
+        77.9004
+      ],
+      "area": 18925.833627648004,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.774146415451324,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000257.txt",
+      "distance": 1
+    },
+    {
+      "id": 48,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000259.txt",
+      "category_id": 0.0,
+      "bbox": [
+        857.64096,
+        652.13964,
+        248.11968000000002,
+        78.19956
+      ],
+      "area": 19402.849803340803,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.36194965915001254,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000259.txt",
+      "distance": 1
+    },
+    {
+      "id": 49,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000261.txt",
+      "category_id": 0.0,
+      "bbox": [
+        868.76928,
+        653.67,
+        237.68064,
+        72.47988000000001
+      ],
+      "area": 17227.064265523204,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4671551429662891,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000261.txt",
+      "distance": 1
+    },
+    {
+      "id": 50,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000263.txt",
+      "category_id": 0.0,
+      "bbox": [
+        881.48928,
+        658.42956,
+        233.36064,
+        80.0604
+      ],
+      "area": 18682.946182656,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4279740634765016,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000263.txt",
+      "distance": 1
+    },
+    {
+      "id": 51,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000265.txt",
+      "category_id": 0.0,
+      "bbox": [
+        890.88,
+        657.38952,
+        233.19935999999998,
+        82.39968
+      ],
+      "area": 19215.552640204798,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 6,
+      "trackmap_index": 4,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.7037505988243395,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000265.txt",
+      "distance": 1
+    },
+    {
+      "id": 52,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000211.txt",
+      "category_id": 0.0,
+      "bbox": [
+        819.7305600000001,
+        745.8501600000001,
+        83.18016,
+        64.86048
+      ],
+      "area": 5395.1051040768,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000211.txt",
+      "distance": 1
+    },
+    {
+      "id": 53,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "category_id": 0.0,
+      "bbox": [
+        776.44416,
+        758.10492,
+        76.42944,
+        73.05012
+      ],
+      "area": 5583.1797635328,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.523948165077891,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "distance": 1
+    },
+    {
+      "id": 54,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000217.txt",
+      "category_id": 0.0,
+      "bbox": [
+        754.17408,
+        768.2504399999999,
+        72.4896,
+        79.84008
+      ],
+      "area": 5787.575463167999,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4454412515031957,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000217.txt",
+      "distance": 1
+    },
+    {
+      "id": 55,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "category_id": 0.0,
+      "bbox": [
+        728.59968,
+        780.3648,
+        64.20096000000001,
+        83.2302
+      ],
+      "area": 5343.4587409920005,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.48328966491364456,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000219.txt",
+      "distance": 1
+    },
+    {
+      "id": 56,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "category_id": 0.0,
+      "bbox": [
+        704.9856,
+        794.46528,
+        62.09088,
+        83.2302
+      ],
+      "area": 5167.836360576,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3064588466745871,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000221.txt",
+      "distance": 1
+    },
+    {
+      "id": 57,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "category_id": 0.0,
+      "bbox": [
+        686.6400000000001,
+        808.56468,
+        70.51968,
+        83.2302
+      ],
+      "area": 5869.367070335999,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.10562888916855374,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "distance": 1
+    },
+    {
+      "id": 58,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "category_id": 0.0,
+      "bbox": [
+        659.1494399999999,
+        819.14004,
+        50.780159999999995,
+        83.23992
+      ],
+      "area": 4226.936455987199,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.7273493618417305,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "distance": 1
+    },
+    {
+      "id": 59,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000227.txt",
+      "category_id": 0.0,
+      "bbox": [
+        635.54496,
+        827.24976,
+        61.37088,
+        86.75964
+      ],
+      "area": 5324.5154552832,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3588951615040003,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000227.txt",
+      "distance": 1
+    },
+    {
+      "id": 60,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "category_id": 0.0,
+      "bbox": [
+        610.6655999999999,
+        835.4998800000001,
+        68.01024000000001,
+        92.52036
+      ],
+      "area": 6292.331888486401,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3762233968588645,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "distance": 1
+    },
+    {
+      "id": 61,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "category_id": 0.0,
+      "bbox": [
+        585.5692799999999,
+        842.83524,
+        74.21952,
+        97.03044000000001
+      ],
+      "area": 7201.552682188802,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.07867600989405883,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "distance": 1
+    },
+    {
+      "id": 62,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000241.txt",
+      "category_id": 0.0,
+      "bbox": [
+        457.53024,
+        886.8149999999999,
+        80.4,
+        112.85028
+      ],
+      "area": 9073.162512,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 8,
+      "trackmap_index": 5,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 6.474008215199625,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000241.txt",
+      "distance": 1
+    },
+    {
+      "id": 63,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000213.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1847.5008,
+        922.1104799999999,
+        94.67904,
+        127.0998
+      ],
+      "area": 12033.687048192,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000213.txt",
+      "distance": 1
+    },
+    {
+      "id": 64,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1828.44096,
+        920.2798799999999,
+        95.28,
+        135.15984
+      ],
+      "area": 12878.0295552,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.0070668001676941,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000215.txt",
+      "distance": 1
+    },
+    {
+      "id": 65,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1731.94944,
+        914.33016,
+        86.00064,
+        136.7604
+      ],
+      "area": 11761.481926656,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 4.537571325819226,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000225.txt",
+      "distance": 1
+    },
+    {
+      "id": 66,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1696.31424,
+        894.1600800000001,
+        95.85024,
+        140.90004
+      ],
+      "area": 13505.302650009598,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.780455316056605,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "distance": 1
+    },
+    {
+      "id": 67,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000233.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1656.51456,
+        899.52984,
+        76.12992,
+        112.79952
+      ],
+      "area": 8587.4184336384,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.823722899038199,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000233.txt",
+      "distance": 1
+    },
+    {
+      "id": 68,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000235.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1636.36032,
+        896.89032,
+        111.79968000000001,
+        148.60044
+      ],
+      "area": 16613.4816398592,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 9,
+      "trackmap_index": 6,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.6946945178179337,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000235.txt",
+      "distance": 1
+    },
+    {
+      "id": 69,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1337.17056,
+        347.54508,
+        131.12064,
+        86.01012
+      ],
+      "area": 11277.7019808768,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000223.txt",
+      "distance": 1
+    },
+    {
+      "id": 70,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1278.44544,
+        333.4554,
+        124.84992,
+        105.00948
+      ],
+      "area": 13110.4251772416,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 3.3252090340307907,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000229.txt",
+      "distance": 1
+    },
+    {
+      "id": 71,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1259.25504,
+        323.54964,
+        116.57087999999999,
+        106.53984
+      ],
+      "area": 12419.442903859199,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.45184816675636,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000231.txt",
+      "distance": 1
+    },
+    {
+      "id": 72,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000237.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1153.58016,
+        298.12968,
+        746.7590399999999,
+        371.94012
+      ],
+      "area": 277749.64694868476,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 4.643036164447291,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000237.txt",
+      "distance": 1
+    },
+    {
+      "id": 73,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000243.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1124.26944,
+        278.45964,
+        100.0992,
+        111.3804
+      ],
+      "area": 11149.08893568,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.688863774301289,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000243.txt",
+      "distance": 1
+    },
+    {
+      "id": 74,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000247.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1087.97568,
+        282.61548,
+        121.67039999999999,
+        116.7696
+      ],
+      "area": 14207.403939839998,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 11,
+      "trackmap_index": 7,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.2917965688614945,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000247.txt",
+      "distance": 1
+    },
+    {
+      "id": 75,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000245.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1598.99904,
+        496.83024,
+        533.7004800000001,
+        252.37980000000002
+      ],
+      "area": 134695.22040230402,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 14,
+      "trackmap_index": 8,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000245.txt",
+      "distance": 1
+    },
+    {
+      "id": 76,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000247.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1639.85472,
+        503.9496,
+        539.07072,
+        254.80008
+      ],
+      "area": 137355.26258165762,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 14,
+      "trackmap_index": 8,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.227667625567166,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000247.txt",
+      "distance": 1
+    },
+    {
+      "id": 77,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000251.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1680.1900799999999,
+        530.36964,
+        487.18080000000003,
+        285.27984
+      ],
+      "area": 138982.860675072,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 14,
+      "trackmap_index": 8,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 2.391262771056611,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000251.txt",
+      "distance": 1
+    },
+    {
+      "id": 78,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000255.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1719.9456,
+        537.8453999999999,
+        399.42912,
+        234.44964
+      ],
+      "area": 93646.0133895168,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 14,
+      "trackmap_index": 8,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.5045216979814104,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000255.txt",
+      "distance": 1
+    },
+    {
+      "id": 79,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000269.txt",
+      "category_id": 0.0,
+      "bbox": [
+        1872.4704000000002,
+        567.7894799999999,
+        94.0992,
+        150.55956
+      ],
+      "area": 14167.534148352,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 14,
+      "trackmap_index": 8,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 7.333135431925817,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000269.txt",
+      "distance": 1
+    },
+    {
+      "id": 80,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000259.txt",
+      "category_id": 0.0,
+      "bbox": [
+        327.66912,
+        938.29968,
+        150.86016,
+        119.84004
+      ],
+      "area": 18079.0876088064,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000259.txt",
+      "distance": 1
+    },
+    {
+      "id": 81,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000261.txt",
+      "category_id": 0.0,
+      "bbox": [
+        312.51072,
+        943.94484,
+        164.27904,
+        131.10984000000002
+      ],
+      "area": 21538.598649753603,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.946850326081156,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000261.txt",
+      "distance": 1
+    },
+    {
+      "id": 82,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000263.txt",
+      "category_id": 0.0,
+      "bbox": [
+        297.35040000000004,
+        949.5899999999999,
+        177.69984,
+        142.37964
+      ],
+      "area": 25300.839247257598,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.4588053360258253,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000263.txt",
+      "distance": 1
+    },
+    {
+      "id": 83,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000265.txt",
+      "category_id": 0.0,
+      "bbox": [
+        286.34496,
+        958.32504,
+        191.79072,
+        144.09036
+      ],
+      "area": 27635.1938894592,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.5517648639541746,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000265.txt",
+      "distance": 1
+    },
+    {
+      "id": 84,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000267.txt",
+      "category_id": 0.0,
+      "bbox": [
+        275.34528,
+        967.0600800000001,
+        205.87008,
+        145.8
+      ],
+      "area": 30015.857664000003,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3307823165088512,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000267.txt",
+      "distance": 1
+    },
+    {
+      "id": 85,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000271.txt",
+      "category_id": 0.0,
+      "bbox": [
+        252.56063999999998,
+        982.69956,
+        223.48032,
+        152.30052
+      ],
+      "area": 34036.1689457664,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 1.1772900589032569,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000271.txt",
+      "distance": 1
+    },
+    {
+      "id": 86,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000273.txt",
+      "category_id": 0.0,
+      "bbox": [
+        241.04447999999996,
+        990.21528,
+        230.50943999999998,
+        156.06972
+      ],
+      "area": 35975.5437581568,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.09489367375655622,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000273.txt",
+      "distance": 1
+    },
+    {
+      "id": 87,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000275.txt",
+      "category_id": 0.0,
+      "bbox": [
+        235.28448,
+        993.9747600000001,
+        234.03072,
+        157.95
+      ],
+      "area": 36965.152224,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 16,
+      "trackmap_index": 9,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.367141674559896,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000275.txt",
+      "distance": 1
+    },
+    {
+      "id": 88,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000267.txt",
+      "category_id": 0.0,
+      "bbox": [
+        990.43584,
+        312.9246,
+        110.6496,
+        128.48976
+      ],
+      "area": 14217.340548096,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 17,
+      "trackmap_index": 10,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": -1,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000267.txt",
+      "distance": 1
+    },
+    {
+      "id": 89,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000269.txt",
+      "category_id": 0.0,
+      "bbox": [
+        992.0505599999999,
+        316.93032,
+        110.6208,
+        130.11948
+      ],
+      "area": 14393.920973184002,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 17,
+      "trackmap_index": 10,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.3803151587828186,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000269.txt",
+      "distance": 1
+    },
+    {
+      "id": 90,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000273.txt",
+      "category_id": 0.0,
+      "bbox": [
+        982.1952,
+        322.94052,
+        113.18975999999999,
+        124.30044
+      ],
+      "area": 14069.536971494399,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 17,
+      "trackmap_index": 10,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.6658100094693246,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000273.txt",
+      "distance": 1
+    },
+    {
+      "id": 91,
+      "image_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000275.txt",
+      "category_id": 0.0,
+      "bbox": [
+        980.9241599999999,
+        324.31968,
+        109.81056,
+        125.50032
+      ],
+      "area": 13781.2604193792,
+      "segmentation": [],
+      "iscrowd": 0,
+      "track_id": 17,
+      "trackmap_index": 10,
+      "vid_id": 0,
+      "track_color": [
+        255,
+        255,
+        255
+      ],
+      "displaced": false,
+      "error": 0.21960637201933292,
+      "state_id": "/home/aroot/miscellaneous/traffic_rush_1/traffic_rush_1.00000275.txt",
+      "distance": 1
+    }
+  ]
+}
