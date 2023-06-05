@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("../")
 sys.path.append(".")
-from env_init import *
+from sim_env_init import *
 
 from drawing_functions import *
 
@@ -88,7 +88,7 @@ def load_layers(files, sensing_agent):
     for i, layer in enumerate(yolo_layer_list):
         yblayer = []
         for j, yb in enumerate(layer):
-            if i * j % 2:
+            if True or i * j % 2:
                 yblayer.append(yb)
 
         sensing_agent.heartbeat()
