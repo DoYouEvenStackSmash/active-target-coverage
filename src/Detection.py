@@ -47,7 +47,6 @@ class Detection:
         Exposes attributes for modification
         """
         self.attributes = attr
-    
 
 
 class Position:
@@ -103,8 +102,8 @@ class Position:
             "theta": self.theta,
             "phi": self.phi,
         }
-    
-    def initialize_fields(x,y,z,theta,phi):
+
+    def initialize_fields(x, y, z, theta, phi):
         """
         Convenience function for updating all fields
         """

@@ -4,23 +4,45 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
+
 np = import_numpy()
 
+
 class Bbox(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     # Bbox
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Bbox
-    def X(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def X(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float32Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0),
+        )
+
     # Bbox
-    def Y(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
+    def Y(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float32Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4),
+        )
+
     # Bbox
-    def W(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
+    def W(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float32Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8),
+        )
+
     # Bbox
-    def H(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(12))
+    def H(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float32Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(12),
+        )
+
 
 def CreateBbox(builder, x, y, w, h):
     builder.Prep(4, 16)
@@ -32,7 +54,6 @@ def CreateBbox(builder, x, y, w, h):
 
 
 class BboxT(object):
-
     # BboxT
     def __init__(self):
         self.x = 0.0  # type: float

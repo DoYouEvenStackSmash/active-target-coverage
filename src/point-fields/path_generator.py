@@ -71,8 +71,9 @@ def render_path(screen, paths, filename="out.json", YOLO=True):
         # time.sleep(0.02)
 
     path = None
-    max_width = 1000
-    max_height = 1000
+    sq = 1
+    max_width = sq
+    max_height = sq
     if YOLO:
         path = {
             "points": [
@@ -95,7 +96,7 @@ def render_path(screen, paths, filename="out.json", YOLO=True):
     sys.exit()
 
 
-def create_grid(origin=(0, 0, 0), width=1000, height=1000, points=10):
+def create_grid(origin=(0, 0, 0), width=1000, height=1000, points=25):
     """
     Creates a grid of points
     returns a list of (x,y) points

@@ -18,8 +18,8 @@ def adjust_angle(theta):
     return theta
 
 
-ACCELERATION_THRESHOLD = 1
-MAX_SCALE_FACTOR = 1
+ACCELERATION_THRESHOLD = 1.6    
+MAX_SCALE_FACTOR = 1.4
 
 
 class ObjectTrack:
@@ -154,12 +154,16 @@ class ObjectTrack:
             self.r_naught.append(r)
             self.theta_naught.append(
                 self.parent_agent.map_detection_back(
-                    theta, self.parent_agent.get_fov_width(), self.parent_agent.get_max_x()
+                    theta,
+                    self.parent_agent.get_fov_width(),
+                    self.parent_agent.get_max_x(),
                 )
             )
             self.phi_naught.append(
                 self.parent_agent.map_detection_back(
-                    phi, self.parent_agent.get_fov_height(),self.parent_agent.get_max_y()
+                    phi,
+                    self.parent_agent.get_fov_height(),
+                    self.parent_agent.get_max_y(),
                 )
             )
 
@@ -347,22 +351,19 @@ class ObjectTrack:
         phi = phi * self.parent_agent.get_fov_height() - (
             self.parent_agent.get_fov_height() / 2
         )
-        
+
         # phi = min(phi, self.parent_agent.get_fov_height())
         # phi = max(phi, -self.parent_agent.get_fov_height())
-                
+
         # theta = min(theta, self.parent_agent.get_fov_height())
         # theta = max(theta, -self.parent_agent.get_fov_height())
         # x = x / 10
         x = self.parent_agent.map_detection_back(
-            theta, self.parent_agent.get_fov_width(), 
-            self.parent_agent.get_max_x()
+            theta, self.parent_agent.get_fov_width(), self.parent_agent.get_max_x()
         )
 
-
         y = self.parent_agent.map_detection_back(
-            phi, self.parent_agent.get_fov_height(), 
-            self.parent_agent.get_max_y()
+            phi, self.parent_agent.get_fov_height(), self.parent_agent.get_max_y()
         )
 
         last_pos = self.get_last_detection()
@@ -371,7 +372,7 @@ class ObjectTrack:
         # some sanity mappping
         x = ((x / xmax) * xmax - xmax / 2) / xmax * 100 + 50
         y = ((y / ymax) * ymax - ymax / 2) / ymax * 100 + 50
-        print(x,y)
+        # print(x, y)
         return Detection(Position(r, x, y, theta, phi), last_pos.get_attributes())
 
     def predict_next_state(self, steps=1):
@@ -469,7 +470,7 @@ class ObjectTrack:
 
         for i, det in enumerate(self.path):
             yb = det.get_attributes()
-            
+
             # fid = None
 
             fid = yb.img_filename
@@ -477,16 +478,16 @@ class ObjectTrack:
             yb_json["track_id"] = self.track_id
             steps.append(yb_json)
         return steps
-    
+
     def add_new_step(self, yb, frame_id):
-        ''' 
+        """
         Add a new bounding box to the object track
-        '''
-        # update velocity  
+        """
+        # update velocity
         if len(self.path) > 0:
             pass
             # self.update_track_vector(yb.get_center_coord())
-    
+
         self.last_frame = frame_id
         yb.parent_track = self.track_id
         self.path.append(yb)

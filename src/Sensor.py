@@ -36,11 +36,11 @@ class Sensor:
         self,
         parent_agent=None,
         sensor_radius=300,
-        sensor_width=np.pi/2,
-        sensor_height=np.pi/2,
+        sensor_width=np.pi / 2,
+        sensor_height=np.pi / 2,
         _id=None,
-        max_x = 1920,
-        max_y = 1080
+        max_x=1920,
+        max_y=1080,
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius
@@ -207,7 +207,7 @@ class Sensor:
         # print(adj_win_bnd)
         dist, target_horiz, target_vert = target_posn.get_cartesian_coordinates()
         print(target_horiz)
-        
+
         flags = 0
 
         angle_flag = False
@@ -221,12 +221,13 @@ class Sensor:
 
         # if angle out of bounds
         # print(target_x)
-        if target_horiz < 0 + adj_win_bnd or target_horiz > Sensor.WINDOW_WIDTH - adj_win_bnd:
+        if (
+            target_horiz < 0 + adj_win_bnd
+            or target_horiz > Sensor.WINDOW_WIDTH - adj_win_bnd
+        ):
             flags += Sensor.ANGULAR
 
         if flags > 0:
             return False, flags
 
         return True, Sensor.VALID
-
-

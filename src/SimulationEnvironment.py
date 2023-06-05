@@ -87,7 +87,6 @@ class SimulationEnvironment:
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
 
-    
     def visible_vertical_targets(self):
         """
         Convenience function for testing targets of single agent
@@ -101,14 +100,14 @@ class SimulationEnvironment:
         # add targets to all agent updates
         for i, t in enumerate(self.targets):
             for k in updates:
-                updates[k].append(self.targets[i])
+                updates[k].append(self.targets[i].get_position())
 
         # update all agents
         for k in updates:
-            detections = self.agents[k].create_pov_detection_set_from_targets(
-                frame_id, updates[k]
-            )
-            self.agents[k].load_detection_layer(detections)
+            yblayer = []
+            for posn in updates[k]:
+                yblayer.append(self.create_agent_yolobox(k, posn))
+            self.agents[k].ingest_new_yolobox_layer(yblayer, True)
 
     def add_target(self, T):
         """
@@ -116,24 +115,35 @@ class SimulationEnvironment:
         """
         self.targets.append(T)
 
-
-    def get_agent(self,_id):
+    def get_agent(self, _id):
         """
         Accessor for an agent by id
         """
         return self.agents[_id]
 
+    def serialize_agent_tracks(self):
+        for k in self.agents:
+            sa = self.agents[k]
+            e = sa.export_tracks()
+            f = open(f"{sa._id}_out.json","w")
+            f.write(json.dumps(e,indent=2))
+            f.close()
+        
+
     def check_grid_visibility(self, agent_id, global_target_posn):
         """
-        Hidden simulation visibility check 
+        Hidden simulation visibility check
         """
-        GLOBAL_ORIGIN = Position(0,0,0)
+        GLOBAL_ORIGIN = Position(0, 0, 0)
         new_posn = self.convert_to_agent_coordinates(agent_id, global_target_posn)
-        theta, radius = mfn.car2pol(GLOBAL_ORIGIN.get_cartesian_coordinates(), new_posn.get_cartesian_coordinates())
+        theta, radius = mfn.car2pol(
+            GLOBAL_ORIGIN.get_cartesian_coordinates(),
+            new_posn.get_cartesian_coordinates(),
+        )
         phi = 0
-        
+
         sensing_agent = self.get_agent(agent_id)
-        
+
         if sensing_agent.is_visible_fov(theta, phi, radius):
             return True
         return False
@@ -143,14 +153,21 @@ class SimulationEnvironment:
         Hidden function for generating valid detections
         """
         DEFAULT_CLASS = 0
-        DEFAULT_WIDTH=1
-        DEFAULT_HEIGHT=1
+        DEFAULT_WIDTH = 1
+        DEFAULT_HEIGHT = 1
 
-        agent_target_posn = self.convert_to_agent_coordinates(agent_id, global_target_posn)
-        sensor_target_posn = self.convert_to_sensor_frame_coordinates(agent_id, agent_target_posn)
-        
-        x,y,z = sensor_target_posn.get_cartesian_coordinates()
-        yb = sann.register_annotation(DEFAULT_CLASS,[y,z,DEFAULT_WIDTH,DEFAULT_HEIGHT],distance=x)
+        agent_target_posn = self.convert_to_agent_coordinates(
+            agent_id, global_target_posn
+        )
+        sensor_target_posn = self.convert_to_sensor_frame_coordinates(
+            agent_id, agent_target_posn
+        )
+
+        x, y, z = sensor_target_posn.get_cartesian_coordinates()
+
+        yb = sann.register_annotation(
+            DEFAULT_CLASS, [y, z, DEFAULT_WIDTH, DEFAULT_HEIGHT], distance=x
+        )
         return yb
 
     def generate_yolo_bbox(self):
@@ -158,34 +175,59 @@ class SimulationEnvironment:
         Hidden function for populating yolobox data
         """
         DEFAULT_CLASS = 0
-        DEFAULT_WIDTH=1
-        DEFAULT_HEIGHT=1
+        DEFAULT_WIDTH = 1
+        DEFAULT_HEIGHT = 1
         pass
 
     def convert_to_agent_coordinates(self, agent_id, target_posn):
         """
         Hidden simulation coordinate transformation
         """
-        GLOBAL_ORIGIN = Position(0,0,0)
+        GLOBAL_ORIGIN = Position(0, 0, 0)
         sensing_agent = self.get_agent(agent_id)
-        theta, radius = mfn.car2pol(sensing_agent.get_origin().get_cartesian_coordinates(), target_posn.get_cartesian_coordinates())
-        x1,y1,z1 = mfn.pol2car(GLOBAL_ORIGIN.get_cartesian_coordinates(), radius, theta)
-        new_posn = Position(x1,y1,z1)
+        theta, radius = mfn.car2pol(
+            sensing_agent.get_origin().get_cartesian_coordinates(),
+            target_posn.get_cartesian_coordinates(),
+        )
+        
+        x1, y1, z1 = mfn.pol2car(
+            GLOBAL_ORIGIN.get_cartesian_coordinates(), radius, theta
+        )
+        new_posn = Position(x1, y1, z1, theta)
         return new_posn
 
     def convert_to_sensor_frame_coordinates(self, agent_id, agent_target_posn):
         """
         Hidden function for converting to an agent's SENSOR frame of reference
         """
-        GLOBAL_ORIGIN = Position(0,0,0)
+        GLOBAL_ORIGIN = Position(0, 0, 0)
 
         sa = self.get_agent(agent_id)
 
-        theta, radius = mfn.car2pol(GLOBAL_ORIGIN.get_cartesian_coordinates(), agent_target_posn.get_cartesian_coordinates())
+        theta, radius = mfn.car2pol(
+            GLOBAL_ORIGIN.get_cartesian_coordinates(),
+            agent_target_posn.get_cartesian_coordinates(),
+        )
         phi = 0
-
+        
         x = radius
         y = theta / sa.get_fov_width() * sa.get_max_x() + sa.get_max_x() / 2
         z = phi / sa.get_fov_height() * sa.get_max_y() + sa.get_max_y() / 2
-        new_posn = Position(x,y,z)
+        new_posn = Position(x, y, z, theta, phi)
+        
         return new_posn
+
+    def convert_from_agent_coordinates(self,agent_id, agent_target_posn):
+        """
+
+        """
+        GLOBAL_ORIGIN = Position(0, 0, 0)
+        theta, phi = agent_target_posn.get_angles()
+        x,y,z = agent_target_posn.get_cartesian_coordinates()
+        sa = self.get_agent(agent_id)
+        
+        theta, radius = mfn.car2pol(GLOBAL_ORIGIN.get_cartesian_coordinates(), agent_target_posn.get_cartesian_coordinates())
+        ox,oy,oz = mfn.pol2car(sa.get_origin().get_cartesian_coordinates(), radius, theta)
+        oz = z
+        return Position(ox,oy,oz, theta, phi)
+        

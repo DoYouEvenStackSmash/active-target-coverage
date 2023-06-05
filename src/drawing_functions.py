@@ -179,8 +179,8 @@ def render_predictions(screen, sensing_agent):
         return
     for i in range(len(arr)):
         curr_pt, pred_pt = (), ()
-        curr_pt = arr[i][0]
-        pred_pt = arr[i][1]
+        curr_pt = arr[i][0].get_cartesian_coordinates()
+        pred_pt = arr[i][1].get_cartesian_coordinates()
         if len(pred_pt):
             pred_pt = [pred_pt[1], pred_pt[2], 0]
             curr_pt = [curr_pt[1], curr_pt[2], 0]

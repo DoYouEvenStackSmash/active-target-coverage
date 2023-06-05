@@ -166,7 +166,7 @@ class SensingAgent:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, offset)
-    
+
     def tracker_query(self):
         """
         Wrapper function for querying the tracker
@@ -196,7 +196,7 @@ class SensingAgent:
             return self.sensors[sensor_idx]
         else:
             return self.centered_sensor
-    
+
     def is_visible(self, target_posn):
         """
         Determines whether a target point is in the Sensor's sensor fov
@@ -226,7 +226,6 @@ class SensingAgent:
             return False
         return True
 
-
     def is_detectable(self, target_pt, sensor_id=-1):
         """
         Indicates whether a target point is detectable (within tolerance)
@@ -248,7 +247,6 @@ class SensingAgent:
             return self.centered_sensor.is_rel_detectable_fov(target_posn)
         else:
             return self.sensors[sensor_id].is_rel_detectable_fov(target_posn)
-
 
     def get_max_x(self):
         """
@@ -306,7 +304,7 @@ class SensingAgent:
             fov_radius = self.centered_sensor.get_fov_radius()
         return fov_radius
 
-    # exoskeleton functions 
+    # exoskeleton functions
 
     def get_center(self):
         """
@@ -387,8 +385,7 @@ class SensingAgent:
         Accessor for the agent's object tracker
         """
         return self.obj_tracker
-    
-    
+
     def get_predictions(self, idx=-1):
         """
         Accessor for object tracker predictions
@@ -418,8 +415,8 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection(idx)
         abs_det = []
         for det in rel_det:
-            curr = self.transform_to_global_coord(det[0])
-            pred = self.transform_to_global_coord(det[1])
+            curr = self.transform_from_det_coord(det[0])
+            pred = self.transform_from_det_coord(det[1])
             abs_det.append((curr, pred))
         return abs_det
 
@@ -447,20 +444,24 @@ class SensingAgent:
         return detections
 
     # ingest
-    def ingest_new_yolobox_layer(self, yolobox_layer = None, SCALE_FLAG=False):
+    def ingest_new_yolobox_layer(self, yolobox_layer=None, SCALE_FLAG=False):
         """
         wrapper for processing a new layer of detections
         """
         yolobox_layer = yolobox_layer if yolobox_layer != None else []
 
-        detections = self.create_detection_layer_from_yoloboxes(yolobox_layer, SCALE_FLAG)
+        detections = self.create_detection_layer_from_yoloboxes(
+            yolobox_layer, SCALE_FLAG
+        )
 
         self.heartbeat()
 
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 
-    def create_detection_layer_from_yoloboxes(self, yolobox_layer = None, SCALE_FLAG=False):
+    def create_detection_layer_from_yoloboxes(
+        self, yolobox_layer=None, SCALE_FLAG=False
+    ):
         """
         Create a detection layer from yoloboxes
         """
@@ -471,30 +472,30 @@ class SensingAgent:
         for i in range(len(yolobox_layer)):
             yb = yolobox_layer[i]
             detection_layer.append(self.create_detection(yb, SCALE_FLAG))
-        
+
         return detection_layer
 
     def create_detection(self, yb, SCALE_FLAG=False):
         """
         Wrapper for create detection
         """
-        x,y,w,h = yb.bbox
+        x, y, w, h = yb.bbox
         distance = yb.distance
 
         if SCALE_FLAG:
-            x,w = x / self.get_max_x(), w / self.get_max_x()
-            y,h = y / self.get_max_y(), h / self.get_max_y()
-        
-        posn = self.create_position(x,y,w,h, distance)
+            x, w = x / self.get_max_x(), w / self.get_max_x()
+            y, h = y / self.get_max_y(), h / self.get_max_y()
+
+        posn = self.create_position(x, y, w, h, distance)
         det = Detection(posn, yb)
         return det
-  
+
     def create_position(self, x, y, w, h, distance=0):
         """
         wrapper for Yolo style detections
-        
+
         # calculate vector 1, agent pov on horizontal plane
-        
+
                     (0,0)
                 +-------+-------+
                 |       |       |
@@ -514,14 +515,18 @@ class SensingAgent:
         """
         dist = distance
         # normalize x between 0 and 100
-        rel_x = (x * self.get_max_x() - (self.get_max_x() / 2)) / self.get_max_x() * 100 + 50
+        rel_x = (
+            x * self.get_max_x() - (self.get_max_x() / 2)
+        ) / self.get_max_x() * 100 + 50
         # normalize theta in terms of agent pov
         theta = (rel_x / 100) * self.get_fov_width() - (self.get_fov_width() / 2)
 
         # vertical component
-        rel_y = (y * self.get_max_y() - (self.get_max_y() / 2)) / self.get_max_y() * 100 + 50
+        rel_y = (
+            y * self.get_max_y() - (self.get_max_y() / 2)
+        ) / self.get_max_y() * 100 + 50
         phi = (rel_y / 100) * self.get_fov_height() - (self.get_fov_height() / 2)
-        
+
         posn = Position(dist, rel_x, rel_y, theta, phi)
         return posn
 
@@ -546,7 +551,7 @@ class SensingAgent:
         posn = Position(dist, rel_x, rel_y, theta, phi)
         # print(f"frame_coords {posn.get_cartesian_coordinates()}")
         return posn
-    
+
     # legacy detection transform
     def transform_to_local_detection_coord(self, target_pt):
         """
@@ -584,9 +589,9 @@ class SensingAgent:
         val = ratio * max_coord + max_coord / 2
         return val
 
-    def transform_to_global_coord(self, target_pt):
+    def transform_from_det_coord(self, target_pt):
         """
-        Transforms a position from agent local coords to world coords
+        Transforms a position from sensor frame coordinates to frame coordinates
         returns a point
         """
         x, y, z = target_pt.get_cartesian_coordinates()
@@ -594,8 +599,18 @@ class SensingAgent:
         y = self.map_detection_back(theta, self.get_fov_width(), self.get_max_x())
         z = self.map_detection_back(phi, self.get_fov_height(), self.get_max_y())
 
-        return [x, y, z]
+        return Position(x, y, z, theta, phi)
 
+    def transform_from_frame_coord(self, frame_posn):
+        """
+        Transforms a position from frame coordinates to agent coordinates
+        returns a point
+        """
+        r, y, z = frame_posn.get_cartesian_coordinates()
+        theta, phi = frame_posn.get_angles()
+        x,y,z = mfn.pol2car((0,0,0), r, theta)
+        return Position(x,y,z,theta, phi)
+        
 
     def export_tracks(self):
         """

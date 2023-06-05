@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("../")
 sys.path.append(".")
-from env_init import *
+from sim_env_init import *
 
 from drawing_functions import *
 
@@ -37,7 +37,7 @@ def main():
         p = load_json_file(file)
         t = init_target(_id=i, path=p)
         targets.append(t)
-    env = init_environment(targets=targets)
+    env = init_sim_environment(targets=targets)
     target_traverse(screen, env)
 
 
