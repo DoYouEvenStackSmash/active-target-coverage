@@ -10,6 +10,10 @@ from drawing_functions import *
 
 from support.file_loader import *
 
+from StreamingAnnotations import StreamingAnnotations as sann
+
+from YoloBox import *
+
 GLOBAL_ORIGIN = (0,0,0)
 def convert_to_sensor_coord(sa, pt):
   
@@ -49,18 +53,31 @@ def coordinate_map_test(screen, sa):
       # print(theta)
       sensor_posn = convert_to_sensor_frame_coords(sa,npt)
 
-      print(sensor_posn.get_cartesian_coordinates())
+      # print(sensor_posn.get_cartesian_coordinates())
 
       # if sa.is_visible_fov(theta, phi, rad):
       #   pafn.frame_draw_dot(screen, pt, pafn.colors["cyan"],4,8)
-      # else:
-      #   pafn.frame_draw_dot(screen, pt, pafn.colors["red"],4,8)
       
-      result, flags = sa.is_detectable_fov(sensor_posn)
-      if result:
-        pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+      
+      result = False
+      if sa.is_visible_fov(theta, phi, rad):
+        x,y,z = sensor_posn.get_cartesian_coordinates()
+        
+        yb = sann.register_annotation(0,[y,z,1,1],distance=x)
+        print(yb.distance)
+        det = sa.create_detection(yb, True)
+        print(det.get_cartesian_coordinates())
+        
+        
+        result, flags = sa.is_detectable_fov(det.get_position())
+        if result:
+          pafn.frame_draw_dot(screen, pt, pafn.colors["green"])
+        else:
+          pafn.frame_draw_dot(screen, pt, pafn.colors["tangerine"])
       else:
-        pafn.frame_draw_dot(screen, pt, pafn.colors["tangerine"])
+        pafn.frame_draw_cross(screen, pt, pafn.colors["red"])
+      
+      
       
       # print(npt.get_cartesian_coordinates())
       pygame.display.update()

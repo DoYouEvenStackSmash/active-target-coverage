@@ -399,7 +399,7 @@ class PygameArtFxns:
         """
         draws a cross at a point
         """
-        x, y, z = origin
+        x, y = origin
         line1 = [(x - 10, y), (x + 10, y)]
         line2 = [(x, y - 10), (x, y + 10)]
         lines = [line1, line2]

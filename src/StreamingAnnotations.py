@@ -86,11 +86,11 @@ class StreamingAnnotations:
 
         return yoloboxes
 
-    def register_annotation(class_id=0, bbox=None, valid_frame_name="frame_"):
+    def register_annotation(class_id=0, bbox=None, valid_frame_name="frame_",distance=0):
         """
         Registers an annotation as a YoloBox
         """
         bbox = bbox if bbox != None else []
 
-        yb = YoloBox(class_id, bbox, valid_frame_name)
+        yb = YoloBox(class_id, bbox, valid_frame_name,distance=distance)
         return yb

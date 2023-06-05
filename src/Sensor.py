@@ -223,7 +223,7 @@ class Sensor:
         # print(target_x)
         if target_horiz < 0 + adj_win_bnd or target_horiz > Sensor.WINDOW_WIDTH - adj_win_bnd:
             flags += Sensor.ANGULAR
-        print(flags)
+
         if flags > 0:
             return False, flags
 
