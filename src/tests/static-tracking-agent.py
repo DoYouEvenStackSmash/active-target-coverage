@@ -30,14 +30,12 @@ def tracking_test(screen, environment, interval=0):
     pafn.clear_frame(screen)
 
     for k in environment.agents:
-      print(k)
       sensing_agent = environment.agents[k]
       
       r,t = sensing_agent.tracker_query()
       sensing_agent.reposition(r,t)
       sensing_agent.heartbeat()
-      for at in sensing_agent.obj_tracker.get_active_tracks():
-        print(at.avg_detection_time)
+
       render_predictions(screen, sensing_agent)
       accumulate_predictions(sensing_agent, curr_pts, pred_pts)
       for idx in range(len(curr_pts)):
@@ -87,13 +85,12 @@ def main():
   sa2._id = 1
   sensing_agents[sa2._id] = sa2
   sensing_agents[sa._id] = sa
-  # print(sensing_agents)
-  # sys.exit()
+  
   targets = []
   # load json point files
   for i,file in enumerate(sys.argv[1:-1]):
     p = load_json_file(file)
-    # p.reverse()
+    
     t = init_target(_id=i, path=p)
     targets.append(t)
   env = init_environment(sensing_agents=sensing_agents, targets=targets)

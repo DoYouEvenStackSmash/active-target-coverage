@@ -398,7 +398,7 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection()
 
         if not len(rel_det):
-            print("empty")
+            #print("empty")
             return (None, None)
 
         curr_det, pred_det = rel_det[0]
