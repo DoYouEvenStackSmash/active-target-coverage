@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class Position(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsPosition(cls, buf, offset):
@@ -26,77 +24,48 @@ class Position(object):
     def X(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # Position
     def Y(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # Position
     def Z(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # Position
     def Theta(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # Position
     def Phi(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
-            return self._tab.Get(
-                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
-            )
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
-
-def PositionStart(builder):
-    builder.StartObject(5)
-
-
-def PositionAddX(builder, x):
-    builder.PrependFloat32Slot(0, x, 0.0)
-
-
-def PositionAddY(builder, y):
-    builder.PrependFloat32Slot(1, y, 0.0)
-
-
-def PositionAddZ(builder, z):
-    builder.PrependFloat32Slot(2, z, 0.0)
-
-
-def PositionAddTheta(builder, theta):
-    builder.PrependFloat32Slot(3, theta, 0.0)
-
-
-def PositionAddPhi(builder, phi):
-    builder.PrependFloat32Slot(4, phi, 0.0)
-
-
-def PositionEnd(builder):
-    return builder.EndObject()
+def PositionStart(builder): builder.StartObject(5)
+def PositionAddX(builder, x): builder.PrependFloat32Slot(0, x, 0.0)
+def PositionAddY(builder, y): builder.PrependFloat32Slot(1, y, 0.0)
+def PositionAddZ(builder, z): builder.PrependFloat32Slot(2, z, 0.0)
+def PositionAddTheta(builder, theta): builder.PrependFloat32Slot(3, theta, 0.0)
+def PositionAddPhi(builder, phi): builder.PrependFloat32Slot(4, phi, 0.0)
+def PositionEnd(builder): return builder.EndObject()
 
 
 class PositionT(object):
+
     # PositionT
     def __init__(self):
         self.x = 0.0  # type: float

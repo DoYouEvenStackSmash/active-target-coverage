@@ -29,9 +29,9 @@ def mouse_test(screen, environment):
             for k in environment.agents:
                 sensing_agent = environment.agents[k]
 
-                r, t = sensing_agent.tracker_query()
-                print(f"estimated rotation {r}")
-                sensing_agent.reposition(r, t)
+                # r, t = sensing_agent.tracker_query()
+                # print(f"estimated rotation {r}")
+                # sensing_agent.reposition(r, t)
                 sensing_agent.heartbeat()
                 arr = sensing_agent.estimate_next_detection()
                 draw_sensing_agent(screen, sensing_agent)

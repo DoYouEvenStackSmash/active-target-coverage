@@ -69,11 +69,11 @@ while flag:
     pygame.display.update()
     for i, t in enumerate(sim_env.targets):
         flag = t.step() or flag
-        if i == 1 and counter % 17:
-            t.origin = zero_det
-            t.path[t.idx] = zero_det
+        # if i == 1 and counter % 17:
+        #     t.origin = zero_det
+        #     t.path[t.idx] = zero_det
 
-    if not counter % 7:
+    if not counter % 7 or not counter % 3:
       sim_env.visible_vertical_targets()
 
     # print(sa.estimate_next_detection())

@@ -57,6 +57,8 @@ table Annotation {
   error:float;
   // id for the agent state
   state_id:int;
+  // distance??
+  distance:float;
 }
 
 table Position {
