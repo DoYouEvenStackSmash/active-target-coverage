@@ -39,9 +39,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 5,
+        "track_lifespan": 2,
         "default_avg_dist": 10,
-        "radial_exclusion": 300,
+        "radial_exclusion": 400,
     }
     display_constants = {"trail_len": 0}
 
@@ -114,12 +114,10 @@ class ObjectTrackManager:
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
-            print(yb.bbox)
             x, y = yb.bbox[:2]
             yb.bbox = [pt2[0], pt2[1], 1, 1]
             trk.path[-1].attributes = yb
-
-            trk.theta[-1] = adjust_angle(trk.theta[-1] + angle)
+            trk.theta_naught[-1] = adjust_angle(trk.theta_naught[-1] + angle)
 
         pass
 
@@ -138,7 +136,6 @@ class ObjectTrackManager:
             )
             # theta, r = mfn.car2pol(self.parent_agent.get_origin(), origin)
             new_pt = mfn.pol2car(pt1, -distance, np.pi)
-            print(pt1, new_pt)
             # print(new_pt)
             # continue
             pt2 = self.parent_agent.transform_to_local_sensor_coord((0, 0), new_pt)
@@ -147,7 +144,6 @@ class ObjectTrackManager:
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
-            print(yb.bbox)
             x, y = yb.bbox[:2]
             yb.bbox = [pt2[0], pt2[1], 1, 1]
             trk.path[-1].attributes = yb
@@ -156,7 +152,8 @@ class ObjectTrackManager:
         """
         Initialize a new empty layer
         """
-        self.layers.append([])
+        layer = []
+        self.layers.append(layer)
 
     def has_active_tracks(self):
         """
@@ -164,6 +161,12 @@ class ObjectTrackManager:
         returns true if there are active tracks
         """
         return self.active_tracks != None and len(self.active_tracks) > 0
+    
+    def get_active_tracks(self):
+        if not self.has_active_tracks():
+            return []
+        else:
+            return self.active_tracks
 
     def add_new_layer(self, yolobox_arr):
         """
@@ -378,6 +381,7 @@ class ObjectTrackManager:
             }
             for i in self.linked_tracks
         ]
+        print(f"linked_tracks: {len(self.linked_tracks)}")
 
         trackmap = {}  # {track_id : posn in linked_tracks}
         for i, lt in enumerate(linked_tracks):

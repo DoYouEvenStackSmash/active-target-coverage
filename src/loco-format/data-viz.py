@@ -17,7 +17,13 @@ for lt in linked_tracks:
     for st in steps:
         err.append(annos[st].error)
     errors.append(err)
-plt.plot(errors[0])
+
+fig,axs = plt.subplots(len(errors))
+if len(errors) > 1:
+    for eidx,err in enumerate(errors):
+        axs[eidx].plot(errors[eidx])
+else:
+    axs.plot(errors[0])
 plt.show()
 
 # print(c)

@@ -108,7 +108,6 @@ class SensingAgent:
 
         # perform translation
         if est_translation != None:
-            print(f"est_translation:{est_translation}")
             translation = self.apply_translation_to_agent(est_translation)
 
         # update tracker
@@ -277,7 +276,7 @@ class SensingAgent:
         returns a LOCO formatted json object
         """
         self.obj_tracker.close_all_tracks()
-        self.obj_tracker.link_all_tracks(0)
+        self.obj_tracker.link_all_tracks()
         e = self.obj_tracker.export_loco_fmt()
         print(f"exporting states of {self}")
         e["states"] = [s.to_json() for s in self.exoskeleton.states]
@@ -299,9 +298,7 @@ class SensingAgent:
         curr_state = self.exoskeleton.get_age()
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
-            # print(f"val {val}")
             dc = self.transform_to_local_sensor_coord((0, 0), (val[0], val[1]))
-            print(dc)
             bbox = [dc[0], dc[1], 1, 1]
             yb = sann.register_annotation(a.get_id(), bbox, curr_state)
             posn = Position(val[0], val[1])
@@ -409,7 +406,6 @@ class SensingAgent:
             return (None, None)
         pred_pt = pred_det.get_attr_coord()
         curr_pt = curr_det.get_attr_coord()
-        print(pred_pt)
         # if no estimate available
         if not len(pred_pt):
             return (None, None)
@@ -427,7 +423,6 @@ class SensingAgent:
         # if predicted point is out of coverage by range
         if flag == Sensor.RANGE:
             pred_pt = pred_det.get_attr_coord()
-            print(f"pred_pt {pred_pt}")
             offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
             if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
                 offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
