@@ -30,6 +30,7 @@ def tracking_test(screen, environment, interval=0):
     pafn.clear_frame(screen)
 
     for k in environment.agents:
+      print(k)
       sensing_agent = environment.agents[k]
       
       r,t = sensing_agent.tracker_query()
@@ -77,17 +78,22 @@ def main():
   screen = pafn.create_display(1000, 1000)
   pafn.clear_frame(screen)
   sensing_agents = {}
-  sa = init_sensing_agent(origin=(500,0), width=1.5 * np.pi, radius=2000)
-  # sa = init_sensing_agent(origin=(700,150), width=1.5 * np.pi, radius=200)
+  sa = init_sensing_agent(_id=0, origin=(500,0), width=1.5 * np.pi, radius=2000)
+  sa2 = init_sensing_agent(_id=1, origin=(700,150), width=1.5 * np.pi, radius=200)
   sa.rotate_agent((500,500))
+  sa2.rotate_agent((500,500))
   sa.ALLOW_TRANSLATION=False
   sa.ALLOW_ROTATION=False
+  sa2._id = 1
+  sensing_agents[sa2._id] = sa2
   sensing_agents[sa._id] = sa
+  # print(sensing_agents)
+  # sys.exit()
   targets = []
   # load json point files
   for i,file in enumerate(sys.argv[1:-1]):
     p = load_json_file(file)
-    p.reverse()
+    # p.reverse()
     t = init_target(_id=i, path=p)
     targets.append(t)
   env = init_environment(sensing_agents=sensing_agents, targets=targets)
