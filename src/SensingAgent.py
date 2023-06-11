@@ -138,8 +138,8 @@ class SensingAgent:
         # if curr_pt == pred_pt:
         #     return (None, None)
 
-        status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
-
+        # status, flag = self.centered_sensor.is_rel_detectable(pred_det.get_attr_coord())
+        status, flag = self.centered_sensor.is_rel_detectable_fov(pred_det)
         # if predicted point is detectable from pov of SensingAgent
         if status:
             return (None, None)

@@ -65,11 +65,11 @@ class Position:
         self.theta = theta
         self.phi = phi
 
-    def get_center_coord(self):
+    def get_center_coordinates(self):
         """
         Accessor for center of the position
         """
-        return self.get_cartesian_coord()
+        return self.get_cartesian_coordinates()
 
     def get_cartesian_coordinates(self):
         """

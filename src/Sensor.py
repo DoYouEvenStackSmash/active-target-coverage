@@ -15,7 +15,7 @@ def adjust_angle(theta):
 
     return theta
 
-
+unwrap = lambda posn : posn.get_cartesian_coordinates()
 class Sensor:
     VALID = 0
     ANGULAR = 1
@@ -53,10 +53,18 @@ class Sensor:
     def get_origin(self):
         """
         Accessor for parent origin
-        returns a point
+        returns a Position
         """
         origin = self.parent_agent.get_origin()
         return origin
+
+    def get_origin_coord(self):
+        """
+        Accessor for getting parent origin coordinates
+        returns a Tuple
+        """
+        origin_coord = self.get_origin().get_cartesian_coordinates()
+        return origin_coord
 
     def get_fov_theta(self):
         """
@@ -137,7 +145,7 @@ class Sensor:
 
         for i in fov_offts:
             horizontal_axis.append(
-                mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i)
+                mfn.pol2car(self.get_origin_coord(), radius, i)
             )
         return horizontal_axis
 
@@ -164,7 +172,7 @@ class Sensor:
 
         for i in fov_offts:
             horizontal_axis.append(
-                mfn.pol2car(self.get_origin().get_cartesian_coordinates(), radius, i)
+                mfn.pol2car(self.get_origin_coord(), radius, i)
             )
         return horizontal_axis
 
@@ -205,7 +213,7 @@ class Sensor:
         adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
         adj_rad_bnd = self.get_fov_radius()
         # print(adj_win_bnd)
-        dist, target_horiz, target_vert = target_posn.get_cartesian_coordinates()
+        dist, target_horiz, target_vert = unwrap(target_posn)#.get_cartesian_coordinates()
         print(target_horiz)
 
         flags = 0

@@ -80,12 +80,23 @@ class SimulationEnvironment:
         for c in range(len(pairs)):
             if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
                 continue
+
             if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
-                updates[pairs[c][0]].append(pairs[c][1])
+                updates[pairs[c][0]].append(pairs[c][1].get_position())
 
         # update the trackers of all agents
         for k in updates:
-            self.agents[k].new_detection_set(frame_id, updates[k])
+            yblayer = []
+            for posn in updates[k]:
+                yblayer.append(self.create_agent_yolobox(k, posn))
+            self.agents[k].ingest_new_yolobox_layer(yblayer,True)
+            
+
+    # def check_distance(self, agent, target):
+    #     x,y,z = agent.get_center().get_cartesian_coordinates()
+    #     tx,ty,tz = target.get_position().get_cartesian_coordinates()
+
+        
 
     def visible_vertical_targets(self):
         """

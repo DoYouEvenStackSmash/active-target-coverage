@@ -8,7 +8,7 @@ from support.Polygon import *
 from aux_functions import *
 import time
 from State import State
-
+from Detection import *
 
 def adjust_angle(theta):
     """adjusts some theta to arctan2 interval [0,pi] and [-pi, 0]"""
@@ -18,7 +18,7 @@ def adjust_angle(theta):
         theta = theta + 2 * np.pi
 
     return theta
-
+unwrap = lambda posn : posn.get_cartesian_coordinates()
 
 class RigidBody:
     """A class representing a rigid body.
@@ -162,16 +162,30 @@ class RigidBody:
     def get_center(self):
         """
         Accessor for the RigidBody's origin
-        returns a point
+        returns a Position
         """
         return self.ref_center
 
+    def get_center_coord(self):
+        """
+        Accessor for the RigidBody's origin
+        returns a tuple
+        """
+        return self.get_center().get_cartesian_coordinates()
+    
     def get_endpoint(self):
         """
         Accessor for the RigidBody endpoint
-        Returns a point
+        Returns a position
         """
         return self.endpoint
+    
+    def get_endpoint_coord(self):
+        """
+        Accessor for the RigidBody endpoint
+        Returns a tuple
+        """
+        return self.get_endpoint().get_cartesian_coordinates()
 
     def get_origin(self):
         """
@@ -179,6 +193,13 @@ class RigidBody:
         returns a point
         """
         return self.origin
+
+    def get_origin_coord(self):
+        """
+        Accessor for an origin point
+        returns a point
+        """
+        return self.get_origin().get_cartesian_coordinates()
 
     def get_normals(self):
         """
@@ -202,12 +223,15 @@ class RigidBody:
 
         Returns a normalized angle theta
         """
-        center = self.get_center().get_cartesian_coordinates()
-        endpoint = self.get_endpoint().get_cartesian_coordinates()
-        target_point = target_point.get_cartesian_coordinates()
+        
+        
+        center = unwrap(self.get_center())#.get_cartesian_coordinates()
+        endpoint = unwrap(self.get_endpoint())#.get_cartesian_coordinates()
+        target_point = unwrap(target_point)#.get_cartesian_coordinates()
+        
+        
         norm, dist = mfn.car2pol(center, endpoint)
         rad, r = mfn.car2pol(endpoint, target_point)
-        phi, r = mfn.car2phi(endpoint, target_point)
 
         norm = mfn.correct_angle(norm)
         rad = mfn.correct_angle(rad)
@@ -226,19 +250,19 @@ class RigidBody:
         """
         Rotation for the rigid body
         """
-        rotation = self.get_relative_rotation(target_point.get_cartesian_coordinates())
+        rotation = self.get_relative_rotation(unwrap(target_point))#.get_cartesian_coordinates())
         rotation = self.apply_rotation_to_body(rotation)
         self.rel_theta += rotation
         return rotation
 
-    def translate_body(self, target_point):
+    def translate_body(self, target_posn):
         """
         Translates internal polygon
         Does not return
         """
-        theta, r = mfn.car2pol(self.get_center(), target_point)
+        theta, r = mfn.car2pol(self.get_center_coord(), unwrap(target_posn))
         pt2 = mfn.pol2car(self.get_center(), r, theta)
-        cx, cy, cz = self.get_center()
+        cx, cy, cz = unwrap(self.get_center())
         z_disp = pt2[2] - cz
         x_disp, y_disp = pt2[0] - cx, pt2[1] - cy
         self.endpoint = mfn.pol2car(self.endpoint, r, theta)
@@ -255,11 +279,11 @@ class RigidBody:
         """
         rot_mat = tfn.calculate_rotation_matrix(rotation, 1)
         self.endpoint = tfn.rotate_point(
-            self.get_center(), self.get_endpoint(), rot_mat
+            self.get_center_coord(), self.get_endpoint(), rot_mat
         )
         self.origin = tfn.rotate_point(self.get_center(), self.get_origin(), rot_mat)
         self.ref_center = tfn.rotate_point(
-            self.get_center(), self.get_center(), rot_mat
+            self.get_center_coord(), self.get_center(), rot_mat
         )
 
         rotate_polygon(self.body, rot_mat, self.get_center())
@@ -270,15 +294,18 @@ class RigidBody:
         Applies a translation to the rigid body
         returns a displacement vector
         """
-        self.ref_center = mfn.pol2car(
-            self.get_center(), translation_dist, self.get_rel_theta()
-        )
-        self.endpoint = mfn.pol2car(
-            self.get_endpoint(), translation_dist, self.get_rel_theta()
-        )
-        self.origin = mfn.pol2car(
-            self.get_origin(), translation_dist, self.get_rel_theta()
-        )
+        tup2pos = lambda tup : Position(tup[0], tup[1], tup[2])
+        # rc = Position()
+        
+        self.ref_center = tup2pos(mfn.pol2car(
+            self.get_center_coord(), translation_dist, self.get_rel_theta()
+        ))
+        self.endpoint = tup2pos(mfn.pol2car(
+            self.get_endpoint_coord(), translation_dist, self.get_rel_theta()
+        ))
+        self.origin = tup2pos(mfn.pol2car(
+            self.get_origin_coord(), translation_dist, self.get_rel_theta()
+        ))
         x_disp, y_disp, z_disp = mfn.pol2car(
             (0, 0, 0), translation_dist, self.get_rel_theta()
         )

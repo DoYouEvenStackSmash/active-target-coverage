@@ -108,6 +108,10 @@ class ObjectTrackManager:
         """
         Apply a linear displacement to offset a translation by a parent agent
         """
+
+        if not self.has_active_tracks():
+            return
+        
         pass
 
     def init_new_layer(self):
