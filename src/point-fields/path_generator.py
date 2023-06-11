@@ -14,14 +14,8 @@ import json
 
 MAGNITUDE = 6
 
-rng = np.random.default_rng(12345)
 
-rand_angle = lambda: (rng.uniform() * 2 * np.pi) - np.pi
-
-rand_mag = lambda: (rng.uniform() * MAGNITUDE)
-
-
-def create_circle(center_pt, radius=50, num_pts=50):
+def create_circle(center_pt, radius=50, num_pts=50, direction = 1):
     """
     Creates a circle of points in euclidean coordinates around the center
     return a list of (x,y) points
@@ -32,11 +26,21 @@ def create_circle(center_pt, radius=50, num_pts=50):
     angles = []
     pts = []
 
+    angles = []
+    angle1 = []
+    angle2 = []
     for i in range(num_pts // 2):
-        angles.append(i * step)
+        angle1.append(i * step)
     for i in range(num_pts // 2):
-        angles.append(-np.pi + i * step)
-
+        angle2.append(-np.pi + i * step)
+    if direction < 0:
+        temp = angle1
+        angle1 = angle2
+        angle2 = temp
+    for i in angle1:
+        angles.append(i)
+    for i in angle2:
+        angles.append(i)
     for i in range(len(angles)):
         pt = mfn.pol2car(center_pt, radius, angles[i])
         pts.append(pt)
@@ -56,10 +60,19 @@ def create_line(pt1, pt2, num_pts=50):
     return pts
 
 
-def render_path(screen, paths, filename="out.json"):
+def render_path(screen, paths, filename="out.json", magnitude = MAGNITUDE):
     """
     Renders and serializes a path
     """
+    
+    MAGNITUDE = int(magnitude)
+
+    rng = np.random.default_rng(12345)
+
+    rand_angle = lambda: (rng.uniform() * 2 * np.pi) - np.pi
+
+    rand_mag = lambda: (rng.uniform() * MAGNITUDE)
+    
     for p in range(len(paths)):
         path = paths[p]
         for i, pt in enumerate(path):
@@ -104,6 +117,8 @@ def loop_line():
     origin = (500, 500)
     circ = create_circle(origin, 100, 50)
     # circ.reverse()
+    circ2 = create_circle((700,500), 100, 50, -1)
+    circ2.reverse()
     intersection_pt = mfn.pol2car(origin, 100, 0)
 
     print(paths)
@@ -111,6 +126,7 @@ def loop_line():
     end_pt = mfn.pol2car(intersection_pt, 600, np.pi / 2)
     paths.append(create_line(start_pt, intersection_pt, 25))
     paths.append(circ)
+    paths.append(circ2)
     paths.append(create_line(intersection_pt, end_pt, 25))
     super_path = []
     for path in paths:
@@ -121,7 +137,7 @@ def loop_line():
 
 
 def get_lerp(origin, p):
-    segment = 4
+    segment = 1
     pts = []
     if segment > 0:
         spts = []
@@ -139,11 +155,11 @@ def get_lerp(origin, p):
         # get equilateral vertex of each segment
         sign = 1
         for i in range(len(spts) - 1):
-            ev.append(gfn.get_equilateral_vertex(spts[i], spts[i + 1], sign))
+            ev.append(gfn.get_isosceles_vertex(spts[i], spts[i + 1], sign, 35))
             sign = sign * -1
 
         # calculate lerp points
-        n = 20
+        n = 100
         step = 1 / n
         print(len(spts))
         for sp in range(len(spts) - 1):
@@ -167,23 +183,30 @@ def main():
     pafn.clear_frame(screen)
     paths = None
     flags = sys.argv[1:]
+    # if len(sys.argv) == 2:
+    #     sys.argv.append("0")
     opts = ["ACC", "GRID", "CIRCLE"]
     for f in flags:
         if f == "ACC":
             paths = loop_line()
-            render_path(screen, paths, f"loop_{MAGNITUDE}noise.json")
+            render_path(screen, paths, f"loop_{sys.argv[-1]}noise.json", sys.argv[-1])
         elif f == "GRID":
             paths = create_grid()
-            render_path(screen, paths, f"grid_{MAGNITUDE}noise.json")
+            render_path(screen, paths, f"grid_{sys.argv[-1]}noise.json", sys.argv[-1])
         elif f == "CIRCLE":
             origin = (500, 500)
             paths = create_circle(origin, 150, 50)
-            render_path(screen, [paths], f"circle_{MAGNITUDE}noise.json")
-        elif "LERP":
+            render_path(screen, [paths], f"circle_{sys.argv[-1]}noise.json", sys.argv[-1])
+        elif f == "LERP":
             origin = (800, 200)
             dest = (400, 1000)
             paths = get_lerp(origin, dest)
-            render_path(screen, [paths], f"lerp_{MAGNITUDE}noise.json")
+            render_path(screen, [paths], f"lerp_{sys.argv[-1]}noise.json", sys.argv[-1])
+        elif f == "LINE":
+            origin = (650, 200)
+            dest = (400, 1000)
+            paths = create_line(origin,dest)
+            render_path(screen, [paths], f"line_{sys.argv[-1]}noise.json", sys.argv[-1])
         else:
             print(f"options: {opts}")
             sys.exit()
