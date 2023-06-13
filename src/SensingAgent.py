@@ -62,6 +62,7 @@ class SensingAgent:
         sensors=None,
         rotation_flag=True,
         translation_flag=True,
+        prediction_flag=True
     ):
         """Initializes a SensingAgent instance.
 
@@ -81,6 +82,7 @@ class SensingAgent:
         self.sensors = sensors if sensors is not None else []
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
+        self.ALLOW_PREDICTION = prediction_flag
 
     def get_clock(self):
         """accessor for clock"""
@@ -133,7 +135,7 @@ class SensingAgent:
         """
         det_arr = self.obj_tracker.get_last_detections()
         pt_arr = []
-        print(det_arr)
+        
         for det in det_arr:
             pt_arr.append(self.transform_to_global_coord(det))
         return pt_arr
@@ -405,8 +407,15 @@ class SensingAgent:
         Uses past information to predict the next rotation if it exists
         Returns () or the tuple containing the partial rotation
         """
-
-        rel_det = self.estimate_rel_next_detection()
+        rel_det = []
+        if not self.ALLOW_PREDICTION:
+            dets = self.obj_tracker.get_last_detections()
+            if not len(dets):
+                rel_det = []
+            else:
+                rel_det.append([(),dets[0]])
+        else:
+            rel_det = self.estimate_rel_next_detection()
 
         if not len(rel_det):
             #print("empty")
@@ -416,7 +425,7 @@ class SensingAgent:
         if pred_det == None:
             return (None, None)
         pred_pt = pred_det.get_attr_coord()
-        curr_pt = curr_det.get_attr_coord()
+        # curr_pt = curr_det.get_attr_coord()
         # if no estimate available
         if not len(pred_pt):
             return (None, None)

@@ -336,3 +336,16 @@ class PygameArtFxns:
         Does not return
         """
         pygame.gfxdraw.filled_polygon(screen, pts, color)
+
+    def frame_draw_cross(screen, pt, color=(255,255,255), size=10):
+        """
+        Draws a small cross
+        Does not return
+        """
+        x,y = pt
+        sz = size
+        l1 = [(x+sz,y),(x-sz,y)]
+        l2 = [(x, y+sz), (x, y-sz)]
+        PygameArtFxns.frame_draw_bold_line(screen, l1, color)
+        PygameArtFxns.frame_draw_bold_line(screen, l2, color)
+        

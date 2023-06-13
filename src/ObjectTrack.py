@@ -20,7 +20,8 @@ def adjust_angle(theta):
 
 ACCELERATION_THRESHOLD = 1.5
 MAX_SCALE_FACTOR = 1.2
-
+MAX_RANGE = 2000
+MAX_ANGLE = np.pi
 
 class ObjectTrack:
     """
@@ -350,15 +351,16 @@ class ObjectTrack:
         accel_r = self.accel_r[-1]
         jolt_r = self.jolt_r[-1]
         t = scale_factor
+        jolt_scale = -.1
         r = (
-            r_0 * t
-            + delta_r * self.avg_detection_time * t
+            r_0
+            + delta_r * self.avg_detection_time
             + (1 / 2) * accel_r * np.square(self.avg_detection_time * t)
-            + (1 / 6)
+            + (1 / 6) * jolt_scale
             * jolt_r
             * np.power(self.avg_detection_time * t, 3)
-        )
-        return r
+        ) * t
+        return min(r, MAX_RANGE)
     
     def predict_theta(self, scale_factor=1):
         """
@@ -370,7 +372,7 @@ class ObjectTrack:
         jolt_theta = self.jolt_theta[-1]
         t = 1
         overall_t = scale_factor
-        jolt_scale = 0.3
+        jolt_scale = -1
         theta = (
             theta_0
             + (delta_theta * self.avg_detection_time * t

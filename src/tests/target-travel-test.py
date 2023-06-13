@@ -22,7 +22,7 @@ def target_traverse(screen, environment):
       pafn.frame_draw_dot(screen, t.get_position(), t.color)
       flag = t.step() or flag
     pygame.display.update()
-    time.sleep(0.05)
+    time.sleep(0.005)
   sys.exit()
   
 

@@ -26,12 +26,26 @@ def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
         (ox - 10 * scale, oy + 10 * scale),
         (ox + 30 * scale, oy),
     ]
+    scale2 = 1
+    opts2 = [
+        (ox - 10 * scale2, oy - 10 * scale2),
+        (ox - 10 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy - 10 * scale2),
+        (ox + 20 * scale2, oy + 10 * scale2),
+        (ox - 10 * scale2, oy - 10 * scale2),
+        (ox - 10 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy - 10 * scale2),
+
+        # (ox + 30 * scale, oy),
+    ]
+    
     # print(opts)
 
     mpt = gfn.get_midpoint(opts[0], opts[1])
     mpt2 = gfn.get_midpoint(mpt, opts[2])
 
-    ap = Polygon(opts)
+    ap = Polygon(opts2)
 
     rb = RigidBody(
         parent_agent=None,

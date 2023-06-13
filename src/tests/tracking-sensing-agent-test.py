@@ -20,10 +20,9 @@ def tracking_test(screen, environment):
       sensing_agent = environment.agents[k]
 
       r,t = sensing_agent.tracker_query()
-      
       sensing_agent.reposition(r,t)
-      render_predictions(screen, sensing_agent)
       sensing_agent.heartbeat()
+      render_predictions(screen, sensing_agent)
       
       draw_sensing_agent(screen, sensing_agent)
     
@@ -32,7 +31,6 @@ def tracking_test(screen, environment):
       pafn.frame_draw_dot(screen, t.get_position(), t.color)
       flag = t.step() or flag
       
-    
     pygame.display.update()
     time.sleep(0.1)
     environment.visible_targets()
