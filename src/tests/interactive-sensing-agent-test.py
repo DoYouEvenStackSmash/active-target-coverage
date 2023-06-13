@@ -9,9 +9,10 @@ from env_init import *
 from drawing_functions import *
 
 
-def mouse_test(screen, environment):
+def mouse_test(screen, environment, measurement_rate = 1):
   pt = None
   last_pt = None
+  counter = 0
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN:
@@ -38,7 +39,9 @@ def mouse_test(screen, environment):
         draw_sensing_agent(screen, sensing_agent)
       pygame.display.update()
       environment.targets[0].origin = pt
-      environment.visible_targets()
+      counter += 1
+      if not counter % measurement_rate:
+        environment.visible_targets()
 
 
 def main():
@@ -50,7 +53,10 @@ def main():
   sensing_agents[sa._id] = sa
   t = init_target()
   env = init_environment(sensing_agents=sensing_agents, targets=[t])
-  mouse_test(screen, env)
+  md = 1
+  if len(sys.argv) > 1:
+    md = int(sys.argv[-1])
+  mouse_test(screen, env, md)
 
 if __name__ == '__main__':
   main()

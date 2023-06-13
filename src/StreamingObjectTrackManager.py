@@ -96,6 +96,20 @@ class ObjectTrackManager:
 
         return pred_arr
 
+    def get_last_detections(self):
+        """
+        Return the most recent detection from all tracks
+        """
+        if not self.has_active_tracks():
+            return []
+        last_arr = []
+        for i, trk in enumerate(self.active_tracks):
+            if not len(trk.path):
+                continue
+            last_arr.append(trk.get_last_detection_coordinate())
+        return last_arr
+
+        
     def add_angular_displacement(self, distance, angle, direction=1):
         """
         Apply an angular displacement to offset a rotation by a parent agent
@@ -321,6 +335,7 @@ class ObjectTrackManager:
 
             # add entity to nearest track
             T = self.global_track_store[elem[0]]
+            print(curr_layer[elem[1]].get_cartesian_coord())
             T.add_new_detection(curr_layer[elem[1]], fc, elem[2])
 
             # update counters

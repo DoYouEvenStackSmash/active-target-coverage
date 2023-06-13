@@ -127,6 +127,17 @@ class SensingAgent:
         if body_translation != 0:
             self.obj_tracker.add_linear_displacement(-body_translation, -body_rotation)
 
+    def get_last_detections(self):
+        """
+        Wrapper function for getting recent detections
+        """
+        det_arr = self.obj_tracker.get_last_detections()
+        pt_arr = []
+        print(det_arr)
+        for det in det_arr:
+            pt_arr.append(self.transform_to_global_coord(det))
+        return pt_arr
+
     def heartbeat(self):
         """
         Exoskeleton heartbeat

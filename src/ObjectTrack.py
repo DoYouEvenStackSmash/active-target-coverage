@@ -189,7 +189,7 @@ class ObjectTrack:
         Accessor for the coordinate of the last detection
         """
         if len(self.path) > 0:
-            return self.path[-1].get_center_coord()
+            return self.path[-1].get_cartesian_coord()
         return None
 
     def get_loco_track(self, fdict=None, steps=None):
@@ -349,16 +349,16 @@ class ObjectTrack:
         delta_r = self.delta_r[-1]
         accel_r = self.accel_r[-1]
         jolt_r = self.jolt_r[-1]
-
+        t = scale_factor
         r = (
-            r_0
-            + delta_r * self.avg_detection_time
-            + (1 / 2) * accel_r * np.square(self.avg_detection_time * scale_factor)
+            r_0 * t
+            + delta_r * self.avg_detection_time * t
+            + (1 / 2) * accel_r * np.square(self.avg_detection_time * t)
             + (1 / 6)
             * jolt_r
-            * np.power(self.avg_detection_time * scale_factor, 3)
+            * np.power(self.avg_detection_time * t, 3)
         )
-        return r * scale_factor
+        return r
     
     def predict_theta(self, scale_factor=1):
         """
@@ -368,17 +368,19 @@ class ObjectTrack:
         delta_theta = self.delta_theta[-1]
         accel_theta = self.accel_theta[-1]
         jolt_theta = self.jolt_theta[-1]
-
+        t = 1
+        overall_t = scale_factor
+        jolt_scale = 0.3
         theta = (
             theta_0
-            + (delta_theta * self.avg_detection_time
+            + (delta_theta * self.avg_detection_time * t
             + (1 / 2)
             * accel_theta
-            * np.square(self.avg_detection_time * scale_factor)
-            + (1 / 6)
+            * np.square(self.avg_detection_time * t)
+            + (1 / 6) * jolt_scale
             * jolt_theta
-            * np.power(self.avg_detection_time * scale_factor, 3))
-            * scale_factor
+            * np.power(self.avg_detection_time * t, 3))
+            * overall_t
             * np.pi
             
         )

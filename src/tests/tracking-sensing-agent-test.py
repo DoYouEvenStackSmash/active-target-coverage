@@ -18,6 +18,7 @@ def tracking_test(screen, environment):
 
     for k in environment.agents:
       sensing_agent = environment.agents[k]
+
       r,t = sensing_agent.tracker_query()
       
       sensing_agent.reposition(r,t)
