@@ -7,7 +7,7 @@ sys.path.append(".")
 from env_init import *
 
 """
-Initializes environment objects
+A test which initializes environment objects
 """
 sa = init_sensing_agent()
 t = init_target()

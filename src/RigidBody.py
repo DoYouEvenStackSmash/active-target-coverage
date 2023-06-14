@@ -73,7 +73,7 @@ class RigidBody:
         self.point_set = point_set if point_set is not None else []
         self.body = rigid_link
         self.rel_theta = rel_theta
-        self.color = color or rand_color()
+        self.color = color if color != None else rand_color()
         self.time_stamp = time_stamp
         self.states = states if states is not None else []
 
@@ -295,12 +295,12 @@ class RigidBody:
         """
         self.point_set = point_set
 
-    def get_grid(self, spacing=10):
+    def get_grid(self, spacing=10, radius=500):
         """
         Drawing function for getting a coordinate grid oriented with the rigid body
         returns a List of (pt1, pt2) points
         """
-        r = 300
+        r = radius
         tlpt = mfn.pol2car(
             self.get_center(), r, adjust_angle(self.get_rel_theta() - np.pi / 4)
         )

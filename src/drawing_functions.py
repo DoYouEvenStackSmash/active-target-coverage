@@ -42,11 +42,17 @@ def adjust_angle(theta):
 
     return theta
 
-
+DRAW_BOUNDARIES = True # draw the threshold regions for visibility
 DRAW_HORIZONTAL = False
-OUTLINE = False
+OUTLINE = False # draw only the outlined fov of the agent
+GRID=False  # draw the cartesian plane around the agent
+LINE=False  # allow a straight line to be drawn between last detection and next prediction
+DELAY = 3   # delay to draw marked points
+INVERTED = 1
+MARKERS = True # draw markers for the predictions
 
-
+frame_colors = [pafn.colors["white"], pafn.colors["black"]]
+color_grade = [pafn.colors["white"], pafn.colors["tangerine"], pafn.colors["lightslategray"], pafn.colors["dimgray"], pafn.colors["black"], pafn.colors["black"], pafn.colors["black"]]
 def draw_coordinate_frame(screen, sensor, levels=5):
     """
     Helper function for displaying the sensor field of view
@@ -64,7 +70,7 @@ def draw_coordinate_frame(screen, sensor, levels=5):
             pafn.frame_draw_line(
                 screen,
                 (coord_frame[-1][i - 1], coord_frame[-1][i]),
-                pafn.colors["black"],
+                frame_colors[INVERTED],
             )
     else:  # draw full sensor field of view
         for c in range(levels):
@@ -72,7 +78,7 @@ def draw_coordinate_frame(screen, sensor, levels=5):
                 pafn.frame_draw_line(
                     screen,
                     (coord_frame[c][i - 1], coord_frame[c][i]),
-                    pafn.colors["black"],
+                    frame_colors[INVERTED],
                 )
         for endpoint in coord_frame[-1]:
             pafn.frame_draw_line(
@@ -80,14 +86,15 @@ def draw_coordinate_frame(screen, sensor, levels=5):
             )
 
     # draw threshold regions
-    for endpoint in detect_frame[-1][:2]:
-        pafn.frame_draw_line(
-            screen, (sensor.get_origin(), endpoint), pafn.colors["tangerine"]
-        )
-    for endpoint in detect_frame[-1][2:]:
-        pafn.frame_draw_line(
-            screen, (sensor.get_origin(), endpoint), pafn.colors["cyan"]
-        )
+    if DRAW_BOUNDARIES:
+        for endpoint in detect_frame[-1][:2]:
+            pafn.frame_draw_line(
+                screen, (sensor.get_origin(), endpoint), pafn.colors["tangerine"]
+            )
+        for endpoint in detect_frame[-1][2:]:
+            pafn.frame_draw_line(
+                screen, (sensor.get_origin(), endpoint), pafn.colors["cyan"]
+            )
 
 
 def draw_all_normals(screen, rigid_body):
@@ -119,7 +126,7 @@ def draw_all_links(screen, link, color=None):
         color = pafn.colors["indigo"]
     points = link.get_points()
     pafn.frame_draw_filled_polygon(screen, points, color)
-    pafn.frame_draw_polygon(screen, points, pafn.colors["black"])
+    pafn.frame_draw_polygon(screen, points, frame_colors[INVERTED])
     pafn.frame_draw_dot(screen, link.get_center(), pafn.colors["white"])
 
 
@@ -132,7 +139,8 @@ def draw_rigid_body(screen, rigid_body):
     """
     draw_all_normals(screen, rigid_body)
     draw_all_links(screen, rigid_body, rigid_body.color)
-    draw_body_grid(screen, rigid_body)
+    if GRID:
+        draw_body_grid(screen, rigid_body)
     # pafn.frame_draw_bold_line(screen, rigid_body.get_horizontal_axis(), pafn.colors["black"])
     # pafn.frame_draw_bold_line(screen, rigid_body.get_vertical_axis(), pafn.colors["black"])
 
@@ -140,7 +148,7 @@ def draw_rigid_body(screen, rigid_body):
 def draw_body_grid(screen, rigid_body):
     axes = rigid_body.get_grid()
     for ax in axes:
-        pafn.frame_draw_line(screen, ax, pafn.colors["black"])
+        pafn.frame_draw_line(screen, ax, frame_colors[INVERTED])
 
 
 def draw_sensing_agent(screen, sensing_agent):
@@ -165,11 +173,12 @@ def render_predictions(screen, sensing_agent):
         curr_pt = arr[0][0]
         pred_pt = arr[0][1]
     if len(pred_pt):
-        pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"])
-        pafn.frame_draw_dot(screen, pred_pt, pafn.colors["yellow"])
-        pafn.frame_draw_line(
-            screen, (curr_pt, pred_pt), pafn.colors["white"]
-        )
+        # pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"], 5,10)
+        pafn.frame_draw_cross(screen, pred_pt, pafn.colors["yellow"], 20)
+        if LINE:
+            pafn.frame_draw_bold_line(
+                screen, (curr_pt, pred_pt), pafn.colors["white"]
+            )
 
 def render_path(screen, path, color):
     """
@@ -213,3 +222,52 @@ def import_agent_record(screen, agent_record):
 
         render_path(screen, pts, color)
         pygame.display.update()
+    
+def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
+    """
+    Accumulates the last detection and predicted next detection points 
+    for rendering.
+    """
+    curr_pt, pred_pt = (),()
+    arr = sensing_agent.estimate_next_detection()
+    if len(arr):
+        curr_pt = arr[0][0]
+        pred_pt = arr[0][1]
+    else:
+        return
+    if len(pred_pt):
+        curr_pts.append(curr_pt)
+        pred_pts.append(pred_pt)
+    else:
+        curr_pts.append(curr_pt)
+        pred_pts.append(curr_pt)
+    
+def environment_agent_update(environment, FORCE_UPDATE=False):
+    """
+    Allows agents to make their predictions and move if necessary
+    """
+    for k in environment.agents:
+        sensing_agent = environment.agents[k]
+        if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
+            r,t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r,t)
+            sensing_agent.heartbeat()
+  
+def environment_agent_illustration(screen, environment, measurement_rate, curr_pts, pred_pts, marked_pts):
+    """
+    Draws nice things (Agents, marked points, predictions, etc) on the screen
+    """
+    for k in environment.agents:
+        sensing_agent = environment.agents[k]
+        render_predictions(screen, sensing_agent)
+        # demo rendering
+        accumulate_predictions(sensing_agent, curr_pts, pred_pts)
+        for i in range(max(0, len(marked_pts) - 5), len(marked_pts)):
+            pafn.frame_draw_dot(screen, marked_pts[i], color_grade[len(marked_pts) - i], 0, (1 - (len(marked_pts) - i) / 5) * 10)
+        # if len(curr_pts):
+        #   pafn.frame_draw_cross(screen, curr_pts[-1], pafn.colors["tangerine"], 20)
+        if MARKERS:
+            for idx in range(max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3):
+                pafn.frame_draw_dot(screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2)
+        
+        draw_sensing_agent(screen, sensing_agent)

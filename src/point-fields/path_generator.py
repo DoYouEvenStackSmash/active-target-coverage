@@ -115,19 +115,19 @@ def loop_line():
     """
     paths = []
     origin = (500, 500)
-    circ = create_circle(origin, 100, 50)
+    circ = create_circle(origin, 100, 400)
     # circ.reverse()
-    circ2 = create_circle((700,500), 100, 50, -1)
+    circ2 = create_circle((700,500), 100, 400, -1)
     circ2.reverse()
     intersection_pt = mfn.pol2car(origin, 100, 0)
 
     print(paths)
     start_pt = mfn.pol2car(intersection_pt, 300, -np.pi / 2)
     end_pt = mfn.pol2car(intersection_pt, 600, np.pi / 2)
-    paths.append(create_line(start_pt, intersection_pt, 25))
+    paths.append(create_line(start_pt, intersection_pt, 400))
     paths.append(circ)
     paths.append(circ2)
-    paths.append(create_line(intersection_pt, end_pt, 25))
+    paths.append(create_line(intersection_pt, end_pt, 400))
     super_path = []
     for path in paths:
         for pt in path:
@@ -137,7 +137,7 @@ def loop_line():
 
 
 def get_lerp(origin, p):
-    segment = 1
+    segment = 4
     pts = []
     if segment > 0:
         spts = []
@@ -159,7 +159,7 @@ def get_lerp(origin, p):
             sign = sign * -1
 
         # calculate lerp points
-        n = 100
+        n = 400
         step = 1 / n
         print(len(spts))
         for sp in range(len(spts) - 1):
