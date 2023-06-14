@@ -13,7 +13,6 @@ from Environment import Environment
 from StreamingObjectTrackManager import ObjectTrackManager
 
 
-
 def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
     """
     Initializes an exoskeleton for an agent
@@ -38,10 +37,9 @@ def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
         (ox - 10 * scale2, oy + 10 * scale2),
         (ox + 20 * scale2, oy + 10 * scale2),
         (ox + 20 * scale2, oy - 10 * scale2),
-
         # (ox + 30 * scale, oy),
     ]
-    
+
     # print(opts)
 
     mpt = gfn.get_midpoint(opts[0], opts[1])

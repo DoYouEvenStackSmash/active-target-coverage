@@ -108,7 +108,7 @@ class ObjectTrackManager:
                 continue
             last_arr.append(trk.get_last_detection_coordinate())
         return last_arr
-    
+
     def get_last_detections(self):
         if not self.has_active_tracks():
             return []
@@ -184,7 +184,7 @@ class ObjectTrackManager:
         returns true if there are active tracks
         """
         return self.active_tracks != None and len(self.active_tracks) > 0
-    
+
     def get_active_tracks(self):
         if not self.has_active_tracks():
             return []

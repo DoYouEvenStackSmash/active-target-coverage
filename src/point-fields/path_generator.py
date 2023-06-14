@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+
 sys.path.append("../")
 sys.path.append(".")
 from render_support import MathFxns as mfn
@@ -15,7 +16,7 @@ import json
 MAGNITUDE = 6
 
 
-def create_circle(center_pt, radius=50, num_pts=50, direction = 1):
+def create_circle(center_pt, radius=50, num_pts=50, direction=1):
     """
     Creates a circle of points in euclidean coordinates around the center
     return a list of (x,y) points
@@ -60,11 +61,11 @@ def create_line(pt1, pt2, num_pts=50):
     return pts
 
 
-def render_path(screen, paths, filename="out.json", magnitude = MAGNITUDE):
+def render_path(screen, paths, filename="out.json", magnitude=MAGNITUDE):
     """
     Renders and serializes a path
     """
-    
+
     MAGNITUDE = int(magnitude)
 
     rng = np.random.default_rng(12345)
@@ -72,7 +73,7 @@ def render_path(screen, paths, filename="out.json", magnitude = MAGNITUDE):
     rand_angle = lambda: (rng.uniform() * 2 * np.pi) - np.pi
 
     rand_mag = lambda: (rng.uniform() * MAGNITUDE)
-    
+
     for p in range(len(paths)):
         path = paths[p]
         for i, pt in enumerate(path):
@@ -117,7 +118,7 @@ def loop_line():
     origin = (500, 500)
     circ = create_circle(origin, 100, 400)
     # circ.reverse()
-    circ2 = create_circle((700,500), 100, 400, -1)
+    circ2 = create_circle((700, 500), 100, 400, -1)
     circ2.reverse()
     intersection_pt = mfn.pol2car(origin, 100, 0)
 
@@ -196,7 +197,9 @@ def main():
         elif f == "CIRCLE":
             origin = (500, 500)
             paths = create_circle(origin, 150, 50)
-            render_path(screen, [paths], f"circle_{sys.argv[-1]}noise.json", sys.argv[-1])
+            render_path(
+                screen, [paths], f"circle_{sys.argv[-1]}noise.json", sys.argv[-1]
+            )
         elif f == "LERP":
             origin = (800, 200)
             dest = (400, 1000)
@@ -205,7 +208,7 @@ def main():
         elif f == "LINE":
             origin = (650, 200)
             dest = (400, 1000)
-            paths = create_line(origin,dest)
+            paths = create_line(origin, dest)
             render_path(screen, [paths], f"line_{sys.argv[-1]}noise.json", sys.argv[-1])
         else:
             print(f"options: {opts}")

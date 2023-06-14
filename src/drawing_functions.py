@@ -42,17 +42,28 @@ def adjust_angle(theta):
 
     return theta
 
-DRAW_BOUNDARIES = True # draw the threshold regions for visibility
+
+DRAW_BOUNDARIES = True  # draw the threshold regions for visibility
 DRAW_HORIZONTAL = False
-OUTLINE = False # draw only the outlined fov of the agent
-GRID=False  # draw the cartesian plane around the agent
-LINE=False  # allow a straight line to be drawn between last detection and next prediction
-DELAY = 3   # delay to draw marked points
+OUTLINE = False  # draw only the outlined fov of the agent
+GRID = False  # draw the cartesian plane around the agent
+LINE = False  # allow a straight line to be drawn between last detection and next prediction
+DELAY = 3  # delay to draw marked points
 INVERTED = 1
-MARKERS = True # draw markers for the predictions
+MARKERS = True  # draw markers for the predictions
 
 frame_colors = [pafn.colors["white"], pafn.colors["black"]]
-color_grade = [pafn.colors["white"], pafn.colors["tangerine"], pafn.colors["lightslategray"], pafn.colors["dimgray"], pafn.colors["black"], pafn.colors["black"], pafn.colors["black"]]
+color_grade = [
+    pafn.colors["white"],
+    pafn.colors["tangerine"],
+    pafn.colors["lightslategray"],
+    pafn.colors["dimgray"],
+    pafn.colors["black"],
+    pafn.colors["black"],
+    pafn.colors["black"],
+]
+
+
 def draw_coordinate_frame(screen, sensor, levels=5):
     """
     Helper function for displaying the sensor field of view
@@ -163,11 +174,12 @@ def draw_sensing_agent(screen, sensing_agent):
     # draw_body_coordinate_frame(screen, exoskeleton)
     draw_rigid_body(screen, exoskeleton)
 
+
 def render_predictions(screen, sensing_agent):
     """
     renders an agents predictions if applicable
     """
-    curr_pt, pred_pt = (),()
+    curr_pt, pred_pt = (), ()
     arr = sensing_agent.estimate_next_detection()
     if len(arr):
         curr_pt = arr[0][0]
@@ -176,9 +188,8 @@ def render_predictions(screen, sensing_agent):
         # pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"], 5,10)
         pafn.frame_draw_cross(screen, pred_pt, pafn.colors["yellow"], 20)
         if LINE:
-            pafn.frame_draw_bold_line(
-                screen, (curr_pt, pred_pt), pafn.colors["white"]
-            )
+            pafn.frame_draw_bold_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+
 
 def render_path(screen, path, color):
     """
@@ -186,6 +197,7 @@ def render_path(screen, path, color):
     """
     for i in range(1, len(path)):
         pafn.frame_draw_bold_line(screen, (path[i - 1], path[i]), color)
+
 
 def import_agent_record(screen, agent_record):
     """
@@ -222,13 +234,14 @@ def import_agent_record(screen, agent_record):
 
         render_path(screen, pts, color)
         pygame.display.update()
-    
+
+
 def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
     """
-    Accumulates the last detection and predicted next detection points 
+    Accumulates the last detection and predicted next detection points
     for rendering.
     """
-    curr_pt, pred_pt = (),()
+    curr_pt, pred_pt = (), ()
     arr = sensing_agent.estimate_next_detection()
     if len(arr):
         curr_pt = arr[0][0]
@@ -241,7 +254,8 @@ def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
     else:
         curr_pts.append(curr_pt)
         pred_pts.append(curr_pt)
-    
+
+
 def environment_agent_update(environment, FORCE_UPDATE=False):
     """
     Allows agents to make their predictions and move if necessary
@@ -249,11 +263,14 @@ def environment_agent_update(environment, FORCE_UPDATE=False):
     for k in environment.agents:
         sensing_agent = environment.agents[k]
         if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
-            r,t = sensing_agent.tracker_query()
-            sensing_agent.reposition(r,t)
+            r, t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r, t)
             sensing_agent.heartbeat()
-  
-def environment_agent_illustration(screen, environment, measurement_rate, curr_pts, pred_pts, marked_pts):
+
+
+def environment_agent_illustration(
+    screen, environment, measurement_rate, curr_pts, pred_pts, marked_pts
+):
     """
     Draws nice things (Agents, marked points, predictions, etc) on the screen
     """
@@ -263,11 +280,21 @@ def environment_agent_illustration(screen, environment, measurement_rate, curr_p
         # demo rendering
         accumulate_predictions(sensing_agent, curr_pts, pred_pts)
         for i in range(max(0, len(marked_pts) - 5), len(marked_pts)):
-            pafn.frame_draw_dot(screen, marked_pts[i], color_grade[len(marked_pts) - i], 0, (1 - (len(marked_pts) - i) / 5) * 10)
+            pafn.frame_draw_dot(
+                screen,
+                marked_pts[i],
+                color_grade[len(marked_pts) - i],
+                0,
+                (1 - (len(marked_pts) - i) / 5) * 10,
+            )
         # if len(curr_pts):
         #   pafn.frame_draw_cross(screen, curr_pts[-1], pafn.colors["tangerine"], 20)
         if MARKERS:
-            for idx in range(max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3):
-                pafn.frame_draw_dot(screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2)
-        
+            for idx in range(
+                max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3
+            ):
+                pafn.frame_draw_dot(
+                    screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2
+                )
+
         draw_sensing_agent(screen, sensing_agent)

@@ -16,7 +16,6 @@ LALT = 256
 LSHIFT = 1
 
 
-
 def grid_sensing_agent(screen, sensing_agent, points):
     for p in points:
         # p = pygame.mouse.get_pos()
@@ -24,7 +23,7 @@ def grid_sensing_agent(screen, sensing_agent, points):
         if visible:
             pafn.frame_draw_dot(screen, p, pafn.colors["green"], 8, 6)
         else:
-            pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)                    
+            pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)
         pt = sensing_agent.transform_to_local_detection_coord(p)
 
         pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
@@ -57,14 +56,14 @@ def grid_sensing_agent(screen, sensing_agent, points):
                     p = pygame.mouse.get_pos()
                     pafn.clear_frame(screen)
                     rotation = sensing_agent.rotate_agent(p)
-        
+
                 for p in points:
                     # p = pygame.mouse.get_pos()
                     visible = sensing_agent.is_visible(p)
                     if visible:
                         pafn.frame_draw_dot(screen, p, pafn.colors["green"], 8, 6)
                     else:
-                        pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)                    
+                        pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)
                     pt = sensing_agent.transform_to_local_detection_coord(p)
 
                     pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
@@ -84,10 +83,11 @@ def main():
     pygame.init()
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
-    origin = (500,500)
+    origin = (500, 500)
     sa = init_sensing_agent(origin=origin)
     p = load_json_file(sys.argv[1])
     grid_sensing_agent(screen, sa, p)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

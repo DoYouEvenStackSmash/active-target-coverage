@@ -18,9 +18,9 @@ for lt in linked_tracks:
         err.append(annos[st].error)
     errors.append(err)
 
-fig,axs = plt.subplots(len(errors))
+fig, axs = plt.subplots(len(errors))
 if len(errors) > 1:
-    for eidx,err in enumerate(errors):
+    for eidx, err in enumerate(errors):
         axs[eidx].plot(errors[eidx])
 else:
     axs.plot(errors[0])

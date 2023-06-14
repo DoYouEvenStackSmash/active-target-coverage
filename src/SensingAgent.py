@@ -62,7 +62,7 @@ class SensingAgent:
         sensors=None,
         rotation_flag=True,
         translation_flag=True,
-        prediction_flag=True
+        prediction_flag=True,
     ):
         """Initializes a SensingAgent instance.
 
@@ -135,7 +135,7 @@ class SensingAgent:
         """
         det_arr = self.obj_tracker.get_last_detections()
         pt_arr = []
-        
+
         for det in det_arr:
             pt_arr.append(self.transform_to_global_coord(det))
         return pt_arr
@@ -413,12 +413,12 @@ class SensingAgent:
             if not len(dets):
                 rel_det = []
             else:
-                rel_det.append([(),dets[0]])
+                rel_det.append([(), dets[0]])
         else:
             rel_det = self.estimate_rel_next_detection()
 
         if not len(rel_det):
-            #print("empty")
+            # print("empty")
             return (None, None)
 
         curr_det, pred_det = rel_det[0]

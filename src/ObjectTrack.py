@@ -23,10 +23,12 @@ MAX_SCALE_FACTOR = 1.2
 MAX_RANGE = 2000
 MAX_ANGLE = np.pi
 
+
 class ObjectTrack:
     """
     An abstraction for an object track.
     """
+
     def __init__(
         self,
         track_id,
@@ -107,7 +109,7 @@ class ObjectTrack:
 
         self.color = color
         self.last_frame = last_frame
-    
+
     def heartbeat(self):
         """
         Heartbeat function
@@ -141,9 +143,9 @@ class ObjectTrack:
         """
         if len(self.path):
             return self.predict_next_state()
-        
+
         return self.get_last_detection()
-        
+
         # pass
 
     def get_track_heading(self):
@@ -151,7 +153,12 @@ class ObjectTrack:
         Accessor for track trajectory information
         Returns the track heading
         """
-        return (self.get_last_detection(), self.r, self.acceleration[-1], self.theta[-1])
+        return (
+            self.get_last_detection(),
+            self.r,
+            self.acceleration[-1],
+            self.theta[-1],
+        )
 
     def is_alive(self, fc, expiration):
         """
@@ -224,7 +231,6 @@ class ObjectTrack:
             steps.append(yb_json)
         return steps
 
-    
     def add_new_detection(self, detection, frame_id, error=-1):
         """
         Add a new bounding box to the object track
@@ -234,7 +240,7 @@ class ObjectTrack:
 
         # set detection time
         self.detection_idx.append(self.parent_agent.get_clock())
-        
+
         if len(self.path):
             self.detection_time = (
                 self.detection_idx[-1] - self.detection_idx[-2] + self.detection_time
@@ -242,13 +248,12 @@ class ObjectTrack:
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
         else:
-            r, y= detection.get_cartesian_coord()
+            r, y = detection.get_cartesian_coord()
             self.r_naught.append(0)
 
         self.error_over_time.append(error)
         self.path.append(detection)
 
-    
     def update_track_trajectory(self, det, displacement=None):
         """
         Updates the track trajectory components using cartesian coordinates
@@ -263,19 +268,21 @@ class ObjectTrack:
         curr_pt = det.get_cartesian_coord()
 
         theta, distance = mfn.car2pol(last_pt, curr_pt)
-        
+
         # TODO: Figure out which time is optimal
         # delta_t = max(1,(self.detection_idx[-1] - self.detection_idx[-2]))
         delta_t = self.avg_detection_time
-        
+
         # self.velocity
         velocity = (distance - self.r_naught[-1]) / delta_t
-        
+
         # self.acceleration
         acceleration = (velocity - self.delta_r[-1]) / delta_t
         acceleration_sign = 1 if acceleration >= 0 else -1
-        acceleration = acceleration_sign * min(ACCELERATION_THRESHOLD, abs(acceleration))
-        
+        acceleration = acceleration_sign * min(
+            ACCELERATION_THRESHOLD, abs(acceleration)
+        )
+
         # self.jolt
         jolt = (acceleration - self.accel_r[-1]) / delta_t
 
@@ -283,12 +290,14 @@ class ObjectTrack:
         self.delta_r.append(abs(velocity))
 
         self.accel_r.append(acceleration)
-        
+
         self.jolt_r.append(jolt)
 
         int_theta = theta + 2 * np.pi if theta < 0 else theta
         last_theta = (
-            self.theta_naught[-1] + 2 * np.pi if self.theta_naught[-1] < 0 else self.theta_naught[-1]
+            self.theta_naught[-1] + 2 * np.pi
+            if self.theta_naught[-1] < 0
+            else self.theta_naught[-1]
         )
 
         # normalize angle to some ratio of pi
@@ -296,20 +305,21 @@ class ObjectTrack:
 
         # velocity is pi/time
         angular_velocity = angle_diff / delta_t
-        
+
         angular_acceleration = (angular_velocity - self.delta_theta[-1]) / delta_t
         angular_acceleration_sign = 1 if angular_acceleration >= 0 else -1
-        
-        angular_acceleration = angular_acceleration_sign * min(ACCELERATION_THRESHOLD, abs(angular_acceleration))
+
+        angular_acceleration = angular_acceleration_sign * min(
+            ACCELERATION_THRESHOLD, abs(angular_acceleration)
+        )
         angular_jolt = (angular_acceleration - self.accel_theta[-1]) / delta_t
-        
+
         self.theta_naught.append(theta)
         self.delta_theta.append(angular_velocity)
         self.accel_theta.append(angular_acceleration)
         self.jolt_theta.append(angular_jolt)
-    
+
         pass
-    
 
     def estimate_next_position(self, scale_factor=1):
         """
@@ -321,7 +331,7 @@ class ObjectTrack:
         angle = self.predict_theta(scale_factor)
         # velocity
         velocity = self.predict_range(scale_factor)
-        
+
         pt = mfn.pol2car(
             last_pos.get_cartesian_coord(),
             velocity,
@@ -341,7 +351,7 @@ class ObjectTrack:
         return det
 
         pass
-    
+
     def predict_range(self, scale_factor=1):
         """
         Wrapper for range query
@@ -351,17 +361,15 @@ class ObjectTrack:
         accel_r = self.accel_r[-1]
         jolt_r = self.jolt_r[-1]
         t = scale_factor
-        jolt_scale = -.1
+        jolt_scale = -0.1
         r = (
             r_0
             + delta_r * self.avg_detection_time
             + (1 / 2) * accel_r * np.square(self.avg_detection_time * t)
-            + (1 / 6) * jolt_scale
-            * jolt_r
-            * np.power(self.avg_detection_time * t, 3)
+            + (1 / 6) * jolt_scale * jolt_r * np.power(self.avg_detection_time * t, 3)
         ) * t
         return min(r, MAX_RANGE)
-    
+
     def predict_theta(self, scale_factor=1):
         """
         Wrapper for theta query
@@ -375,16 +383,16 @@ class ObjectTrack:
         jolt_scale = -1
         theta = (
             theta_0
-            + (delta_theta * self.avg_detection_time * t
-            + (1 / 2)
-            * accel_theta
-            * np.square(self.avg_detection_time * t)
-            + (1 / 6) * jolt_scale
-            * jolt_theta
-            * np.power(self.avg_detection_time * t, 3))
+            + (
+                delta_theta * self.avg_detection_time * t
+                + (1 / 2) * accel_theta * np.square(self.avg_detection_time * t)
+                + (1 / 6)
+                * jolt_scale
+                * jolt_theta
+                * np.power(self.avg_detection_time * t, 3)
+            )
             * overall_t
             * np.pi
-            
         )
 
         return theta

@@ -33,7 +33,7 @@ class Target:
         Returns an (x,y) point
         """
         return self.origin
-    
+
     def get_position(self):
         """
         Accessor for the position of the target
@@ -42,7 +42,6 @@ class Target:
         if not len(self.path):
             return self.get_origin()
         return self.path[self.idx]
-
 
     def get_attributes(self):
         """

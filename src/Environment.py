@@ -66,7 +66,9 @@ class Environment:
             # self.agents[k].heartbeat()
             updates[k] = []
             for target in self.targets:
-                d = mfn.euclidean_dist(self.agents[k].get_origin(), target.get_position())
+                d = mfn.euclidean_dist(
+                    self.agents[k].get_origin(), target.get_position()
+                )
                 pairs.append((self.agents[k]._id, target, d))
 
         pairs = sorted(pairs, key=sortkey)
@@ -111,7 +113,7 @@ class Environment:
 
         r = y
         return mfn.pol2car(self.agent.get_origin(), r, theta)
-    
+
     def serialize_agent_tracks(self):
         """
         export tracks of all agents
