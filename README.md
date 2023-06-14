@@ -1,4 +1,4 @@
-# Object tracking 
+# Active Object Tracking and Target Coverage
 
 ## Interactive (mouse driven) demos
 These are some fun interactive tests to exhibit the tracker behaviors.  The higher the sample rate, the more accurate the tracker will be.
