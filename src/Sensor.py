@@ -20,7 +20,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.1
+    TOLERANCE = 0.25
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 

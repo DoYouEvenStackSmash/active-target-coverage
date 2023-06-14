@@ -1,20 +1,23 @@
 #!/usr/bin/python3
 
+"""
+A test for showing the tracks that targets take
+"""
+
 import sys
 
 sys.path.append("../")
 sys.path.append(".")
 from env_init import *
-
 from drawing_functions import *
-
 from support.file_loader import *
 
 def target_traverse(screen, environment):
   """
-  Step through all targets in the environment
+  Step through all targets in the environment and display their positions
   """
   flag = True
+  # run until all targets have stopped moving
   while flag:
     flag = False
     for i in range(len(environment.targets)):
@@ -31,11 +34,13 @@ def main():
     screen = pafn.create_display(1000, 1000)
     pafn.clear_frame(screen)
     targets = []
-    # load json point files
+    # load json point files and initialize targets
     for i,file in enumerate(sys.argv[1:]):
       p = load_json_file(file)
       t = init_target(_id=i, path=p)
       targets.append(t)
+    
+    # initialize environment
     env = init_environment(targets=targets)
     target_traverse(screen, env)
 

@@ -20,13 +20,15 @@ def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
     returns a rigid body
     """
     ox, oy = origin
-    scale = 2
+    scale = 1.5
+    # makes the agent look like a triangle
     opts = [
         (ox - 10 * scale, oy - 10 * scale),
         (ox - 10 * scale, oy + 10 * scale),
         (ox + 30 * scale, oy),
     ]
-    scale2 = 1
+    # makes the agent look like an hourglass thing
+    scale2 = 1.5
     opts2 = [
         (ox - 10 * scale2, oy - 10 * scale2),
         (ox - 10 * scale2, oy + 10 * scale2),
@@ -45,7 +47,7 @@ def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
     mpt = gfn.get_midpoint(opts[0], opts[1])
     mpt2 = gfn.get_midpoint(mpt, opts[2])
 
-    ap = Polygon(opts2)
+    ap = Polygon(opts)
 
     rb = RigidBody(
         parent_agent=None,

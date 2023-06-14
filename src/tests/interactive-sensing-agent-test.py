@@ -10,6 +10,9 @@ from drawing_functions import *
 
 
 def active_mouse_test(screen, environment, measurement_rate = 1):
+  """
+  A test for tracking the user's mouse according to some measurement rate
+  """
   pt = None
   last_pt = None
   counter = 0
@@ -23,25 +26,11 @@ def active_mouse_test(screen, environment, measurement_rate = 1):
         sys.exit()
       
       pt = pygame.mouse.get_pos()
-      # if pt == last_pt:
-      #   # counter+=1
-      #   continue
+
       last_pt = pt
 
       pafn.clear_frame(screen)
       environment_agent_update(environment, True)
-      # pafn.frame_draw_dot(screen, pt, pafn.colors["green"], 0, 8)
-
-      # for k in environment.agents:
-      #   sensing_agent = environment.agents[k]
-        
-      #   r,t = sensing_agent.tracker_query()
-      #   sensing_agent.reposition(r,t)
-      #   sensing_agent.heartbeat()
-        
-      #   render_predictions(screen, sensing_agent)
-
-      #   draw_sensing_agent(screen, sensing_agent)
       
       environment.targets[0].origin = pt
       counter += 1
@@ -55,8 +44,12 @@ def main():
   pygame.init()
   screen = pafn.create_display(1400, 1000)
   pafn.clear_frame(screen)
+  
+  # initialize agent
+  sa = init_sensing_agent(origin=(50,400),width=np.pi/2,radius=300)
+  sa.heartbeat()
+
   sensing_agents = {}
-  sa = init_sensing_agent(origin=(0,400))
   sensing_agents[sa._id] = sa
   t = init_target()
   env = init_environment(sensing_agents=sensing_agents, targets=[t])

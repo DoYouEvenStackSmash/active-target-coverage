@@ -10,57 +10,54 @@ from drawing_functions import *
 
 from support.file_loader import *
 
+SLEEP_DURATION=0.01 # How long do you want the environment to wait before proceeding?
 
-
-def tracking_test(screen, environment, interval=0):
+def tracking_test(screen, environment, sample_rate=1):
+  """
+  A test where the agents in the environment track targets
+  """
   flag = True
   counter = 0
   curr_pts = []
   pred_pts = []
   marked_pts = []
+
+  # run until all targets have stopped moving
   while flag:
     flag = False
     pafn.clear_frame(screen)
+    #allow agents to make predictions and move
     environment_agent_update(environment, True)
     
-    # for k in environment.agents:
-    #   sensing_agent = environment.agents[k]
-      
-    #   # render_predictions(screen, sensing_agent)
-    #   # for i in sensing_agent.get_last_detections():
-    #   #   pafn.frame_draw_dot(screen, i, pafn.colors["cyan"],0,8)
-    #   # accumulate_predictions(sensing_agent, curr_pts, pred_pts)
-    #   # sensing_agent.heartbeat()
-    #   # for idx in range(len(curr_pts)):
-    #   #   pafn.frame_draw_dot(screen, curr_pts[idx], pafn.colors["tangerine"])
-    #   #   pafn.frame_draw_dot(screen, pred_pts[idx], pafn.colors["yellow"])
-    #   #   pafn.frame_draw_line(
-    #   #       screen, (curr_pts[idx], pred_pts[idx]), pafn.colors["white"]
-    #   #   )
-
-    #   draw_sensing_agent(screen, sensing_agent)
-  
-    if not counter % interval:# or not counter % 9:
+    if not counter % sample_rate:# or not counter % 9:
       for i in range(len(environment.targets)):
         t = environment.targets[i]
         pafn.frame_draw_dot(screen, t.get_position(), t.color)
         marked_pts.append(t.get_position())
+      # allow agents which cannot predict to move
       environment_agent_update(environment)
+      # allow agents to see the targets
       environment.visible_targets()
-    environment_agent_illustration(screen, environment, interval, curr_pts,pred_pts, marked_pts)
+    # render the environment
+    environment_agent_illustration(screen, environment, sample_rate, curr_pts,pred_pts, marked_pts)
+    
+    # update the target positions
+
     for i in range(len(environment.targets)):
         t = environment.targets[i]
-        # pafn.frame_draw_dot(screen, t.get_position(), t.color)
         flag = t.step() or flag
     
     pygame.display.update()
-    time.sleep(0.01)
+    time.sleep(SLEEP_DURATION)
     counter += 1
+  
+  # serialize the agent tracks for viewing
   for i in environment.agents:
     sensing_agent = environment.agents[i]
     import_agent_record(screen, sensing_agent.export_tracks())
   pygame.display.update()
 
+  # wait for the user to click and exit
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN: 
@@ -72,32 +69,41 @@ def main():
   pygame.init()
   screen = pafn.create_display(1000, 1000)
   pafn.clear_frame(screen)
-  sensing_agents = {}
+  
+  # initialize agent 1
   sa = init_sensing_agent(_id=0, origin=(650,250), width=np.pi, radius=100)
-  sa2 = init_sensing_agent(_id=1, origin=(650,250), width=np.pi, radius=100)
   sa.rotate_agent((500,500))
-  sa2.rotate_agent((500,500))
-  # sa.ALLOW_TRANSLATION=False
-  # sa.ALLOW_ROTATION=False
-  sa.heartbeat()
-  sa2.heartbeat()
-  sa.ALLOW_PREDICTION = False
-  sa2.ALLOW_PREDICTION = True
   sa._id = 0
-  sa2._id = 1
+  sa.heartbeat()
+  sa.ALLOW_PREDICTION = True
+  
+  ## uncomment to allow competing agent
+  # initialize agent 2
+  # sa2 = init_sensing_agent(_id=1, origin=(650,250), width=np.pi, radius=100)
+  # sa2.rotate_agent((500,500))
+  # sa2.heartbeat()
+  # sa2._id = 1
+  # sa2.ALLOW_PREDICTION = False
+
+  sensing_agents = {}
   sensing_agents[sa._id] = sa
-  sensing_agents[sa2._id] = sa2
+  # sensing_agents[sa2._id] = sa2
+  
+  
   
   targets = []
-  # load json point files
+  # load json point files and initialize targets
   for i,file in enumerate(sys.argv[1:-1]):
     p = load_json_file(file)
-    
     t = init_target(_id=i, path=p)
     targets.append(t)
+  
+  # initialize environment
   env = init_environment(sensing_agents=sensing_agents, targets=targets)
-  time.sleep(0.2)
-  tracking_test(screen, env, int(sys.argv[-1]))
+
+  measurement_rate = int(sys.argv[-1])
+
+  tracking_test(screen, env, measurement_rate)
 
 if __name__ == '__main__':
   main()

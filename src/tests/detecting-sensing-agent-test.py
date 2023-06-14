@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+"""
+A test for sanity checking an agent's detections vs visibility
+"""
 import sys
 
 sys.path.append("../")
@@ -13,7 +15,27 @@ from support.file_loader import *
 LALT = 256
 LSHIFT = 1
 
+
+
 def grid_sensing_agent(screen, sensing_agent, points):
+    for p in points:
+        # p = pygame.mouse.get_pos()
+        visible = sensing_agent.is_visible(p)
+        if visible:
+            pafn.frame_draw_dot(screen, p, pafn.colors["green"], 8, 6)
+        else:
+            pafn.frame_draw_dot(screen, p, pafn.colors["red"], 8, 6)                    
+        pt = sensing_agent.transform_to_local_detection_coord(p)
+
+        pt2 = sensing_agent.transform_to_local_sensor_coord((0, 0), pt)
+        pt3 = sensing_agent.transform_to_global_coord(pt)
+
+        detectable, flag = sensing_agent.is_detectable(pt2)
+
+        if detectable:
+            pafn.frame_draw_dot(screen, p, pafn.colors["cyan"])
+        else:
+            pafn.frame_draw_dot(screen, p, pafn.colors["red"])
     draw_sensing_agent(screen, sensing_agent)
     pygame.display.update()
     while 1:
@@ -35,7 +57,7 @@ def grid_sensing_agent(screen, sensing_agent, points):
                     p = pygame.mouse.get_pos()
                     pafn.clear_frame(screen)
                     rotation = sensing_agent.rotate_agent(p)
-
+        
                 for p in points:
                     # p = pygame.mouse.get_pos()
                     visible = sensing_agent.is_visible(p)

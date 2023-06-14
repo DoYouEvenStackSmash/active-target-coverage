@@ -42,14 +42,15 @@ def adjust_angle(theta):
 
     return theta
 
-DRAW_BOUNDARIES = True
+DRAW_BOUNDARIES = True # draw the threshold regions for visibility
 DRAW_HORIZONTAL = False
-OUTLINE = True
-GRID=False
-LINE=False
-DELAY = 3
+OUTLINE = False # draw only the outlined fov of the agent
+GRID=False  # draw the cartesian plane around the agent
+LINE=False  # allow a straight line to be drawn between last detection and next prediction
+DELAY = 3   # delay to draw marked points
 INVERTED = 1
-MARKERS = True
+MARKERS = True # draw markers for the predictions
+
 frame_colors = [pafn.colors["white"], pafn.colors["black"]]
 color_grade = [pafn.colors["white"], pafn.colors["tangerine"], pafn.colors["lightslategray"], pafn.colors["dimgray"], pafn.colors["black"], pafn.colors["black"], pafn.colors["black"]]
 def draw_coordinate_frame(screen, sensor, levels=5):
@@ -145,7 +146,7 @@ def draw_rigid_body(screen, rigid_body):
 
 
 def draw_body_grid(screen, rigid_body):
-    axes = rigid_body.get_grid(50,4000)
+    axes = rigid_body.get_grid()
     for ax in axes:
         pafn.frame_draw_line(screen, ax, frame_colors[INVERTED])
 
@@ -223,6 +224,10 @@ def import_agent_record(screen, agent_record):
         pygame.display.update()
     
 def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
+    """
+    Accumulates the last detection and predicted next detection points 
+    for rendering.
+    """
     curr_pt, pred_pt = (),()
     arr = sensing_agent.estimate_next_detection()
     if len(arr):
@@ -238,25 +243,31 @@ def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
         pred_pts.append(curr_pt)
     
 def environment_agent_update(environment, FORCE_UPDATE=False):
-  for k in environment.agents:
-      sensing_agent = environment.agents[k]
-      if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
-        r,t = sensing_agent.tracker_query()
-        sensing_agent.reposition(r,t)
-        sensing_agent.heartbeat()
+    """
+    Allows agents to make their predictions and move if necessary
+    """
+    for k in environment.agents:
+        sensing_agent = environment.agents[k]
+        if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
+            r,t = sensing_agent.tracker_query()
+            sensing_agent.reposition(r,t)
+            sensing_agent.heartbeat()
   
 def environment_agent_illustration(screen, environment, measurement_rate, curr_pts, pred_pts, marked_pts):
-  for k in environment.agents:
-    sensing_agent = environment.agents[k]
-    render_predictions(screen, sensing_agent)
-    # demo rendering
-    accumulate_predictions(sensing_agent, curr_pts, pred_pts)
-    for i in range(max(0, len(marked_pts) - 5), len(marked_pts)):
-      pafn.frame_draw_dot(screen, marked_pts[i], color_grade[len(marked_pts) - i], 0, (1 - (len(marked_pts) - i) / 5) * 10)
-    # if len(curr_pts):
-    #   pafn.frame_draw_cross(screen, curr_pts[-1], pafn.colors["tangerine"], 20)
-    if MARKERS:
-        for idx in range(max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3):
-            pafn.frame_draw_dot(screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2)
-    
-    draw_sensing_agent(screen, sensing_agent)
+    """
+    Draws nice things (Agents, marked points, predictions, etc) on the screen
+    """
+    for k in environment.agents:
+        sensing_agent = environment.agents[k]
+        render_predictions(screen, sensing_agent)
+        # demo rendering
+        accumulate_predictions(sensing_agent, curr_pts, pred_pts)
+        for i in range(max(0, len(marked_pts) - 5), len(marked_pts)):
+            pafn.frame_draw_dot(screen, marked_pts[i], color_grade[len(marked_pts) - i], 0, (1 - (len(marked_pts) - i) / 5) * 10)
+        # if len(curr_pts):
+        #   pafn.frame_draw_cross(screen, curr_pts[-1], pafn.colors["tangerine"], 20)
+        if MARKERS:
+            for idx in range(max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3):
+                pafn.frame_draw_dot(screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2)
+        
+        draw_sensing_agent(screen, sensing_agent)

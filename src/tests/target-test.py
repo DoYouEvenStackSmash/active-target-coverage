@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+"""
+A test for initializing targets with paths
+"""
 import sys
 
 sys.path.append("../")

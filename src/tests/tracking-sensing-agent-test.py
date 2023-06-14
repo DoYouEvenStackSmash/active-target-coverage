@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+"""
+Legacy test which allows the agent to see the target at every time step
+"""
 import sys
 
 sys.path.append("../")
@@ -10,6 +12,7 @@ from drawing_functions import *
 
 from support.file_loader import *
 
+SLEEP_DURATION=0.1
 def tracking_test(screen, environment):
   flag = True
   while flag:
@@ -22,8 +25,9 @@ def tracking_test(screen, environment):
       r,t = sensing_agent.tracker_query()
       sensing_agent.reposition(r,t)
       sensing_agent.heartbeat()
+
+      # render the prediction of the agent
       render_predictions(screen, sensing_agent)
-      
       draw_sensing_agent(screen, sensing_agent)
     
     for i in range(len(environment.targets)):
@@ -32,13 +36,17 @@ def tracking_test(screen, environment):
       flag = t.step() or flag
       
     pygame.display.update()
-    time.sleep(0.1)
+    time.sleep(SLEEP_DURATION)
     environment.visible_targets()
-  # for i in environment.agents:
-  #   sensing_agent = environment.agents[i]
-  #   import_agent_record(screen, sensing_agent.export_tracks())
+  
+  # display the tracks which the agents have recorded
+
+  for i in environment.agents:
+    sensing_agent = environment.agents[i]
+    import_agent_record(screen, sensing_agent.export_tracks())
   pygame.display.update()
 
+  # wait for the user to click their mouse to exit
   while 1:
     for event in pygame.event.get():
       if event.type == pygame.MOUSEBUTTONDOWN: 
@@ -50,17 +58,24 @@ def main():
   pygame.init()
   screen = pafn.create_display(1000, 1000)
   pafn.clear_frame(screen)
-  sensing_agents = {}
+
+  # initialize sensing agent
   sa = init_sensing_agent(origin=(500,200), width=np.pi)
+  sa.heartbeat()
+
+  sensing_agents = {}
   sensing_agents[sa._id] = sa
+
   targets = []
-  # load json point files
+  # load json point files and initialize targets
   for i,file in enumerate(sys.argv[1:]):
     p = load_json_file(file)
     t = init_target(_id=i, path=p)
     targets.append(t)
+  
+  # initialize environment
   env = init_environment(sensing_agents=sensing_agents, targets=targets)
-  time.sleep(0.2)
+
   tracking_test(screen, env)
 
 if __name__ == '__main__':
