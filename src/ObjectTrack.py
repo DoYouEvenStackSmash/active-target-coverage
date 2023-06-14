@@ -20,7 +20,7 @@ def adjust_angle(theta):
 
 ACCELERATION_THRESHOLD = 1.5
 MAX_SCALE_FACTOR = 1.2
-MAX_RANGE = 2000
+MAX_RANGE = 500
 MAX_ANGLE = np.pi
 
 

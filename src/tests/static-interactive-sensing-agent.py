@@ -64,6 +64,7 @@ def main():
     sa.ALLOW_ROTATION = False
     sa.ALLOW_TRANSLATION = False
     sa._id = 1
+    sa.exoskeleton.color = pafn.colors["yellow"]
     sa.heartbeat()
 
     sensing_agents[sa._id] = sa
