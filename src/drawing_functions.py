@@ -48,7 +48,7 @@ DRAW_HORIZONTAL = False
 OUTLINE = False  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
 LINE = False  # allow a straight line to be drawn between last detection and next prediction
-DELAY = 3  # delay to draw marked points
+DELAY = 0.3  # delay to draw marked points
 INVERTED = 1
 MARKERS = True  # draw markers for the predictions
 
