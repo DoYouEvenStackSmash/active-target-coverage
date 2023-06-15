@@ -47,10 +47,10 @@ DRAW_BOUNDARIES = True  # draw the threshold regions for visibility
 DRAW_HORIZONTAL = False
 OUTLINE = False  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
-LINE = False  # allow a straight line to be drawn between last detection and next prediction
+LINE = True  # allow a straight line to be drawn between last detection and next prediction
 DELAY = 3  # delay to draw marked points
 INVERTED = 1
-MARKERS = True  # draw markers for the predictions
+MARKERS = False  # draw markers for the predictions
 
 frame_colors = [pafn.colors["white"], pafn.colors["black"]]
 color_grade = [
