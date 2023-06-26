@@ -39,9 +39,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 15,
+        # self.track_lifespan: 15,
         "default_avg_dist": 10,
-        "radial_exclusion": 400,
+        # self.radial_exclusion: 400,
     }
     display_constants = {"trail_len": 0}
 
@@ -63,6 +63,8 @@ class ObjectTrackManager:
         img_centers=None,  #
         imported=False,  # Flag denoting whether this is a live tracker or loading track history
         parent_agent=None,  # Placeholder for parent agent
+        radial_exclusion=400,
+        track_lifespan=15,
     ):
         self.global_track_store = (
             global_track_store if global_track_store is not None else {}
@@ -81,6 +83,8 @@ class ObjectTrackManager:
         self.img_centers = img_centers if img_centers is not None else []
         self.imported = imported
         self.parent_agent = parent_agent
+        self.radial_exclusion = radial_exclusion
+        self.track_lifespan = track_lifespan
 
     def get_predictions(self, pred_arr):
         """
@@ -338,7 +342,7 @@ class ObjectTrackManager:
 
             # Gate check for global nearest neighbors
             # do not increment pair count for radial exclusion in case this is a new track
-            if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
+            # if elem[2] > ObjectTrackManager.constants[self.radial_exclusion]:
                 tc -= 1
                 break
 
@@ -372,7 +376,7 @@ class ObjectTrackManager:
             for i in range(max_rot):
                 # pass over active tracks
                 if self.active_tracks[-1].is_alive(
-                    fc, ObjectTrackManager.constants["track_lifespan"]
+                    # fc, ObjectTrackManager.constants[self.track_lifespan]
                 ):
                     self.active_tracks.rotate()
                 else:
