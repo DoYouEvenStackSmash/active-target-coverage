@@ -63,7 +63,7 @@ def main():
 
     # initialize sensing agent
     sa = init_sensing_agent(origin=(500, 200), width=np.pi)
-    sa.rotate_agent((500,500))
+    sa.rotate_agent((500, 500))
     sa.heartbeat()
     sa.avg_window_len = 1
     sensing_agents = {}

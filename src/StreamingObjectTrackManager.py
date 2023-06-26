@@ -63,9 +63,9 @@ class ObjectTrackManager:
         img_centers=None,  #
         imported=False,  # Flag denoting whether this is a live tracker or loading track history
         parent_agent=None,  # Placeholder for parent agent
-        radial_exclusion=400, # gating threshold for data association
-        track_lifespan=2, # track lifespan
-        avg_window_len = 0 # size of rolling average
+        radial_exclusion=400,  # gating threshold for data association
+        track_lifespan=2,  # track lifespan
+        avg_window_len=0,  # size of rolling average
     ):
         self.global_track_store = (
             global_track_store if global_track_store is not None else {}
@@ -320,7 +320,6 @@ class ObjectTrackManager:
             if state == None:
                 state = t.get_last_detection()
             pred.append((t.track_id, state.get_cartesian_coord()))
-            
 
         # create list of all pairs with distances between track heads and detections in curr layer
         for c in range(len(curr_layer)):
@@ -381,9 +380,7 @@ class ObjectTrackManager:
             max_rot = len(self.active_tracks)
             for i in range(max_rot):
                 # pass over active tracks
-                if self.active_tracks[-1].is_alive(
-                    fc, self.track_lifespan
-                ):
+                if self.active_tracks[-1].is_alive(fc, self.track_lifespan):
                     self.active_tracks.rotate()
                 else:
                     # reap tracks which are no longer active

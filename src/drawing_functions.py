@@ -48,9 +48,7 @@ DRAW_HORIZONTAL = False
 OUTLINE = False  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
 
-LINE = (
-    False  # allow a straight line to be drawn between last detection and next prediction
-)
+LINE = False  # allow a straight line to be drawn between last detection and next prediction
 DELAY = 3  # delay to draw marked points
 
 INVERTED = 1
@@ -251,7 +249,7 @@ def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
         for i in range(len(arr)):
             curr_pt = arr[i][0]
             pred_pt = arr[i][1]
-    
+
             if len(pred_pt):
                 curr_pts.append(curr_pt)
                 pred_pts.append(pred_pt)
@@ -260,6 +258,7 @@ def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
                 pred_pts.append(curr_pt)
     else:
         return
+
 
 def environment_agent_update(environment, FORCE_UPDATE=False):
     """

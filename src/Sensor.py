@@ -37,7 +37,7 @@ class Sensor:
         sensor_radius=300,
         sensor_width=np.pi / 4,
         _id=None,
-        tolerance = 0.2
+        tolerance=0.2,
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius
@@ -58,7 +58,6 @@ class Sensor:
         Mutator for tolerance
         """
         self.tolerance = tolerance
-
 
     def get_fov_theta(self):
         """

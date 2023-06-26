@@ -94,7 +94,7 @@ def main():
     # sa2.ALLOW_PREDICTION = False
 
     sensing_agents = {}
-    
+
     sensing_agents[sa._id] = sa
     # sensing_agents[sa2._id] = sa2
 

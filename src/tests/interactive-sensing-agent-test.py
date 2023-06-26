@@ -53,7 +53,6 @@ def main():
     sa.heartbeat()
     sa.obj_tracker.avg_window_len = 2
 
-
     sensing_agents = {}
     sensing_agents[sa._id] = sa
     t = init_target()
