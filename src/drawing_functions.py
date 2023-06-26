@@ -49,12 +49,12 @@ OUTLINE = False  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
 
 LINE = (
-    True  # allow a straight line to be drawn between last detection and next prediction
+    False  # allow a straight line to be drawn between last detection and next prediction
 )
 DELAY = 3  # delay to draw marked points
 
 INVERTED = 1
-MARKERS = False  # draw markers for the predictions
+MARKERS = True  # draw markers for the predictions
 
 frame_colors = [pafn.colors["white"], pafn.colors["black"]]
 color_grade = [
@@ -248,17 +248,18 @@ def accumulate_predictions(sensing_agent, curr_pts, pred_pts):
     curr_pt, pred_pt = (), ()
     arr = sensing_agent.estimate_next_detection()
     if len(arr):
-        curr_pt = arr[0][0]
-        pred_pt = arr[0][1]
+        for i in range(len(arr)):
+            curr_pt = arr[i][0]
+            pred_pt = arr[i][1]
+    
+            if len(pred_pt):
+                curr_pts.append(curr_pt)
+                pred_pts.append(pred_pt)
+            else:
+                curr_pts.append(curr_pt)
+                pred_pts.append(curr_pt)
     else:
         return
-    if len(pred_pt):
-        curr_pts.append(curr_pt)
-        pred_pts.append(pred_pt)
-    else:
-        curr_pts.append(curr_pt)
-        pred_pts.append(curr_pt)
-
 
 def environment_agent_update(environment, FORCE_UPDATE=False):
     """
@@ -268,7 +269,6 @@ def environment_agent_update(environment, FORCE_UPDATE=False):
         sensing_agent = environment.agents[k]
         if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
             r, t = sensing_agent.tracker_query()
-            print(r,t)
             sensing_agent.reposition(r, t)
             sensing_agent.heartbeat()
 
@@ -299,7 +299,7 @@ def environment_agent_illustration(
                 max(0, len(pred_pts) - int(measurement_rate * DELAY)), len(pred_pts), 3
             ):
                 pafn.frame_draw_dot(
-                    screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 2
+                    screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 4
                 )
 
         draw_sensing_agent(screen, sensing_agent)

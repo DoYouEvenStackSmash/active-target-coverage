@@ -75,13 +75,15 @@ def main():
 
     # initialize agent 1
 
-    sa = init_sensing_agent(_id=0, origin=(650, 50), width=np.pi/3, radius=400)
+    sa = init_sensing_agent(_id=0, origin=(650, 50), width=np.pi, radius=4000)
     sa.rotate_agent((500, 500))
     sa.set_tolerance(0.4)
     sa._id = 0
     sa.heartbeat()
+    sa.avg_window_len = 1
     sa.ALLOW_PREDICTION = True
-    # sa.ALLOW_TRANSLATION = False
+    sa.ALLOW_TRANSLATION = False
+    sa.ALLOW_ROTATION = False
 
     ## uncomment to allow competing agent
     # initialize agent 2

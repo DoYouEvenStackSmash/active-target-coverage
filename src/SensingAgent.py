@@ -434,7 +434,7 @@ class SensingAgent:
         # if no estimate available
         if not len(pred_pt):
             return (None, None)
-        # print(pred_pt)
+        
         # if first element in track, therefore duplicate
         # if curr_pt == pred_pt:
         #     return (None, None)
