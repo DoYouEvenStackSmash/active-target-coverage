@@ -84,13 +84,19 @@ def load_layers(files, sensing_agent):
         yolo_layer_list.append(al.load_yolofmt_layer(files[i]))
 
     counter = sensing_agent.get_clock()
+    # sensing_agent.heartbeat()
     detection_layer_list = []
     for i, layer in enumerate(yolo_layer_list):
         yblayer = []
-        for j, yb in enumerate(layer):
-            if True or i * j % 2:
+        # sensing_agent.heartbeat()
+        if i % 30:
+            det_layer = sensing_agent.estimate_next_detection()
+            for curr,pred in det_layer:
+                yblayer.append(pred.get_attributes())
+        else:
+            for j, yb in enumerate(layer):
+                # if True or i * j % 2:
                 yblayer.append(yb)
-
         sensing_agent.heartbeat()
         det_layer = sensing_agent.ingest_new_yolobox_layer(yblayer, True)
         # sensing_agent.load_detection_layer(det_layer)

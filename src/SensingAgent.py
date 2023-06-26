@@ -415,9 +415,11 @@ class SensingAgent:
         rel_det = self.estimate_rel_next_detection(idx)
         abs_det = []
         for det in rel_det:
-            curr = self.transform_from_det_coord(det[0])
-            pred = self.transform_from_det_coord(det[1])
-            abs_det.append((curr, pred))
+            curr_posn = self.transform_from_det_coord(det[0])
+            curr_det = Detection(curr_posn,det[0].get_attributes())
+            pred_posn = self.transform_from_det_coord(det[1])
+            pred_det = Detection(pred_posn,det[1].get_attributes())
+            abs_det.append((curr_det, pred_det))
         return abs_det
 
     # legacy ingest for detections
