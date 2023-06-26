@@ -39,9 +39,9 @@ BOXES = IDENTIFIERS
 class ObjectTrackManager:
     constants = {
         "avg_tolerance": 10,
-        "track_lifespan": 15,
+        # self.track_lifespan: 15,
         "default_avg_dist": 10,
-        "radial_exclusion": 400,
+        # self.radial_exclusion: 400,
     }
     display_constants = {"trail_len": 0}
 
@@ -342,7 +342,7 @@ class ObjectTrackManager:
 
             # Gate check for global nearest neighbors
             # do not increment pair count for radial exclusion in case this is a new track
-            if elem[2] > ObjectTrackManager.constants["radial_exclusion"]:
+            # if elem[2] > ObjectTrackManager.constants[self.radial_exclusion]:
                 tc -= 1
                 break
 
@@ -376,7 +376,7 @@ class ObjectTrackManager:
             for i in range(max_rot):
                 # pass over active tracks
                 if self.active_tracks[-1].is_alive(
-                    fc, ObjectTrackManager.constants["track_lifespan"]
+                    # fc, ObjectTrackManager.constants[self.track_lifespan]
                 ):
                     self.active_tracks.rotate()
                 else:
