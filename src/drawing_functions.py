@@ -47,10 +47,12 @@ DRAW_BOUNDARIES = True  # draw the threshold regions for visibility
 DRAW_HORIZONTAL = False
 OUTLINE = False  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
+
 LINE = (
     True  # allow a straight line to be drawn between last detection and next prediction
 )
 DELAY = 3  # delay to draw marked points
+
 INVERTED = 1
 MARKERS = False  # draw markers for the predictions
 
