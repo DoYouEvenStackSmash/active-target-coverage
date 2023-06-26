@@ -63,6 +63,8 @@ class ObjectTrackManager:
         img_centers=None,  #
         imported=False,  # Flag denoting whether this is a live tracker or loading track history
         parent_agent=None,  # Placeholder for parent agent
+        radial_exclusion=400,
+        track_lifespan=15,
     ):
         self.global_track_store = (
             global_track_store if global_track_store is not None else {}
@@ -81,6 +83,8 @@ class ObjectTrackManager:
         self.img_centers = img_centers if img_centers is not None else []
         self.imported = imported
         self.parent_agent = parent_agent
+        self.radial_exclusion = radial_exclusion
+        self.track_lifespan = track_lifespan
 
     def get_predictions(self, pred_arr):
         """

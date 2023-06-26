@@ -247,6 +247,7 @@ class ObjectTrack:
             )
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
+
         else:
             r, y = detection.get_cartesian_coord()
             self.r_naught.append(0)
@@ -277,14 +278,18 @@ class ObjectTrack:
         velocity = (distance - self.r_naught[-1]) / delta_t
 
         # self.acceleration
-        acceleration = (velocity - self.delta_r[-1]) / delta_t
-        acceleration_sign = 1 if acceleration >= 0 else -1
-        acceleration = acceleration_sign * min(
-            ACCELERATION_THRESHOLD, abs(acceleration)
-        )
+        acceleration = 0
+        jolt = 0
+        if len(self.path) > 2:
+            acceleration = (velocity - self.delta_r[-1]) / delta_t
+            acceleration_sign = 1 if acceleration >= 0 else -1
+            acceleration = acceleration_sign * min(
+                ACCELERATION_THRESHOLD, abs(acceleration)
+            )
 
-        # self.jolt
-        jolt = (acceleration - self.accel_r[-1]) / delta_t
+        if len(self.path) > 3:
+            # self.jolt
+            jolt = (acceleration - self.accel_r[-1]) / delta_t
 
         self.r_naught.append(distance)
         self.delta_r.append(abs(velocity))
@@ -305,14 +310,18 @@ class ObjectTrack:
 
         # velocity is pi/time
         angular_velocity = angle_diff / delta_t
+        angular_acceleration = 0
+        angular_jolt = 0
+        if len(self.path) > 2:
+            angular_acceleration = (angular_velocity - self.delta_theta[-1]) / delta_t
+            angular_acceleration_sign = 1 if angular_acceleration >= 0 else -1
 
-        angular_acceleration = (angular_velocity - self.delta_theta[-1]) / delta_t
-        angular_acceleration_sign = 1 if angular_acceleration >= 0 else -1
+            angular_acceleration = angular_acceleration_sign * min(
+                ACCELERATION_THRESHOLD, abs(angular_acceleration)
+            )
 
-        angular_acceleration = angular_acceleration_sign * min(
-            ACCELERATION_THRESHOLD, abs(angular_acceleration)
-        )
-        angular_jolt = (angular_acceleration - self.accel_theta[-1]) / delta_t
+        if len(self.path) > 3:
+            angular_jolt = (angular_acceleration - self.accel_theta[-1]) / delta_t
 
         self.theta_naught.append(theta)
         self.delta_theta.append(angular_velocity)
@@ -381,6 +390,8 @@ class ObjectTrack:
         t = 1
         overall_t = scale_factor
         jolt_scale = -1
+        if len(self.path) < 3:
+            return theta_0
         theta = (
             theta_0
             + (

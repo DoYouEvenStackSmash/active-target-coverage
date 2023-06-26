@@ -497,7 +497,7 @@ STANDARD_COLORS = {
     "brown": (165, 42, 42),
     "maroon": (128, 0, 0),
 }
-rng = np.random.default_rng(12345)
+rng = np.random.default_rng(32345)
 lh = [0, len(SCSET) - 1]
 rand_color = lambda: STANDARD_COLORS[
     SCSET[rng.integers(low=lh[0], high=lh[1], size=1)[0]]
