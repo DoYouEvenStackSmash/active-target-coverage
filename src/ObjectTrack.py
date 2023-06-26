@@ -132,7 +132,8 @@ class ObjectTrack:
             (self.parent_agent.get_clock() - self.detection_idx[-1])
             / self.avg_detection_time,
         )
-        return self.estimate_next_position(scale_factor)
+        avg_window_len = self.parent_agent.obj_tracker.avg_window_len
+        return self.estimate_next_position(scale_factor, avg_window_len)
 
         pass
 
@@ -141,10 +142,9 @@ class ObjectTrack:
         Using filters, estimate the future kinematic state of the target
         using a combination of measurements and predictions
         """
-        if len(self.path):
+        if len(self.path) > 1:
             return self.predict_next_state()
-
-        return self.get_last_detection()
+        return None
 
         # pass
 
@@ -248,9 +248,10 @@ class ObjectTrack:
             self.avg_detection_time = self.detection_time / len(self.detection_idx)
             self.update_track_trajectory(detection)
 
-        else:
-            r, y = detection.get_cartesian_coord()
-            self.r_naught.append(0)
+        # else:
+        #     r, y = detection.get_cartesian_coord()
+        #     self.r_naught.append(0)
+        #     self.theta_naught
 
         self.error_over_time.append(error)
         self.path.append(detection)
@@ -330,16 +331,16 @@ class ObjectTrack:
 
         pass
 
-    def estimate_next_position(self, scale_factor=1):
+    def estimate_next_position(self, scale_factor=1, avg_window_len = 1):
         """
         Estimate position of next detection using trajectory components
         Returns a Detection
         """
         last_pos = self.get_last_detection()
 
-        angle = self.predict_theta(scale_factor)
+        angle = self.predict_theta(scale_factor, avg_window_len)
         # velocity
-        velocity = self.predict_range(scale_factor)
+        velocity = self.predict_range(scale_factor, avg_window_len)
 
         pt = mfn.pol2car(
             last_pos.get_cartesian_coord(),
@@ -361,14 +362,42 @@ class ObjectTrack:
 
         pass
 
-    def predict_range(self, scale_factor=1):
+    def predict_range(self, scale_factor=1, avg_window_len=1):
         """
         Wrapper for range query
         """
-        r_0 = self.r_naught[-1]
-        delta_r = self.delta_r[-1]
-        accel_r = self.accel_r[-1]
-        jolt_r = self.jolt_r[-1]
+        # avg = 1 / (self.avg_detection_time * min(avg_window_len, max(len(self.r_naught), 1)))
+        avg_r = 0 if avg_window_len > 0 else self.r_naught[-1]
+        avg_delta_r = 0 if avg_window_len > 0 else self.delta_r[-1]
+        avg_accel_r = 0 if avg_window_len > 0 else self.accel_r[-1]
+        avg_jolt_r = 0 if avg_window_len > 0 else self.jolt_r[-1]
+        add_to_list = lambda input_list, c: input_list[c] if c < len(input_list) else 0
+        window_adjust = 0
+        # if self.error_over_time[-1] > self.error_over_time[-2]:
+        #     window_adjust = -1
+        for c in range(max(len(self.r_naught) - avg_window_len, 0), len(self.r_naught)):
+            age_scale_factor = c / len(self.r_naught)
+            avg_r += self.r_naught[c] / (avg_window_len) * age_scale_factor
+            avg_delta_r += add_to_list(self.delta_r, c) * 1 / ( avg_window_len) * age_scale_factor
+            avg_accel_r += add_to_list(self.accel_r, c) * 1 / ( avg_window_len) * age_scale_factor
+            avg_jolt_r += add_to_list(self.jolt_r, c) * 1 / ( avg_window_len) * age_scale_factor
+        # avg_r *= avg
+        # avg *= self.avg_detection_time
+        # avg_delta_r *= avg
+        # avg *= self.avg_detection_time
+        # avg_accel_r *= avg
+        # avg *= self.avg_detection_time
+        # avg_jolt_r *= avg
+
+        
+        # r_0 = self.r_naught[-1] # base_len
+        r_0 = avg_r
+        # delta_r = self.delta_r[-1] # base_len - 1
+        delta_r = avg_delta_r
+        # accel_r = self.accel_r[-1] # base_len - 2
+        accel_r = avg_accel_r
+        # jolt_r = self.jolt_r[-1] # base_len - 3
+        jolt_r = avg_jolt_r
         t = scale_factor
         jolt_scale = -0.1
         r = (
@@ -379,23 +408,40 @@ class ObjectTrack:
         ) * t
         return min(r, MAX_RANGE)
 
-    def predict_theta(self, scale_factor=1):
+    def predict_theta(self, scale_factor=1, avg_window_len=1):
         """
         Wrapper for theta query
         """
-        theta_0 = self.theta_naught[-1]
-        delta_theta = self.delta_theta[-1]
-        accel_theta = self.accel_theta[-1]
-        jolt_theta = self.jolt_theta[-1]
-        t = 1
+        
+        avg_theta = 0 if avg_window_len > 0 else self.theta_naught[-1]
+        avg_delta_theta = 0 if avg_window_len > 0 else self.delta_theta[-1]
+        avg_accel_theta = 0 if avg_window_len > 0 else self.accel_theta[-1]
+        avg_jolt_theta = 0 if avg_window_len > 0 else self.jolt_theta[-1]
+        add_to_list = lambda input_list, c: input_list[c] if c < len(input_list) else 0
+        
+        for c in range(max(len(self.theta_naught) - avg_window_len, 0), len(self.theta_naught)):
+            age_scale_factor = c / len(self.theta_naught)
+            avg_theta += self.theta_naught[c] / (avg_window_len) * age_scale_factor
+            avg_delta_theta += add_to_list(self.delta_theta, c) / ( avg_window_len) * age_scale_factor
+            avg_accel_theta += add_to_list(self.accel_theta, c) / ( avg_window_len ) * age_scale_factor
+            avg_jolt_theta += add_to_list(self.jolt_theta, c) / ( avg_window_len ) * age_scale_factor
+        # theta_0 = self.theta_naught[-1]
+        theta_0 = avg_theta
+        # delta_theta = self.delta_theta[-1]
+        delta_theta = avg_delta_theta
+        # accel_theta = self.accel_theta[-1]
+        accel_theta = avg_accel_theta
+        # jolt_theta = self.jolt_theta[-1]
+        jolt_theta = avg_jolt_theta
+        t = 1#scale_factor
         overall_t = scale_factor
         jolt_scale = -1
         if len(self.path) < 3:
-            return theta_0
+            return self.theta_naught[-1]
         theta = (
             theta_0
             + (
-                delta_theta * self.avg_detection_time * t
+                delta_theta * self.avg_detection_time
                 + (1 / 2) * accel_theta * np.square(self.avg_detection_time * t)
                 + (1 / 6)
                 * jolt_scale

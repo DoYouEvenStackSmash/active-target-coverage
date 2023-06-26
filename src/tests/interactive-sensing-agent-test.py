@@ -51,6 +51,8 @@ def main():
     # initialize agent
     sa = init_sensing_agent(origin=(50, 400), width=np.pi / 2, radius=300)
     sa.heartbeat()
+    sa.obj_tracker.avg_window_len = 1
+
 
     sensing_agents = {}
     sensing_agents[sa._id] = sa

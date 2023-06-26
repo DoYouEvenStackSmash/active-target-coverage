@@ -20,7 +20,7 @@ class Sensor:
     ANGULAR = 1
     RANGE = 2
     BOTH = 3
-    TOLERANCE = 0.25
+    TOLERANCE = 0.3
     WINDOW_WIDTH = 100
     """ A class for modeling a sensor onboard a simulated agent
 
@@ -37,11 +37,13 @@ class Sensor:
         sensor_radius=300,
         sensor_width=np.pi / 4,
         _id=None,
+        tolerance = 0.2
     ):
         self.parent_agent = parent_agent
         self.fov_radius = sensor_radius
         self.fov_width = sensor_width
         self._id = _id
+        self.tolerance = tolerance
 
     def get_origin(self):
         """
@@ -50,6 +52,13 @@ class Sensor:
         """
         origin = self.parent_agent.get_origin()
         return origin
+
+    def set_tolerance(self, tolerance):
+        """
+        Mutator for tolerance
+        """
+        self.tolerance = tolerance
+
 
     def get_fov_theta(self):
         """
@@ -130,12 +139,12 @@ class Sensor:
             adjust_angle(
                 self.get_fov_theta()
                 + self.fov_width / 2
-                - self.fov_width * Sensor.TOLERANCE
+                - self.fov_width * self.tolerance
             ),
             adjust_angle(
                 self.get_fov_theta()
                 - self.fov_width / 2
-                + self.fov_width * Sensor.TOLERANCE
+                + self.fov_width * self.tolerance
             ),
             adjust_angle(self.get_fov_theta() - self.fov_width / 2),
         ]
@@ -151,7 +160,7 @@ class Sensor:
         Returns a boolean indicator and a type identifier
         """
         # boundary conditions
-        adj_win_bnd = Sensor.WINDOW_WIDTH * Sensor.TOLERANCE
+        adj_win_bnd = Sensor.WINDOW_WIDTH * self.tolerance
         adj_rad_bnd = self.get_fov_radius()
         target_x = target_pt[0]
         target_y = target_pt[1]
@@ -161,8 +170,8 @@ class Sensor:
 
         # if range out of bounds
         if (
-            target_y > adj_rad_bnd - adj_rad_bnd * Sensor.TOLERANCE
-            or target_y < 0 + adj_rad_bnd * Sensor.TOLERANCE
+            target_y > adj_rad_bnd - adj_rad_bnd * self.tolerance
+            or target_y < 0 + adj_rad_bnd * self.tolerance
         ):
             flags += Sensor.RANGE
 

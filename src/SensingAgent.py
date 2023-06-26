@@ -89,6 +89,11 @@ class SensingAgent:
 
         return self.exoskeleton.time_stamp
 
+    def set_tolerance(self, tolerance):
+        """
+        Mutator for centered sensor tolerance
+        """
+        self.centered_sensor.set_tolerance(tolerance)
     def tracker_query(self):
         """
         Wrapper function for querying the tracker
@@ -429,7 +434,7 @@ class SensingAgent:
         # if no estimate available
         if not len(pred_pt):
             return (None, None)
-
+        # print(pred_pt)
         # if first element in track, therefore duplicate
         # if curr_pt == pred_pt:
         #     return (None, None)
@@ -443,9 +448,9 @@ class SensingAgent:
         # if predicted point is out of coverage by range
         if flag == Sensor.RANGE:
             pred_pt = pred_det.get_attr_coord()
-            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
-            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
-                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+            offset = pred_pt[1] - (self.get_fov_radius() * (1 - self.centered_sensor.tolerance))
+            if pred_pt[1] < self.get_fov_radius() * self.centered_sensor.tolerance:
+                offset = pred_pt[1] - self.get_fov_radius() * self.centered_sensor.tolerance
             return (None, offset)
 
         # if predicted point is out of coverage by angle
@@ -456,9 +461,9 @@ class SensingAgent:
 
         # if predicted point is out of coverage by both angle and range
         if flag == Sensor.BOTH:
-            offset = pred_pt[1] - (self.get_fov_radius() * (1 - Sensor.TOLERANCE))
-            if pred_pt[1] < self.get_fov_radius() * Sensor.TOLERANCE:
-                offset = pred_pt[1] - self.get_fov_radius() * Sensor.TOLERANCE
+            offset = pred_pt[1] - (self.get_fov_radius() * (1 - self.centered_sensor.tolerance))
+            if pred_pt[1] < self.get_fov_radius() * self.centered_sensor.tolerance:
+                offset = pred_pt[1] - self.get_fov_radius() * self.centered_sensor.tolerance
             partial_rotation = (pred_pt[0] - 50) / 100 * self.get_fov_width()
             return (partial_rotation, offset)
 

@@ -10,7 +10,7 @@ from drawing_functions import *
 
 from support.file_loader import *
 
-SLEEP_DURATION = 0.01  # How long do you want the environment to wait before proceeding?
+SLEEP_DURATION = 0.1  # How long do you want the environment to wait before proceeding?
 
 
 def tracking_test(screen, environment, sample_rate=1):
@@ -74,11 +74,14 @@ def main():
     pafn.clear_frame(screen)
 
     # initialize agent 1
-    sa = init_sensing_agent(_id=0, origin=(650, 250), width=np.pi, radius=100)
+
+    sa = init_sensing_agent(_id=0, origin=(650, 50), width=np.pi/3, radius=400)
     sa.rotate_agent((500, 500))
+    sa.set_tolerance(0.4)
     sa._id = 0
     sa.heartbeat()
     sa.ALLOW_PREDICTION = True
+    # sa.ALLOW_TRANSLATION = False
 
     ## uncomment to allow competing agent
     # initialize agent 2
@@ -89,6 +92,7 @@ def main():
     # sa2.ALLOW_PREDICTION = False
 
     sensing_agents = {}
+    
     sensing_agents[sa._id] = sa
     # sensing_agents[sa2._id] = sa2
 

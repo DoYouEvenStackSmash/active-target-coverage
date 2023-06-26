@@ -268,6 +268,7 @@ def environment_agent_update(environment, FORCE_UPDATE=False):
         sensing_agent = environment.agents[k]
         if sensing_agent.ALLOW_PREDICTION == FORCE_UPDATE:
             r, t = sensing_agent.tracker_query()
+            print(r,t)
             sensing_agent.reposition(r, t)
             sensing_agent.heartbeat()
 
