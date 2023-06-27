@@ -57,10 +57,10 @@ class ArtFxns:
         Draws a line connecting the center of a bounding box to the center
         of its successor, or no line if last in the track
         """
-        yb2 = ybbox.next
-        if yb2 == None:
-            # ArtFxns.draw_circle(img1,ybbox,color, radius=8, thickness=2)
-            return
+        yb2 = ybbox.prev
+        # if yb2 == None:
+        #     # ArtFxns.draw_circle(img1,ybbox,color, radius=8, thickness=2)
+        #     return
         x1, y1 = ybbox.get_center_coord()
         pt1 = (int(x1), int(y1))
         x2, y2 = yb2.get_center_coord()
@@ -497,7 +497,7 @@ STANDARD_COLORS = {
     "brown": (165, 42, 42),
     "maroon": (128, 0, 0),
 }
-rng = np.random.default_rng(32345)
+rng = np.random.default_rng(12345)
 lh = [0, len(SCSET) - 1]
 rand_color = lambda: STANDARD_COLORS[
     SCSET[rng.integers(low=lh[0], high=lh[1], size=1)[0]]

@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class Category(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsCategory(cls, buf, offset):
@@ -43,32 +41,15 @@ class Category(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-
-def CategoryStart(builder):
-    builder.StartObject(3)
-
-
-def CategoryAddId(builder, id):
-    builder.PrependInt32Slot(0, id, 0)
-
-
-def CategoryAddName(builder, name):
-    builder.PrependUOffsetTRelativeSlot(
-        1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0
-    )
-
-
-def CategoryAddSupercategory(builder, supercategory):
-    builder.PrependUOffsetTRelativeSlot(
-        2, flatbuffers.number_types.UOffsetTFlags.py_type(supercategory), 0
-    )
-
-
-def CategoryEnd(builder):
-    return builder.EndObject()
+def CategoryStart(builder): builder.StartObject(3)
+def CategoryAddId(builder, id): builder.PrependInt32Slot(0, id, 0)
+def CategoryAddName(builder, name): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
+def CategoryAddSupercategory(builder, supercategory): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(supercategory), 0)
+def CategoryEnd(builder): return builder.EndObject()
 
 
 class CategoryT(object):
+
     # CategoryT
     def __init__(self):
         self.id = 0  # type: int

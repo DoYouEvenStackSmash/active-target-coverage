@@ -19,7 +19,7 @@ def adjust_angle(theta):
 
 
 ACCELERATION_THRESHOLD = 1.5
-MAX_SCALE_FACTOR = 1.2
+MAX_SCALE_FACTOR = 1.4
 MAX_RANGE = 500
 MAX_ANGLE = np.pi
 
@@ -60,7 +60,7 @@ class ObjectTrack:
         parent_agent=None,
         path=None,
         predictions=None,
-        color=rand_color(),
+        color= None,
         last_frame=-1,
     ):
         """Initializes an ObjectTrack instance.
@@ -107,7 +107,7 @@ class ObjectTrack:
         self.path = path if path != None else []
         self.predictions = predictions if predictions != None else []
 
-        self.color = color
+        self.color = color if color != None else rand_color(),
         self.last_frame = last_frame
 
     def heartbeat(self):

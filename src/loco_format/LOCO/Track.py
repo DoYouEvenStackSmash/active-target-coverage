@@ -4,12 +4,10 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
-
 np = import_numpy()
 
-
 class Track(object):
-    __slots__ = ["_tab"]
+    __slots__ = ['_tab']
 
     @classmethod
     def GetRootAsTrack(cls, buf, offset):
@@ -33,8 +31,8 @@ class Track(object):
     def CategoryId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
-        return 0
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
 
     # Track
     def TrackLen(self):
@@ -48,10 +46,7 @@ class Track(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(
-                flatbuffers.number_types.Int32Flags,
-                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
-            )
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
         return 0
 
     # Track
@@ -73,48 +68,25 @@ class Track(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
-
-def TrackStart(builder):
-    builder.StartObject(4)
-
-
-def TrackAddTrackId(builder, trackId):
-    builder.PrependInt32Slot(0, trackId, 0)
-
-
-def TrackAddCategoryId(builder, categoryId):
-    builder.PrependInt32Slot(1, categoryId, 0)
-
-
-def TrackAddTrackLen(builder, trackLen):
-    builder.PrependInt32Slot(2, trackLen, 0)
-
-
-def TrackAddSteps(builder, steps):
-    builder.PrependUOffsetTRelativeSlot(
-        3, flatbuffers.number_types.UOffsetTFlags.py_type(steps), 0
-    )
-
-
-def TrackStartStepsVector(builder, numElems):
-    return builder.StartVector(4, numElems, 4)
-
-
-def TrackEnd(builder):
-    return builder.EndObject()
-
+def TrackStart(builder): builder.StartObject(4)
+def TrackAddTrackId(builder, trackId): builder.PrependInt32Slot(0, trackId, 0)
+def TrackAddCategoryId(builder, categoryId): builder.PrependFloat32Slot(1, categoryId, 0.0)
+def TrackAddTrackLen(builder, trackLen): builder.PrependInt32Slot(2, trackLen, 0)
+def TrackAddSteps(builder, steps): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(steps), 0)
+def TrackStartStepsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def TrackEnd(builder): return builder.EndObject()
 
 try:
     from typing import List
 except:
     pass
 
-
 class TrackT(object):
+
     # TrackT
     def __init__(self):
         self.trackId = 0  # type: int
-        self.categoryId = 0  # type: int
+        self.categoryId = 0.0  # type: float
         self.trackLen = 0  # type: int
         self.steps = None  # type: List[int]
 

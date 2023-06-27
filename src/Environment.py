@@ -1,30 +1,124 @@
 #!/usr/bin/python3
+import sys
+
+sys.path.append("../")
+sys.path.append(".")
 import numpy as np
 from render_support import PygameArtFxns as pafn
 from render_support import GeometryFxns as gfn
 from render_support import MathFxns as mfn
 from render_support import TransformFxns as tfn
-from support.transform_polygon import *
-from support.Polygon import *
-from support.Link import Link
 
-import collections
-
-from YoloBox import YoloBox
-from StreamingObjectTrackManager import ObjectTrackManager
-from ObjectTrack import ObjectTrack
-from AnnotationLoader import AnnotationLoader as al
-from StreamingAnnotations import StreamingAnnotations as sann
-
-import json
-
-import sys
-
-from RigidBody import RigidBody
+import numpy as np
+from support.Polygon import Polygon
 from Sensor import Sensor
+from RigidBody import RigidBody
 from SensingAgent import SensingAgent
-import pygame
-import time
+from Target import Target
+import json
+from StreamingObjectTrackManager import ObjectTrackManager
+# from env_init import init_sensing_agent
+
+def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
+    """
+    Initializes an exoskeleton for an agent
+    returns a rigid body
+    """
+    ox, oy = origin
+    scale = .2
+    # makes the agent look like a triangle
+    opts = [
+        (ox - 10 * scale, oy - 10 * scale),
+        (ox - 10 * scale, oy + 10 * scale),
+        (ox + 30 * scale, oy),
+    ]
+    # makes the agent look like an hourglass thing
+    scale2 = 1.5
+    opts2 = [
+        (ox - 10 * scale2, oy - 10 * scale2),
+        (ox - 10 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy - 10 * scale2),
+        (ox + 20 * scale2, oy + 10 * scale2),
+        (ox - 10 * scale2, oy - 10 * scale2),
+        (ox - 10 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy + 10 * scale2),
+        (ox + 20 * scale2, oy - 10 * scale2),
+        # (ox + 30 * scale, oy),
+    ]
+
+    # print(opts)
+
+    mpt = gfn.get_midpoint(opts[0], opts[1])
+    mpt2 = gfn.get_midpoint(mpt, opts[2])
+
+    ap = Polygon(opts)
+
+    rb = RigidBody(
+        parent_agent=None,
+        ref_origin=mpt,
+        ref_center=mpt2,
+        endpoint=opts[2],
+        rigid_link=ap,
+        states=[],
+    )
+    if sensing_agent != None:
+        rb.parent_agent = sensing_agent
+        sensing_agent.exoskeleton = rb
+    return rb
+
+
+def init_sensor(width=np.pi / 2, radius=200, sensing_agent=None):
+    """
+    Initializes a sensor for a sensing agent
+    returns a sensor
+    """
+    sensor = Sensor(sensor_width=width, sensor_radius=radius)
+    if sensing_agent != None:
+        sensing_agent.centered_sensor = sensor
+        sensor.parent_agent = sensing_agent
+    return sensor
+
+
+def init_object_tracker(sensing_agent=None):
+    """
+    Initializes an object tracker for a sensing agent
+    returns an object track manager
+    """
+    obj_tracker = ObjectTrackManager()
+    if sensing_agent != None:
+        obj_tracker.parent_agent = sensing_agent
+        sensing_agent.obj_tracker = obj_tracker
+    return obj_tracker
+
+
+def init_sensing_agent(_id=0, origin=(0, 0), width=np.pi / 2, radius=200):
+    """
+    Standard initializer for sensing agent
+    returns a sensing agent
+    """
+    sensing_agent = SensingAgent()
+    exoskeleton = init_agent_exoskeleton(origin, sensing_agent)
+    sensor = init_sensor(width, radius, sensing_agent)
+    obj_tracker = init_object_tracker(sensing_agent)
+    return sensing_agent
+
+
+def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None):
+    """
+    standard initializer for target
+    returns a Target
+    """
+    target = Target(origin, color, _id, path)
+    return target
+
+# import sys
+
+# from RigidBody import RigidBody
+# from Sensor import Sensor
+# from SensingAgent import SensingAgent
+# import pygame
+# import time
+# from env_init import *
 
 
 class Environment:
@@ -84,6 +178,77 @@ class Environment:
         # update the trackers of all agents
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
+
+    def target_coverage(self):
+        uncovered_targets = len(self.targets)
+        pairs = []
+        sortkey = lambda x: x[2]
+        frame_id = "frame_" + str(self.counter)
+        self.counter += 1
+        updates = {}
+        for k in self.agents:
+            # self.agents[k].heartbeat()
+            updates[k] = []
+            for target in self.targets:
+                d = mfn.euclidean_dist(
+                    self.agents[k].get_origin(), target.get_position()
+                )
+                pairs.append((self.agents[k]._id, target, d))
+
+        pairs = sorted(pairs, key=sortkey)
+        # TODO: short circuit the for loop, minimum number of updates?
+        covered_targets = set()
+        busy_agents = set()
+        # iterate through all pairs and determine which agents can see which targets
+        for c in range(len(pairs)):
+            if pairs[c][1].get_id() in covered_targets:
+                continue
+            # if pairs[c][0] in busy_agents:
+            #     continue
+            if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
+                continue
+            if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
+                updates[pairs[c][0]].append(pairs[c][1])
+                covered_targets.add(pairs[c][1].get_id())
+                uncovered_targets -= 1
+                busy_agents.add(pairs[c][0])
+        unused_agents = []
+        # for ba in self.agents:
+        #     if ba._id not in busy_agents:
+        #         unused_agents.append(ba)
+        pairs = []
+        # for agent in unused_agents:
+        #     updates[k] = []
+        for t in self.targets:
+            if t.get_id() in covered_targets:
+                continue
+                # d = mfn.euclidean_dist(
+                #     self.agents[k].get_origin(), target.get_position()
+                # )
+                # pairs.append((self.agents[k]._id, target, d))
+                
+            x,y = t.get_origin()
+            var = 60
+            sa = init_sensing_agent(origin=(x+var/2,y+var/2), width=np.pi / 2, radius = var)
+            sa.obj_tracker.radial_exclusion = 400
+            sa.centered_sensor.tolerance = 0.45
+            sa.obj_tracker.avg_window_len = 4
+            sa.obj_tracker.track_lifespan = 80
+            sa._id = len(self.agents)
+            sa.rotate_agent((x,y))
+            sa.heartbeat()
+            updates[sa._id] = []
+            updates[sa._id].append(t)
+            self.agents[sa._id] = sa
+            uncovered_targets-=1
+            covered_targets.add(t.get_id())
+
+        for k in updates:
+            self.agents[k].new_detection_set(frame_id, updates[k])
+            
+            
+            
+            
 
     def add_target(self, T):
         """

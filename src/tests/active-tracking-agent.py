@@ -70,7 +70,7 @@ def tracking_test(screen, environment, sample_rate=1):
 
 def main():
     pygame.init()
-    screen = pafn.create_display(1000, 1000)
+    screen = pafn.create_display(1920, 1080)
     pafn.clear_frame(screen)
 
     # initialize agent 1
