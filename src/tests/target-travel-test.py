@@ -11,7 +11,7 @@ sys.path.append(".")
 from env_init import *
 from drawing_functions import *
 from support.file_loader import *
-
+SLEEP_DURATION = 0.05
 
 def target_traverse(screen, environment):
     """
@@ -26,13 +26,14 @@ def target_traverse(screen, environment):
             pafn.frame_draw_dot(screen, t.get_position(), t.color)
             flag = t.step() or flag
         pygame.display.update()
-        time.sleep(0.005)
+        time.sleep(SLEEP_DURATION)
+    time.sleep(3)
     sys.exit()
 
 
 def main():
     pygame.init()
-    screen = pafn.create_display(1000, 1000)
+    screen = pafn.create_display(1920, 1080)
     pafn.clear_frame(screen)
     targets = []
     # load json point files and initialize targets

@@ -228,6 +228,7 @@ class ObjectTrack:
             fid = yb.img_filename
             yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
             yb_json["track_id"] = self.track_id
+            yb_json["position"] = det.position.to_json()
             steps.append(yb_json)
         return steps
 
@@ -348,7 +349,7 @@ class ObjectTrack:
         # update sensor yolobox coordinates
         yb = None
         yb = last_pos.get_attributes()
-        bbox = [pt2[0], pt2[1], 1, 1]
+        bbox = [pt2[0], pt2[1], yb.bbox[2], yb.bbox[3]]
         yb.bbox = bbox
 
         det = Detection(Position(pt[0], pt[1]), yb)

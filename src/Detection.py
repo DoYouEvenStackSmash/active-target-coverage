@@ -60,3 +60,12 @@ class Position:
 
     def get_center_coord(self):
         return (self.x, self.y)
+    
+    def to_json(self):
+        return {
+            "x":self.x,
+            "y":self.y,
+            "z":self.z,
+            "theta":self.theta,
+            "phi":self.phi
+        }

@@ -143,8 +143,10 @@ class ObjectTrackManager:
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
+            yb.is_displaced = True
             x, y = yb.bbox[:2]
-            yb.bbox = [pt2[0], pt2[1], 1, 1]
+            yb.bbox = [pt2[0], pt2[1], yb.bbox[2], yb.bbox[3]]
+
             trk.path[-1].attributes = yb
             trk.theta_naught[-1] = adjust_angle(trk.theta_naught[-1] + angle)
 
@@ -173,8 +175,9 @@ class ObjectTrackManager:
             trk.path[-1].position.y = new_pt[1]
 
             yb = trk.path[-1].get_attributes()
+            yb.is_displaced = True
             x, y = yb.bbox[:2]
-            yb.bbox = [pt2[0], pt2[1], 1, 1]
+            yb.bbox = [pt2[0], pt2[1], yb.bbox[2], yb.bbox[3]]
             trk.path[-1].attributes = yb
 
     def init_new_layer(self):
@@ -385,15 +388,33 @@ class ObjectTrackManager:
                 else:
                     # reap tracks which are no longer active
                     self.inactive_tracks.append(self.active_tracks.pop())
-
+    
     def export_loco_fmt(self):
         """
         Export active tracks and associated metadata to loco format
         """
         # construct filename lookup dictionary
-        fdict = None
+        fdict = {}
         # construct "images" : []
         imgs = []
+        for i, f in enumerate(self.filenames):
+            fdict[f"{f[:-3]}png"] = i
+        # construct "images" : []
+        imgs = []
+        for k, v in fdict.items():
+            half_h = 540
+            half_w = 960
+            # if imported, adjust angles
+            if self.imported:
+                # if rotaged about the center, swap height and width
+                if angle != 0:
+                    half_h, half_w = self.img_centers[v]
+                else:
+                    half_w, half_h = self.img_centers[v]
+
+            h, w = half_h * 2, half_w * 2
+            imgs.append({"id": v, "file_name": k, "height": h, "width": w})
+
         # construct "annotations" : []
         steps = self.export_linked_loco_tracks(fdict)
 
@@ -411,7 +432,6 @@ class ObjectTrackManager:
             }
             for i in self.linked_tracks
         ]
-        print(f"linked_tracks: {len(self.linked_tracks)}")
 
         trackmap = {}  # {track_id : posn in linked_tracks}
         for i, lt in enumerate(linked_tracks):
@@ -449,8 +469,8 @@ class ObjectTrackManager:
         for st in range(len(track_steps)):
             bbox = track_steps[st]["bbox"]
             x, y, w, h = bbox
-
-            bbox[0], bbox[1] = x, y
+            pt = self.parent_agent.transform_to_global_coord((x,y))
+            bbox[0], bbox[1] = pt[0],pt[1]#x, y
             track_steps[st]["bbox"] = bbox
 
         for i in range(len(track_steps)):

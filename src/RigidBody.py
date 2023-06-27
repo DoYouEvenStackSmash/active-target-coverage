@@ -7,6 +7,7 @@ from support.transform_polygon import *
 from support.Polygon import *
 from aux_functions import *
 import time
+from Detection import *
 from State import State
 
 
@@ -83,8 +84,8 @@ class RigidBody:
         Does not return
         """
         self.increment_clock()
-
-        new_state = State(self.get_center(), self.get_rel_theta(), self.get_clock())
+        
+        new_state = State(self.get_as_posn(self.get_center()), self.get_rel_theta(), self.get_clock())
 
         self.states.append(new_state)
 
@@ -159,6 +160,12 @@ class RigidBody:
         """
         return self.rel_theta
 
+    def get_as_posn(self,coords):
+        """
+        convenience wrapper for getting the coordinates as a Position
+        """
+        return Position(coords[0], coords[1])
+    
     def get_center(self):
         """
         Accessor for the RigidBody's origin

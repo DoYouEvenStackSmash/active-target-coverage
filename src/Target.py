@@ -8,10 +8,10 @@ class Target:
 
     """
 
-    def __init__(self, origin, color=None, _id=0, path=None):
+    def __init__(self, origin, color=None, _id=0, path=None,attributes=None):
         self.origin = origin
         self.color = color
-        self.attributes = None
+        self.attributes = attributes
         self._id = _id
         self.path = path if path != None else []
         self.idx = 0

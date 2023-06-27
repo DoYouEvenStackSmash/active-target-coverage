@@ -318,10 +318,14 @@ class SensingAgent:
         for a in detection_list:
             val = self.transform_to_local_detection_coord(a.get_origin())
             dc = self.transform_to_local_sensor_coord((0, 0), (val[0], val[1]))
+            bbx = a.attributes
             bbox = [dc[0], dc[1], 1, 1]
-            yb = sann.register_annotation(a.get_id(), bbox, curr_state)
+            if bbx != None:
+                bbox[2],bbox[3] = bbx[2],bbx[3]
+            yb = sann.register_annotation(class_id = a.get_id(), bbox=bbox, img_filename=frame_id,state_id=curr_state)
             posn = Position(val[0], val[1])
             detections.append(Detection(posn, yb))
+        self.obj_tracker.filenames.append(frame_id)
         self.obj_tracker.add_new_layer(detections)
         self.obj_tracker.process_layer(len(self.obj_tracker.layers) - 1)
 

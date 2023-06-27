@@ -26,6 +26,19 @@ struct Bbox {
   h:float;
 }
 
+table Position {
+  // x coord of the agent
+  x:float;
+  // y coord of the agent
+  y:float;
+  // z coord of the agent
+  z:float;
+  // azimuth angle of the agent
+  theta:float;
+  // elevation angle of the agent
+  phi:float;
+}
+
 //Annotation containing position of detection in the frame
 table Annotation {
   // id of the annotation
@@ -53,29 +66,20 @@ table Annotation {
   track_color:[int];
   // displacement flag
   is_displaced:bool;
-  is_prediction:bool;
   // confidence in a detection, between 0 and 1
   confidence:float;
   // error between prediction and actual detection
   error:float;
   // id for the agent state
-  state_id:string;
+  state_id:int;
+
+  is_prediction:bool;
+
+  position:Position;
   // distance??
   distance:float;
 }
 
-table Position {
-  // x coord of the agent
-  x:float;
-  // y coord of the agent
-  y:float;
-  // z coord of the agent
-  z:float;
-  // azimuth angle of the agent
-  theta:float;
-  // elevation angle of the agent
-  phi:float;
-}
 
 // State of the agent at a point in time
 table State {

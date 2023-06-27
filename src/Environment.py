@@ -103,12 +103,12 @@ def init_sensing_agent(_id=0, origin=(0, 0), width=np.pi / 2, radius=200):
     return sensing_agent
 
 
-def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None):
+def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None, attributes=None):
     """
     standard initializer for target
     returns a Target
     """
-    target = Target(origin, color, _id, path)
+    target = Target(origin, color, _id, path, attributes)
     return target
 
 # import sys
@@ -153,6 +153,7 @@ class Environment:
         pairs = []
         sortkey = lambda x: x[2]
         frame_id = "frame_" + str(self.counter)
+        
         self.counter += 1
         updates = {}
 
@@ -179,11 +180,11 @@ class Environment:
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
 
-    def target_coverage(self):
+    def target_coverage(self,frame_id):
         uncovered_targets = len(self.targets)
         pairs = []
         sortkey = lambda x: x[2]
-        frame_id = "frame_" + str(self.counter)
+        # frame_id = "frame_" + str(self.counter)
         self.counter += 1
         updates = {}
         for k in self.agents:
@@ -211,22 +212,55 @@ class Environment:
                 updates[pairs[c][0]].append(pairs[c][1])
                 covered_targets.add(pairs[c][1].get_id())
                 uncovered_targets -= 1
-                busy_agents.add(pairs[c][0])
+                busy_agents.add(self.agents[pairs[c][0]]._id)
         unused_agents = []
-        # for ba in self.agents:
-        #     if ba._id not in busy_agents:
-        #         unused_agents.append(ba)
+        for ua in self.agents:
+            ba = self.agents[ua]
+            if ba._id not in busy_agents:
+                unused_agents.append(ba._id)
         pairs = []
-        # for agent in unused_agents:
-        #     updates[k] = []
+        for k in unused_agents:
+            updates[k] = []
+            
+            # pt = mfn.pol2car(self.agents[k].get_origin(), self.agents[k].get_fov_radius() / 2, self.agents[k].get_fov_theta())
+            
+            
+            for t in self.targets:
+                if t.get_id() in covered_targets:
+                    continue
+                d = mfn.euclidean_dist(
+                    self.agents[k].get_origin(), target.get_position()
+                )
+                pairs.append((self.agents[k]._id, target, d))
+        pairs = sorted(pairs, key=sortkey)
+        
+        for c in range(len(pairs)):
+            if pairs[c][1].get_id() in covered_targets:
+                continue
+            if pairs[c][0] in busy_agents:
+                continue
+            # if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
+            #     continue
+            # if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
+            else:
+                k = pairs[c][0]
+                theta, radius = mfn.car2pol(self.agents[k].get_origin(), pairs[c][1].get_origin())
+                pt = mfn.pol2car(self.agents[k].get_origin(), radius - self.agents[k].get_fov_radius() / 2, theta)
+                self.agents[k].rotate_agent(pt)
+                self.agents[k].translate_agent(pt)
+                
+                # self.agents[k].obj_tracker.link_all_tracks()
+                self.agents[k].obj_tracker.close_all_tracks()
+                self.agents[k].clock = 0
+                # self.agents[k].heartbeat()
+                updates[k].append(pairs[c][1])
+                covered_targets.add(pairs[c][1].get_id())
+                uncovered_targets -= 1
+                busy_agents.add(k)
+        
         for t in self.targets:
             if t.get_id() in covered_targets:
                 continue
-                # d = mfn.euclidean_dist(
-                #     self.agents[k].get_origin(), target.get_position()
-                # )
-                # pairs.append((self.agents[k]._id, target, d))
-                
             x,y = t.get_origin()
             var = 60
             sa = init_sensing_agent(origin=(x+var/2,y+var/2), width=np.pi / 2, radius = var)
