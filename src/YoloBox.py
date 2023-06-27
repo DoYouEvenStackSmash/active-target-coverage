@@ -23,14 +23,13 @@ class YoloBox:
         img_filename,
         state_id,
         confidence=0.0,
-        parent_track = None,
-        next_box = None,
-        prev_box = None,
-        center_xy= None,
+        parent_track=None,
+        next_box=None,
+        prev_box=None,
+        center_xy=None,
         distance=0,
-        is_displaced = False,
-        is_prediction = False
-
+        is_displaced=False,
+        is_prediction=False,
     ):
         self.class_id = class_id
         self.bbox = bbox
@@ -44,7 +43,6 @@ class YoloBox:
         self.distance = distance
         self.is_displaced = is_displaced
         self.is_prediction = is_prediction
-        
 
     def get_corner_coords(self):
         """
@@ -84,11 +82,11 @@ class YoloBox:
         w, h = abs(pt1[0] - pt2[0]), abs(pt1[1] - pt2[1])
         return [mpx, mpy, w, h]
 
-    def to_json(self, fid=None, error=-1, sid=-1, color=(255, 255, 255)):
+    def to_json(self, fid=-1, error=-1, sid=-1, color=(255, 255, 255)):
         # print(self.bbox)
         return {
             "id": -1,
-            "image_id": self.img_filename,
+            "image_id": fid,
             "category_id": self.class_id,
             "bbox": self.bbox,
             "area": self.bbox[2] * self.bbox[3],
@@ -97,10 +95,10 @@ class YoloBox:
             "track_id": -1,
             "trackmap_index": -1,
             "vid_id": 0,
-            "track_color": color[0],
+            "track_color": color,
             "is_displaced": self.is_displaced,
             "confidence": self.confidence,
             "error": error,
             "state_id": self.state_id,
-            "is_prediction": self.is_prediction
+            "is_prediction": self.is_prediction,
         }

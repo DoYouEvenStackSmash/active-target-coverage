@@ -321,8 +321,13 @@ class SensingAgent:
             bbx = a.attributes
             bbox = [dc[0], dc[1], 1, 1]
             if bbx != None:
-                bbox[2],bbox[3] = bbx[2],bbx[3]
-            yb = sann.register_annotation(class_id = a.get_id(), bbox=bbox, img_filename=frame_id,state_id=curr_state)
+                bbox[2], bbox[3] = bbx[2], bbx[3]
+            yb = sann.register_annotation(
+                class_id=a.get_id(),
+                bbox=bbox,
+                img_filename=frame_id,
+                state_id=curr_state,
+            )
             posn = Position(val[0], val[1])
             detections.append(Detection(posn, yb))
         self.obj_tracker.filenames.append(frame_id)

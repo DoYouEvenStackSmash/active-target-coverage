@@ -214,7 +214,7 @@ def import_agent_record(screen, agent_record):
     trackmap = agent_record["trackmap"]
     lt = agent_record["linked_tracks"]
 
-    get_center = lambda state: (state["position"]["x"],state["position"]["y"])
+    get_center = lambda state: (state["position"]["x"], state["position"]["y"])
     get_orientation = lambda state: state["orientation"]
     annotations = agent_record["annotations"]
     states = agent_record["states"]
@@ -228,8 +228,8 @@ def import_agent_record(screen, agent_record):
             color = anno["track_color"]
             state = states[anno["state_id"] - 1]
             x, y, w, h = anno["bbox"]
-            rect_x, rect_y = anno["position"]["x"],anno["position"]["y"]
-            theta, rad = mfn.car2pol((0,0), (rect_x,rect_y))
+            rect_x, rect_y = anno["position"]["x"], anno["position"]["y"]
+            theta, rad = mfn.car2pol((0, 0), (rect_x, rect_y))
 
             # theta = (x - 50) / Sensor.WINDOW_WIDTH * fov_width
             theta = adjust_angle(get_orientation(state) + theta)
@@ -304,4 +304,4 @@ def environment_agent_illustration(
                     screen, pred_pts[idx], sensing_agent.exoskeleton.color, 0, 4
                 )
 
-        # draw_sensing_agent(screen, sensing_agent)
+        draw_sensing_agent(screen, sensing_agent)

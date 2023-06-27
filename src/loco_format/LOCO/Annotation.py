@@ -4,10 +4,12 @@
 
 import flatbuffers
 from flatbuffers.compat import import_numpy
+
 np = import_numpy()
 
+
 class Annotation(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsAnnotation(cls, buf, offset):
@@ -31,14 +33,16 @@ class Annotation(object):
     def ImageId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.String(o + self._tab.Pos)
-        return None
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
 
     # Annotation
     def CategoryId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # Annotation
@@ -47,6 +51,7 @@ class Annotation(object):
         if o != 0:
             x = o + self._tab.Pos
             from LOCO.Bbox import Bbox
+
             obj = Bbox()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -56,7 +61,9 @@ class Annotation(object):
     def Area(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # Annotation
@@ -64,7 +71,10 @@ class Annotation(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint8Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1),
+            )
         return 0
 
     # Annotation
@@ -120,7 +130,10 @@ class Annotation(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.Get(
+                flatbuffers.number_types.Int32Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
+            )
         return 0
 
     # Annotation
@@ -146,21 +159,27 @@ class Annotation(object):
     def IsDisplaced(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return False
 
     # Annotation
     def Confidence(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(28))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # Annotation
     def Error(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(30))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # Annotation
@@ -174,7 +193,9 @@ class Annotation(object):
     def IsPrediction(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(34))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return False
 
     # Annotation
@@ -183,6 +204,7 @@ class Annotation(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from LOCO.Position import Position
+
             obj = Position()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -192,45 +214,122 @@ class Annotation(object):
     def Distance(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(38))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float32Flags, o + self._tab.Pos
+            )
         return 0.0
 
-def AnnotationStart(builder): builder.StartObject(18)
-def AnnotationAddId(builder, id): builder.PrependInt32Slot(0, id, 0)
-def AnnotationAddImageId(builder, imageId): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(imageId), 0)
-def AnnotationAddCategoryId(builder, categoryId): builder.PrependFloat32Slot(2, categoryId, 0.0)
-def AnnotationAddBbox(builder, bbox): builder.PrependStructSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(bbox), 0)
-def AnnotationAddArea(builder, area): builder.PrependFloat32Slot(4, area, 0.0)
-def AnnotationAddSegmentation(builder, segmentation): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(segmentation), 0)
-def AnnotationStartSegmentationVector(builder, numElems): return builder.StartVector(1, numElems, 1)
-def AnnotationAddIscrowd(builder, iscrowd): builder.PrependInt32Slot(6, iscrowd, 0)
-def AnnotationAddTrackId(builder, trackId): builder.PrependInt32Slot(7, trackId, 0)
-def AnnotationAddTrackmapIndex(builder, trackmapIndex): builder.PrependInt32Slot(8, trackmapIndex, 0)
-def AnnotationAddVidId(builder, vidId): builder.PrependInt32Slot(9, vidId, 0)
-def AnnotationAddTrackColor(builder, trackColor): builder.PrependUOffsetTRelativeSlot(10, flatbuffers.number_types.UOffsetTFlags.py_type(trackColor), 0)
-def AnnotationStartTrackColorVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def AnnotationAddIsDisplaced(builder, isDisplaced): builder.PrependBoolSlot(11, isDisplaced, 0)
-def AnnotationAddConfidence(builder, confidence): builder.PrependFloat32Slot(12, confidence, 0.0)
-def AnnotationAddError(builder, error): builder.PrependFloat32Slot(13, error, 0.0)
-def AnnotationAddStateId(builder, stateId): builder.PrependInt32Slot(14, stateId, 0)
-def AnnotationAddIsPrediction(builder, isPrediction): builder.PrependBoolSlot(15, isPrediction, 0)
-def AnnotationAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(16, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def AnnotationAddDistance(builder, distance): builder.PrependFloat32Slot(17, distance, 0.0)
-def AnnotationEnd(builder): return builder.EndObject()
+
+def AnnotationStart(builder):
+    builder.StartObject(18)
+
+
+def AnnotationAddId(builder, id):
+    builder.PrependInt32Slot(0, id, 0)
+
+
+def AnnotationAddImageId(builder, imageId):
+    builder.PrependInt32Slot(1, imageId, 0)
+
+
+def AnnotationAddCategoryId(builder, categoryId):
+    builder.PrependFloat32Slot(2, categoryId, 0.0)
+
+
+def AnnotationAddBbox(builder, bbox):
+    builder.PrependStructSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(bbox), 0
+    )
+
+
+def AnnotationAddArea(builder, area):
+    builder.PrependFloat32Slot(4, area, 0.0)
+
+
+def AnnotationAddSegmentation(builder, segmentation):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(segmentation), 0
+    )
+
+
+def AnnotationStartSegmentationVector(builder, numElems):
+    return builder.StartVector(1, numElems, 1)
+
+
+def AnnotationAddIscrowd(builder, iscrowd):
+    builder.PrependInt32Slot(6, iscrowd, 0)
+
+
+def AnnotationAddTrackId(builder, trackId):
+    builder.PrependInt32Slot(7, trackId, 0)
+
+
+def AnnotationAddTrackmapIndex(builder, trackmapIndex):
+    builder.PrependInt32Slot(8, trackmapIndex, 0)
+
+
+def AnnotationAddVidId(builder, vidId):
+    builder.PrependInt32Slot(9, vidId, 0)
+
+
+def AnnotationAddTrackColor(builder, trackColor):
+    builder.PrependUOffsetTRelativeSlot(
+        10, flatbuffers.number_types.UOffsetTFlags.py_type(trackColor), 0
+    )
+
+
+def AnnotationStartTrackColorVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def AnnotationAddIsDisplaced(builder, isDisplaced):
+    builder.PrependBoolSlot(11, isDisplaced, 0)
+
+
+def AnnotationAddConfidence(builder, confidence):
+    builder.PrependFloat32Slot(12, confidence, 0.0)
+
+
+def AnnotationAddError(builder, error):
+    builder.PrependFloat32Slot(13, error, 0.0)
+
+
+def AnnotationAddStateId(builder, stateId):
+    builder.PrependInt32Slot(14, stateId, 0)
+
+
+def AnnotationAddIsPrediction(builder, isPrediction):
+    builder.PrependBoolSlot(15, isPrediction, 0)
+
+
+def AnnotationAddPosition(builder, position):
+    builder.PrependUOffsetTRelativeSlot(
+        16, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0
+    )
+
+
+def AnnotationAddDistance(builder, distance):
+    builder.PrependFloat32Slot(17, distance, 0.0)
+
+
+def AnnotationEnd(builder):
+    return builder.EndObject()
+
 
 import LOCO.Bbox
 import LOCO.Position
+
 try:
     from typing import List, Optional
 except:
     pass
 
-class AnnotationT(object):
 
+class AnnotationT(object):
     # AnnotationT
     def __init__(self):
         self.id = 0  # type: int
-        self.imageId = None  # type: str
+        self.imageId = 0  # type: int
         self.categoryId = 0.0  # type: float
         self.bbox = None  # type: Optional[LOCO.Bbox.BboxT]
         self.area = 0.0  # type: float
@@ -299,8 +398,6 @@ class AnnotationT(object):
 
     # AnnotationT
     def Pack(self, builder):
-        if self.imageId is not None:
-            imageId = builder.CreateString(self.imageId)
         if self.segmentation is not None:
             if np is not None and type(self.segmentation) is np.ndarray:
                 segmentation = builder.CreateNumpyVector(self.segmentation)
@@ -321,8 +418,7 @@ class AnnotationT(object):
             position = self.position.Pack(builder)
         AnnotationStart(builder)
         AnnotationAddId(builder, self.id)
-        if self.imageId is not None:
-            AnnotationAddImageId(builder, imageId)
+        AnnotationAddImageId(builder, self.imageId)
         AnnotationAddCategoryId(builder, self.categoryId)
         if self.bbox is not None:
             bbox = self.bbox.Pack(builder)

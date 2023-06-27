@@ -11,7 +11,9 @@ sys.path.append(".")
 from env_init import *
 from drawing_functions import *
 from support.file_loader import *
+
 SLEEP_DURATION = 0.05
+
 
 def target_traverse(screen, environment):
     """

@@ -45,7 +45,7 @@ table Annotation {
   id:int; 
   
   // image in which the detection was present
-  image_id:string;
+  image_id:int;
   // category of the detection
   category_id:float;
   // bounding box of the detection in yolo format

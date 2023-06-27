@@ -60,7 +60,7 @@ class ObjectTrack:
         parent_agent=None,
         path=None,
         predictions=None,
-        color= None,
+        color=None,
         last_frame=-1,
     ):
         """Initializes an ObjectTrack instance.
@@ -107,7 +107,7 @@ class ObjectTrack:
         self.path = path if path != None else []
         self.predictions = predictions if predictions != None else []
 
-        self.color = color if color != None else rand_color(),
+        self.color = (color if color != None else rand_color(),)
         self.last_frame = last_frame
 
     def heartbeat(self):
@@ -174,8 +174,8 @@ class ObjectTrack:
         Postprocessing step to construct a doubly linked list, in preparation for serialization
         """
         for i in range(len(self.path) - 1):
-            self.path[i].next = self.path[i + 1]
-            self.path[i + 1].prev = self.path[i]
+            self.path[i].attributes.next = self.path[i + 1].attributes
+            self.path[i + 1].attributes.prev = self.path[i].attributes
 
     def get_step_count(self):
         """
@@ -224,9 +224,12 @@ class ObjectTrack:
         for i, det in enumerate(self.path):
             yb = det.get_attributes()
             fid = None
-
-            fid = yb.img_filename
-            yb_json = yb.to_json(fid, self.error_over_time[i], fid, self.color)
+            if fdict != None:
+                fid = fdict[yb.img_filename]
+            # else:
+            #     fid = -1
+            yb_json = yb.to_json(fid, -1)
+            yb_json["track_color"] = self.color[0]
             yb_json["track_id"] = self.track_id
             yb_json["position"] = det.position.to_json()
             steps.append(yb_json)

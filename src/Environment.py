@@ -17,7 +17,9 @@ from SensingAgent import SensingAgent
 from Target import Target
 import json
 from StreamingObjectTrackManager import ObjectTrackManager
+
 # from env_init import init_sensing_agent
+
 
 def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
     """
@@ -25,7 +27,7 @@ def init_agent_exoskeleton(origin=(0, 0), sensing_agent=None):
     returns a rigid body
     """
     ox, oy = origin
-    scale = .2
+    scale = 0.2
     # makes the agent look like a triangle
     opts = [
         (ox - 10 * scale, oy - 10 * scale),
@@ -103,13 +105,16 @@ def init_sensing_agent(_id=0, origin=(0, 0), width=np.pi / 2, radius=200):
     return sensing_agent
 
 
-def init_target(origin=(0, 0), color=(255, 255, 255), _id=0, path=None, attributes=None):
+def init_target(
+    origin=(0, 0), color=(255, 255, 255), _id=0, path=None, attributes=None
+):
     """
     standard initializer for target
     returns a Target
     """
     target = Target(origin, color, _id, path, attributes)
     return target
+
 
 # import sys
 
@@ -153,7 +158,7 @@ class Environment:
         pairs = []
         sortkey = lambda x: x[2]
         frame_id = "frame_" + str(self.counter)
-        
+
         self.counter += 1
         updates = {}
 
@@ -180,7 +185,7 @@ class Environment:
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
 
-    def target_coverage(self,frame_id):
+    def target_coverage(self, frame_id):
         uncovered_targets = len(self.targets)
         pairs = []
         sortkey = lambda x: x[2]
@@ -221,10 +226,9 @@ class Environment:
         pairs = []
         for k in unused_agents:
             updates[k] = []
-            
+
             # pt = mfn.pol2car(self.agents[k].get_origin(), self.agents[k].get_fov_radius() / 2, self.agents[k].get_fov_theta())
-            
-            
+
             for t in self.targets:
                 if t.get_id() in covered_targets:
                     continue
@@ -233,7 +237,7 @@ class Environment:
                 )
                 pairs.append((self.agents[k]._id, target, d))
         pairs = sorted(pairs, key=sortkey)
-        
+
         for c in range(len(pairs)):
             if pairs[c][1].get_id() in covered_targets:
                 continue
@@ -244,11 +248,17 @@ class Environment:
             # if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
             else:
                 k = pairs[c][0]
-                theta, radius = mfn.car2pol(self.agents[k].get_origin(), pairs[c][1].get_origin())
-                pt = mfn.pol2car(self.agents[k].get_origin(), radius - self.agents[k].get_fov_radius() / 2, theta)
+                theta, radius = mfn.car2pol(
+                    self.agents[k].get_origin(), pairs[c][1].get_origin()
+                )
+                pt = mfn.pol2car(
+                    self.agents[k].get_origin(),
+                    radius - self.agents[k].get_fov_radius() / 2,
+                    theta,
+                )
                 self.agents[k].rotate_agent(pt)
                 self.agents[k].translate_agent(pt)
-                
+
                 # self.agents[k].obj_tracker.link_all_tracks()
                 self.agents[k].obj_tracker.close_all_tracks()
                 self.agents[k].clock = 0
@@ -257,32 +267,30 @@ class Environment:
                 covered_targets.add(pairs[c][1].get_id())
                 uncovered_targets -= 1
                 busy_agents.add(k)
-        
+
         for t in self.targets:
             if t.get_id() in covered_targets:
                 continue
-            x,y = t.get_origin()
-            var = 60
-            sa = init_sensing_agent(origin=(x+var/2,y+var/2), width=np.pi / 2, radius = var)
-            sa.obj_tracker.radial_exclusion = 400
-            sa.centered_sensor.tolerance = 0.45
+            x, y = t.get_origin()
+            var = 160
+            sa = init_sensing_agent(
+                origin=(x + var / 2, y + var / 2), width=np.pi / 4, radius=var
+            )
+            sa.obj_tracker.radial_exclusion = 600
+            sa.centered_sensor.tolerance = 0.3
             sa.obj_tracker.avg_window_len = 4
             sa.obj_tracker.track_lifespan = 80
             sa._id = len(self.agents)
-            sa.rotate_agent((x,y))
+            sa.rotate_agent((x, y))
             sa.heartbeat()
             updates[sa._id] = []
             updates[sa._id].append(t)
             self.agents[sa._id] = sa
-            uncovered_targets-=1
+            uncovered_targets -= 1
             covered_targets.add(t.get_id())
 
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
-            
-            
-            
-            
 
     def add_target(self, T):
         """

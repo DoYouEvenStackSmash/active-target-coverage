@@ -13,6 +13,8 @@ from categories import CATEGORIES
 from StreamingAnnotations import StreamingAnnotations as sann
 import numpy as np
 
+from Detection import *
+
 """
   Global scope data structure for processing a set of images
   
@@ -388,7 +390,7 @@ class ObjectTrackManager:
                 else:
                     # reap tracks which are no longer active
                     self.inactive_tracks.append(self.active_tracks.pop())
-    
+
     def export_loco_fmt(self):
         """
         Export active tracks and associated metadata to loco format
@@ -461,18 +463,166 @@ class ObjectTrackManager:
         """
         build "annotations" : [] from linked tracks only
         """
-
+        global_posn = lambda origin, r, agent_angle: mfn.pol2car(origin, r, agent_angle)
         track_steps = []
         for i in self.linked_tracks:
-            self.get_track(i).get_loco_track(fdict=None, steps=track_steps)
+            self.get_track(i).get_loco_track(fdict, steps=track_steps)
 
         for st in range(len(track_steps)):
             bbox = track_steps[st]["bbox"]
             x, y, w, h = bbox
-            pt = self.parent_agent.transform_to_global_coord((x,y))
-            bbox[0], bbox[1] = pt[0],pt[1]#x, y
+            state = self.parent_agent.exoskeleton.states[
+                track_steps[st]["state_id"] - 1
+            ]
+            posn = track_steps[st]["position"]
+            rect_x, rect_y = posn["x"], posn["y"]
+
+            theta, rad = mfn.car2pol((0, 0), (rect_x, rect_y))
+            orientation = state.orientation
+            agent_angle = adjust_angle(orientation + theta)
+            origin = (state.position.x, state.position.y)
+            pt = global_posn(origin, rad, agent_angle)
+
+            # pt = self.parent_agent.transform_to_global_coord((x,y))
+            bbox[0], bbox[1] = pt[0], pt[1]  # x, y
             track_steps[st]["bbox"] = bbox
+            # track_steps[st]["image_id"] = fdict[track_steps[st]["image_id"]]
 
         for i in range(len(track_steps)):
             track_steps[i]["id"] = i
         return track_steps
+
+    def limited_export_loco_fmt(self):
+        """
+        Export active tracks and associated metadata to loco format
+        """
+        # construct filename lookup dictionary
+        fdict = {}
+        # construct "images" : []
+        imgs = []
+        for i, f in enumerate(self.filenames):
+            fdict[f"{f[:-3]}png"] = i
+        # construct "images" : []
+        imgs = []
+        for k, v in fdict.items():
+            half_h = 540
+            half_w = 960
+            # if imported, adjust angles
+            if self.imported:
+                # if rotaged about the center, swap height and width
+                if angle != 0:
+                    half_h, half_w = self.img_centers[v]
+                else:
+                    half_w, half_h = self.img_centers[v]
+
+            h, w = half_h * 2, half_w * 2
+            imgs.append({"id": v, "file_name": k, "height": h, "width": w})
+
+        # construct "annotations" : []
+        steps = self.limited_export_linked_loco_tracks(fdict)
+        # construct "linked_tracks" : []
+        linked_tracks = [
+            {
+                "track_id": i,
+                "category_id": self.get_track(i).class_id,
+                "track_len": 0,
+                "steps": [],
+            }
+            for i in self.linked_tracks
+        ]
+
+        trackmap = {}  # {track_id : posn in linked_tracks}
+        for i, lt in enumerate(linked_tracks):
+            trackmap[linked_tracks[i]["track_id"]] = i
+
+        # add trackmap_index to all annotations
+        for s in steps:
+            linked_tracks[trackmap[s["track_id"]]]["steps"].append(s["id"])
+            s["trackmap_index"] = trackmap[s["track_id"]]
+
+        # add length to linked tracks for fun
+        for l in linked_tracks:
+            l["track_len"] = len(l["steps"])
+
+        # assemble final dictionary
+        exp = {
+            "constants": ObjectTrackManager.constants,
+            "categories": self.categories,
+            "trackmap": list(trackmap),
+            "linked_tracks": linked_tracks,
+            "images": imgs,
+            "annotations": steps,
+        }
+        return exp
+
+    def limited_export_linked_loco_tracks(self, fdict=None):
+        """
+        build "annotations" : [] from linked tracks only
+        """
+        global_posn = lambda origin, r, agent_angle: mfn.pol2car(origin, r, agent_angle)
+        track_steps = []
+        for i in self.linked_tracks:
+            self.get_track(i).get_loco_track(fdict, steps=track_steps)
+
+        for i in range(len(track_steps)):
+            track_steps[i]["id"] = i
+        return track_steps
+
+    def import_loco_fmt(self, s, sys_path="."):
+        # set up trackmap for accessing tracks
+
+        trackmap = s["trackmap"]
+        lt = s["linked_tracks"]
+        for i, track_id in enumerate(trackmap):
+            if track_id not in self.global_track_store and track_id != -1:
+                self.global_track_store[track_id] = ObjectTrack(
+                    track_id, lt[i]["category_id"]
+                )
+                self.global_track_store[track_id].class_id = lt[i]["category_id"]
+
+                # self.global_track_store[track_id].track_manager = self
+            else:
+                continue
+
+        # load image filenames
+        images = s["images"]
+        # construct file dict for accessing file ids
+        # construct sys_paths list for convenience
+        # initialize layers to populate with YoloBoxes
+        for i, imf in enumerate(images):
+            self.filenames.append(imf["file_name"])
+            self.sys_paths.append(sys_path)
+            self.fdict[imf["file_name"]] = i
+            self.layers.append([])
+            self.img_centers.append(
+                tuple((int(imf["width"] / 2), int(imf["height"] / 2)))
+            )
+
+        # load annotations
+        steps = s["annotations"]
+        for st in steps:
+            # skip step if track is invalid
+            if trackmap[st["trackmap_index"]] == -1:
+                continue
+            track = self.get_track(trackmap[st["trackmap_index"]])
+            # track.color = st["track_color"]
+            # if st["error"] > (self.radial_exclusion / 1.5):
+            #     continue
+            # print(st["image_id"])
+            yb = YoloBox(
+                class_id=track.class_id,
+                bbox=st["bbox"],
+                img_filename=self.filenames[st["image_id"]],
+                state_id=st["state_id"],
+                confidence=st["confidence"],
+                parent_track=track.track_id,
+                is_displaced=st["is_displaced"],
+                is_prediction=st["is_prediction"],
+            )
+            # print(self.filenames)
+            # add YoloBox to the appropriate layer based on the image filename
+            # self.layers[self.fdict[self.filenames[st["image_id"]]]].append(yb)
+            # add the yolobox to the correct track
+
+            det = Detection(attributes=yb)
+            track.path.append(det)

@@ -5,8 +5,8 @@ class Detection:
     attributes (Yolobox): the attributes of the detection in agent fov reference frame
     """
 
-    def __init__(self, position, attributes):
-        self.position = position
+    def __init__(self, position=None, attributes=None):
+        self.position = position if position != None else Position()
         self.attributes = attributes
         self.parent_track = None
         self._id = None
@@ -60,12 +60,12 @@ class Position:
 
     def get_center_coord(self):
         return (self.x, self.y)
-    
+
     def to_json(self):
         return {
-            "x":self.x,
-            "y":self.y,
-            "z":self.z,
-            "theta":self.theta,
-            "phi":self.phi
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "theta": self.theta,
+            "phi": self.phi,
         }
