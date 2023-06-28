@@ -21,7 +21,7 @@ class YoloBox:
         class_id,
         bbox,
         img_filename,
-        state_id,
+        state_id = 0,
         confidence=0.0,
         parent_track=None,
         next_box=None,

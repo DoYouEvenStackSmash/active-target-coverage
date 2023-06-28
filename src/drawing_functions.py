@@ -48,11 +48,11 @@ DRAW_HORIZONTAL = False
 OUTLINE = True  # draw only the outlined fov of the agent
 GRID = False  # draw the cartesian plane around the agent
 
-LINE = False  # allow a straight line to be drawn between last detection and next prediction
+LINE = True  # allow a straight line to be drawn between last detection and next prediction
 DELAY = 3  # delay to draw marked points
 
 INVERTED = 1
-MARKERS = False  # draw markers for the predictions
+MARKERS = True  # draw markers for the predictions
 
 frame_colors = [pafn.colors["white"], pafn.colors["black"]]
 color_grade = [
@@ -183,14 +183,16 @@ def render_predictions(screen, sensing_agent):
     """
     curr_pt, pred_pt = (), ()
     arr = sensing_agent.estimate_next_detection()
-    if len(arr):
-        curr_pt = arr[0][0]
-        pred_pt = arr[0][1]
-    if len(pred_pt):
-        # pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"], 5,10)
-        pafn.frame_draw_cross(screen, pred_pt, pafn.colors["yellow"], 20)
-        if LINE:
-            pafn.frame_draw_bold_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
+    if not len(arr):
+        return
+    for i in range(len(arr)):
+        curr_pt = arr[i][0]
+        pred_pt = arr[i][1]
+        if len(pred_pt):
+            # pafn.frame_draw_dot(screen, curr_pt, pafn.colors["tangerine"], 5,10)
+            pafn.frame_draw_cross(screen, pred_pt, pafn.colors["yellow"], 20)
+            if LINE:
+                pafn.frame_draw_bold_line(screen, (curr_pt, pred_pt), pafn.colors["white"])
 
 
 def render_path(screen, path, color):
@@ -305,3 +307,11 @@ def environment_agent_illustration(
                 )
 
         draw_sensing_agent(screen, sensing_agent)
+
+def environment_target_illustration(screen, environment):
+    for t in environment.targets:
+        attr = t.attributes
+        cx,cy = attr[0],attr[1]
+        w,h = attr[2], attr[3]
+        box = [(cx-w/2,cy-h/2), (cx + w/2,cy - h/2), (cx + w/2,cy + h/2), (cx - w/2,cy + h/2)]
+        pafn.frame_draw_polygon(screen, box)

@@ -157,7 +157,7 @@ class Environment:
         """
         pairs = []
         sortkey = lambda x: x[2]
-        frame_id = "frame_" + str(self.counter)
+        frame_id = self.counter
 
         self.counter += 1
         updates = {}
@@ -185,7 +185,7 @@ class Environment:
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
 
-    def target_coverage(self, frame_id):
+    def target_coverage(self, frame_id, measurement_rate):
         uncovered_targets = len(self.targets)
         pairs = []
         sortkey = lambda x: x[2]
@@ -218,6 +218,7 @@ class Environment:
                 covered_targets.add(pairs[c][1].get_id())
                 uncovered_targets -= 1
                 busy_agents.add(self.agents[pairs[c][0]]._id)
+        
         unused_agents = []
         for ua in self.agents:
             ba = self.agents[ua]
@@ -241,9 +242,14 @@ class Environment:
         for c in range(len(pairs)):
             if pairs[c][1].get_id() in covered_targets:
                 continue
-            if pairs[c][0] in busy_agents:
-                continue
-            # if pairs[c][2] > self.agents[pairs[c][0]].get_fov_radius():
+            # if pairs[c][0] in busy_agents:
+            #     continue
+            if pairs[c][2] < self.agents[pairs[c][0]].get_fov_radius():
+                self.agents[pairs[c][0]].rotate_agent(pairs[c][1].get_origin())
+                updates[pairs[c][0]].append(pairs[c][1])
+                covered_targets.add(pairs[c][1].get_id())
+                uncovered_targets -= 1
+                busy_agents.add(self.agents[pairs[c][0]]._id)
             #     continue
             # if self.agents[pairs[c][0]].is_visible(pairs[c][1].get_position()):
             else:
@@ -268,26 +274,26 @@ class Environment:
                 uncovered_targets -= 1
                 busy_agents.add(k)
 
-        for t in self.targets:
-            if t.get_id() in covered_targets:
-                continue
-            x, y = t.get_origin()
-            var = 160
-            sa = init_sensing_agent(
-                origin=(x + var / 2, y + var / 2), width=np.pi / 4, radius=var
-            )
-            sa.obj_tracker.radial_exclusion = 600
-            sa.centered_sensor.tolerance = 0.3
-            sa.obj_tracker.avg_window_len = 4
-            sa.obj_tracker.track_lifespan = 80
-            sa._id = len(self.agents)
-            sa.rotate_agent((x, y))
-            sa.heartbeat()
-            updates[sa._id] = []
-            updates[sa._id].append(t)
-            self.agents[sa._id] = sa
-            uncovered_targets -= 1
-            covered_targets.add(t.get_id())
+        # for t in self.targets:
+        #     if t.get_id() in covered_targets:
+        #         continue
+        #     x, y = t.get_origin()
+        #     var = measurement_rate * 40
+        #     sa = init_sensing_agent(
+        #         origin=(x + var / 2, y + var / 2), width=np.pi / 3, radius=var
+        #     )
+        #     sa.obj_tracker.radial_exclusion = 600
+        #     sa.centered_sensor.tolerance = 0.45
+        #     sa.obj_tracker.avg_window_len = 4
+        #     sa.obj_tracker.track_lifespan = measurement_rate * 10
+        #     sa._id = len(self.agents)
+        #     sa.rotate_agent((x, y))
+        #     sa.heartbeat()
+        #     updates[sa._id] = []
+        #     updates[sa._id].append(t)
+        #     self.agents[sa._id] = sa
+        #     uncovered_targets -= 1
+        #     covered_targets.add(t.get_id())
 
         for k in updates:
             self.agents[k].new_detection_set(frame_id, updates[k])
