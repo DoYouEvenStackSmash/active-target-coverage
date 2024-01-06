@@ -50,7 +50,7 @@ def fuse_annotations(infiles, outfile=None):
         s = al.load_annotations_from_json_file(infile)
         # if not len(s["annotations"]):
         #   continue
-        if len(s["annotations"]) < 5:
+        if len(s["annotations"]) < 7:
             continue
         trackers.append(import_tracks(s))
 

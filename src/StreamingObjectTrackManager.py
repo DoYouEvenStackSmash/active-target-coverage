@@ -36,6 +36,7 @@ def adjust_angle(theta):
 LABELS = True
 IDENTIFIERS = not LABELS
 BOXES = IDENTIFIERS
+PREDICTION = False
 
 
 class ObjectTrackManager:
@@ -116,7 +117,25 @@ class ObjectTrackManager:
                 continue
             last_arr.append(trk.get_last_detection_coordinate())
         return last_arr
+    
+    def insert_prediction(self, track_id, fc, filename):
+        """
+        insert prediction into a stale track
+        """
+        trk = self.get_track(track_id)
+        state = trk.get_state_estimation()
+        if state == None:
+            state = trk.get_most_recent_element()
+            # continue
 
+        yb = state.get_attributes()
+        c, bbx, img_fn, pt = yb.class_id, yb.bbox, yb.img_filename, yb.parent_track
+        # print("filename",filename)
+        nyb = YoloBox(c, bbx, filename,self.parent_agent.get_clock(), parent_track=pt, is_prediction=bool(True))
+        # nyb.is_prediction = bool(True)
+        det = Detection(state.position, nyb)
+        trk.add_new_prediction(det)
+    
     def get_last_detections(self):
         if not self.has_active_tracks():
             return []
@@ -386,10 +405,21 @@ class ObjectTrackManager:
             for i in range(max_rot):
                 # pass over active tracks
                 if self.active_tracks[-1].is_alive(fc, self.track_lifespan):
+                    if self.active_tracks[-1].is_stale(fc):
+                        if PREDICTION:
+                            # print("inserting prediction")
+
+                            self.insert_prediction(
+                                self.active_tracks[-1].track_id,
+                                fc,
+                                self.filenames[fc - 1],
+                            )
                     self.active_tracks.rotate()
                 else:
                     # reap tracks which are no longer active
                     self.inactive_tracks.append(self.active_tracks.pop())
+        if not self.has_active_tracks():
+            self.parent_agent.IS_DEAD = True
 
     def export_loco_fmt(self):
         """
@@ -400,7 +430,7 @@ class ObjectTrackManager:
         # construct "images" : []
         imgs = []
         for i, f in enumerate(self.filenames):
-            fdict[f"{f[:-3]}png"] = i
+            fdict[f"{f[:-3]}jpg"] = i
         # construct "images" : []
         imgs = []
         for k, v in fdict.items():

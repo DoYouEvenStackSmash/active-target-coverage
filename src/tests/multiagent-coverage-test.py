@@ -31,8 +31,9 @@ def wave_test(screen, environment, imwaves, measurement_rate=1):
     marked_pts = []
     for i in range(1, len(imwaves), measurement_rate):
         # if i > measurement_rate:
-        pafn.clear_frame(screen)
+        
         for j in range(measurement_rate):
+            pafn.clear_frame(screen)
             environment_agent_update(environment, True)
             
             # if i > measurement_rate * 2:
@@ -95,7 +96,7 @@ def main():
         imwaves.append([k, v])
 
     # initialize environment
-    env = init_environment(sensing_agents=sensing_agents)
+    env = init_environment()#sensing_agents=sensing_agents)
     target_arr = []
     for w in range(len(imwaves[0][1])):
         target = imwaves[0][1][w]
@@ -103,7 +104,7 @@ def main():
         target_arr[-1].attributes = target
     env.targets = target_arr
     env.target_coverage(imwaves[0][0], int(sys.argv[-1]))
-    environment_agent_update(env, True)
+    # environment_agent_update(env, True)
     # environment_agent_update(env, True)
     wave_test(screen, env, imwaves, int(sys.argv[-1]))
 

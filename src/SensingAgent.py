@@ -63,6 +63,7 @@ class SensingAgent:
         rotation_flag=True,
         translation_flag=True,
         prediction_flag=True,
+        dead_flag=False
     ):
         """Initializes a SensingAgent instance.
 
@@ -83,6 +84,7 @@ class SensingAgent:
         self.ALLOW_ROTATION = rotation_flag
         self.ALLOW_TRANSLATION = translation_flag
         self.ALLOW_PREDICTION = prediction_flag
+        self.IS_DEAD = dead_flag
 
     def get_clock(self):
         """accessor for clock"""
@@ -326,7 +328,7 @@ class SensingAgent:
                 class_id=a.get_id(),
                 bbox=bbox,
                 img_filename=frame_id,
-                state_id=curr_state,
+                # state_id=curr_state,
             )
             posn = Position(val[0], val[1])
             detections.append(Detection(posn, yb))

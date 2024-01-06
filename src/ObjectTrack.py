@@ -60,6 +60,8 @@ class ObjectTrack:
         parent_agent=None,
         path=None,
         predictions=None,
+        prediction_posns = None,
+        detection_posns = None,
         color=None,
         last_frame=-1,
     ):
@@ -105,6 +107,8 @@ class ObjectTrack:
         self.parent_agent = None
 
         self.path = path if path != None else []
+        self.prediction_posns = prediction_posns if prediction_posns != None else []
+        self.detection_posns = detection_posns if detection_posns != None else []
         self.predictions = predictions if predictions != None else []
 
         self.color = (color if color != None else rand_color(),)
@@ -116,11 +120,6 @@ class ObjectTrack:
         """
         self.clock += 1
 
-    def add_new_prediction(self, pred):
-        """
-        Wrapper for object track adding its own prediction
-        """
-        pass
 
     def predict_next_state(self, steps=1):
         """
@@ -130,7 +129,7 @@ class ObjectTrack:
         scale_factor = min(
             MAX_SCALE_FACTOR,
             (self.parent_agent.get_clock() - self.detection_idx[-1])
-            / self.avg_detection_time,
+            / max(self.avg_detection_time,1),
         )
         avg_window_len = self.parent_agent.obj_tracker.avg_window_len
         return self.estimate_next_position(scale_factor, avg_window_len)
@@ -168,6 +167,15 @@ class ObjectTrack:
             Expiration (int): lifetime of the track
         """
         return bool(fc - self.last_frame < expiration)
+    
+    def is_stale(self, fc):
+        """
+        Check whether a track is stale
+        """
+        # print(fc - self.last_frame)
+        if self.last_frame == -1:
+            return False
+        return bool(fc - self.last_frame > 1)
 
     def link_path(self):
         """
@@ -183,6 +191,11 @@ class ObjectTrack:
         """
         return len(self.path)
 
+    def get_most_recent_element(self):
+        if len(self.path) > 0:
+            return self.path[-1]
+        return None
+    
     def get_last_detection(self):
         """
         Accessor for getting the last detection in a track
@@ -198,6 +211,23 @@ class ObjectTrack:
         """
         if len(self.path) > 0:
             return self.path[-1].get_cartesian_coord()
+        return None
+    
+    def get_last_prediction(self):
+        """
+        Accessor for getting the last prediction in a track
+        returns a prediction
+        """
+        if len(self.prediction_posns):
+            return self.path[self.prediction_posns[-1] - 1]
+        return None
+
+    def get_last_prediction_coordinate(self):
+        """
+        Accessor for the coordinate of the last prediction
+        """
+        if len(self.path) > 0:
+            return self.path[self.prediction_posns[-1]].get_cartesian_coord()
         return None
 
     def get_loco_track(self, fdict=None, steps=None):
@@ -244,6 +274,7 @@ class ObjectTrack:
 
         # set detection time
         self.detection_idx.append(self.parent_agent.get_clock())
+        self.detection_posns.append(len(self.path))
 
         if len(self.path):
             self.detection_time = (
@@ -254,6 +285,18 @@ class ObjectTrack:
 
         self.error_over_time.append(error)
         self.path.append(detection)
+
+    def add_new_prediction(self, prediction):
+        """
+        Add a prediction to the object track
+        """
+
+        self.prediction_posns.append(len(self.path))
+        # if len(self.path):
+        #     self.update_track_trajectory(prediction)
+        self.error_over_time.append(-1)
+        # self.confidence.append( 1 - (self.clock - self.detection_idx[-1]) / self.avg_detection_time)
+        self.path.append(prediction)
 
     def update_track_trajectory(self, det, displacement=None):
         """
@@ -329,12 +372,13 @@ class ObjectTrack:
 
         pass
 
-    def estimate_next_position(self, scale_factor=1, avg_window_len=1):
+    def estimate_next_position(self, scale_factor=1, avg_window_len=0):
         """
         Estimate position of next detection using trajectory components
         Returns a Detection
         """
-        last_pos = self.get_last_detection()
+        # last_pos = self.get_last_detection()
+        last_pos = self.get_most_recent_element()
 
         angle = self.predict_theta(scale_factor, avg_window_len)
         # velocity
@@ -343,7 +387,7 @@ class ObjectTrack:
         pt = mfn.pol2car(
             last_pos.get_cartesian_coord(),
             velocity,
-            adjust_angle(adjust_angle(angle)),
+            adjust_angle(angle),
         )
 
         # map cartesian coordinates to sensor coordinates

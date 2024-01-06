@@ -109,7 +109,7 @@ class AnnotationLoader:
             b = s[i].split()
             bx = [float(val) for val in b[2:]]
             cbx = YoloBox.conv_yolox_bbox(bx)
-            yoloboxes.append(YoloBox(float(b[0]), cbx, valid_file, float(b[1])))
+            yoloboxes.append(YoloBox(float(b[0]), cbx, valid_file, confidence=float(b[1])))
 
         return yoloboxes
 

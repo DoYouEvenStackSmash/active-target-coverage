@@ -49,7 +49,9 @@ def main():
     pafn.clear_frame(screen)
 
     # initialize agent
-    sa = init_sensing_agent(origin=(50, 400), width=np.pi / 2, radius=300)
+    sa = init_sensing_agent(origin=(50, 400), width=np.pi / 2, radius=200)
+    sa.track_lifespan=15
+    
     sa.heartbeat()
     sa.obj_tracker.avg_window_len = 2
 
