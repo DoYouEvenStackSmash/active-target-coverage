@@ -81,7 +81,7 @@ def main():
     sa.track_lifespan=15
     sa._id = 0
     sa.heartbeat()
-    sa.avg_window_len = 4
+    sa.obj_tracker.avg_window_len = 4
     sa.ALLOW_PREDICTION = True
     # sa.ALLOW_TRANSLATION = False
     # sa.ALLOW_ROTATION = False
